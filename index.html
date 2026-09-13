@@ -47,8 +47,8 @@
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#2f6b4f" />
 
-  <link rel="icon" type="image/png" href="assets/papel_ ivo_preto.png" />
-  <link rel="apple-touch-icon" href="assets/papel_ ivo_preto.png" />
+  <link rel="icon" type="image/png" href="assets/papel_ivo_preto.png" />
+  <link rel="apple-touch-icon" href="assets/papel_ivo_preto.png" />
 
   <style>
     @media (min-width: 769px) {
@@ -159,44 +159,105 @@
 
 <body class="bg-bgSoft text-textDark">
   <header
-    class="glass fixed top-0 w-full z-[100] px-4 md:px-6 py-3 md:py-4 flex justify-between items-center border-b border-primary/10">
-    <div class="flex items-center gap-3 group cursor-pointer shrink-0"
-      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
-      <div class="relative">
-        <div
-          class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-20 group-hover:opacity-60 transition duration-1000">
-        </div>
-        <div
-          class="relative h-12 w-12 md:h-14 lg:h-16 md:w-14 lg:w-16 rounded-full border-2 border-white shadow-soft bg-white flex items-center justify-center overflow-hidden">
-          <img src="assets/papel_ ivo_preto.png" alt="Ivo Pita Joias" class="w-full h-full object-cover rounded-full" />
-        </div>
+  class="glass fixed top-0 w-full z-[100] px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-3 md:gap-6 border-b border-primary/10">
+  <!-- LOGO + NOME (esquerda) -->
+  <div class="flex items-center gap-3 group cursor-pointer shrink-0"
+    onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+    <div class="relative">
+      <div
+        class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-20 group-hover:opacity-60 transition duration-1000">
       </div>
-      <div class="flex flex-col leading-tight">
-        <h1 class="font-black text-2xl md:text-3xl lg:text-4xl text-primary tracking-tighter font-serif">IVO PITA</h1>
-        <span class="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-gold opacity-90">Indústria de
-          Joias</span>
+      <div
+        class="relative h-12 w-12 md:h-14 lg:h-16 md:w-14 lg:w-16 rounded-full border-2 border-white shadow-soft bg-white flex items-center justify-center overflow-hidden">
+        <img src="assets/papel_ivo_preto.png" alt="Ivo Pita Joias" class="w-full h-full object-cover rounded-full" />
       </div>
     </div>
+    <div class="flex flex-col leading-tight hidden sm:flex">
+      <h1 class="font-black text-2xl md:text-3xl lg:text-4xl text-primary tracking-tighter font-serif">IVO PITA</h1>
+      <span class="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-gold opacity-90">Indústria de
+        Joias</span>
+    </div>
+  </div>
 
-    <div class="flex items-center gap-1 md:gap-4 shrink-0">
-      <button id="cart-btn"
-        class="relative bg-primary text-white p-3 md:p-2.5 rounded-xl md:rounded-full hover:bg-primaryDark transition shadow-card active:scale-95">
-        <i class="fas fa-shopping-bag text-lg md:text-base"></i>
-        <span id="cart-count"
-          class="absolute -top-1 -right-1 bg-white text-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">0</span>
-      </button>
-      <button id="mobile-menu-btn"
-        class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
-        <i class="fa-solid fa-bars-staggered text-xl"></i>
-      </button>
+  <!-- BARRA DE BUSCA (centro) -->
+  <div class="flex-1 max-w-2xl hidden md:block">
+    <div class="relative">
+      <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-textMuted text-sm"></i>
+      <input type="text" id="search-input-desktop"
+        placeholder="Buscar por nome ou referência..."
+        class="w-full pl-10 pr-4 py-2.5 rounded-full border border-primary/20 bg-bgSoft text-sm outline-none transition-all focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/15" />
     </div>
+  </div>
+
+  <!-- BOTÕES (direita) -->
+  <div class="flex items-center gap-1 md:gap-4 shrink-0">
+    <!-- Busca mobile (abre overlay) -->
+    <button id="mobile-search-btn"
+      class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
+      <i class="fas fa-search text-xl"></i>
+    </button>
+
+    <button id="cart-btn"
+      class="relative bg-primary text-white p-3 md:p-2.5 rounded-xl md:rounded-full hover:bg-primaryDark transition shadow-card active:scale-95">
+      <i class="fas fa-shopping-bag text-lg md:text-base"></i>
+      <span id="cart-count"
+        class="absolute -top-1 -right-1 bg-white text-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">0</span>
+    </button>
+
+    <button id="mobile-menu-btn"
+      class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
+      <i class="fa-solid fa-bars-staggered text-xl"></i>
+    </button>
+  </div>
+
   </header>
 
+  <!-- BARRA MARQUEE PROMOCIONAL -->
+  <div class="marquee-bar">
+    <div class="marquee-track">
+      <span class="marquee-item marquee-item-accent">
+        <i class="fa-solid fa-crown"></i> Frete Grátis acima de R$ 3.500
+      </span>
+      <span class="marquee-item">
+        <i class="fa-solid fa-truck-fast"></i> Enviamos para todo o Brasil
+      </span>
+      <span class="marquee-item marquee-item-accent">
+        <i class="fa-solid fa-gem"></i> Joias Folheadas a Ouro e Prata
+      </span>
+      <span class="marquee-item">
+        <i class="fa-solid fa-percent"></i> 5% OFF no PIX
+      </span>
+      <span class="marquee-item marquee-item-accent">
+        <i class="fa-brands fa-instagram"></i> @ivopita
+      </span>
+      <span class="marquee-item">
+        <i class="fa-solid fa-star"></i> Qualidade e Elegância
+      </span>
+      <span class="marquee-item marquee-item-accent">
+        <i class="fa-solid fa-crown"></i> Frete Grátis acima de R$ 3.500
+      </span>
+      <span class="marquee-item">
+        <i class="fa-solid fa-truck-fast"></i> Enviamos para todo o Brasil
+      </span>
+      <span class="marquee-item marquee-item-accent">
+        <i class="fa-solid fa-gem"></i> Joias Folheadas a Ouro e Prata
+      </span>
+      <span class="marquee-item">
+        <i class="fa-solid fa-percent"></i> 5% OFF no PIX
+      </span>
+      <span class="marquee-item marquee-item-accent">
+        <i class="fa-brands fa-instagram"></i> @ivopita
+      </span>
+      <span class="marquee-item">
+        <i class="fa-solid fa-star"></i> Qualidade e Elegância
+      </span>
+    </div>
+  </div>
+
   <!-- MENU DESKTOP -->
-  <div id="navbar-desktop" class="hidden md:block bg-white shadow-card mt-20 border-b border-primary/5"
-    style="position: relative; z-index: 999; overflow: visible;">
+  <div id="navbar-desktop" class="hidden md:block bg-white shadow-card border-b border-primary/5">
     <div class="max-w-7xl mx-auto px-4">
-      <nav class="flex items-center gap-1 py-3 no-scrollbar" style="overflow: visible !important;">
+      <nav class="flex items-center justify-center gap-2 py-3 no-scrollbar flex-wrap" style="overflow: visible !important;">
 
         <button
           class="menu-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 bg-primary text-white shadow-md hover:shadow-lg hover:scale-105 whitespace-nowrap"
@@ -208,44 +269,33 @@
         <div class="dropdown-categoria relative group">
           <button
             class="menu-item-dropdown px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:bg-amber-50 text-amber-700 hover:text-amber-800 flex items-center gap-1 whitespace-nowrap">
-            <i class="fa-solid fa-crown text-amber-500 text-xs"></i>Dourado
+            <i class="fa-solid fa-crown text-amber-500 text-xs"></i>Folheado Dourado
             <i class="fa-solid fa-chevron-down text-[9px] ml-0.5 transition-transform duration-300 text-amber-400"></i>
           </button>
           <div class="dropdown-menu-categoria">
             <div class="dropdown-grid">
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Argolas</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas dourada pequena')">Argolas
-                  Pequenas</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas dourada média')">Argolas
-                  Médias</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas dourada grande')">Argolas
-                  Grandes</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas dourada click')">Argolas de
-                  Click</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas dourada pequena')">Argolas Pequenas</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas dourada média')">Argolas Médias</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas dourada grande')">Argolas Grandes</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas dourada click')">Argolas de Click</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Brincos</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('brinco de pressão dourado')">Brinco de
-                  pressão</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('brincos de moda dourado')">Brincos de
-                  moda</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('brinco de pressão dourado')">Brinco de pressão</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('brincos de moda dourado')">Brincos de moda</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Correntes</span>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('correntes masculina dourado')">Masculina</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('correntes feminina dourado')">Feminina</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('correntes masculina dourado')">Masculina</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('correntes feminina dourado')">Feminina</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Pulseiras</span>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('pulseiras feminina dourado')">Feminina</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('pulseiras masculina dourado')">Masculina</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('pulseiras infantil dourado')">Infantil</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pulseiras feminina dourado')">Feminina</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pulseiras masculina dourado')">Masculina</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pulseiras infantil dourado')">Infantil</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Pingentes</span>
@@ -253,10 +303,8 @@
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Tornozeleiras</span>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('tornozeleiras feminina dourado')">Feminina</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('tornozeleiras infantil dourado')">Infantil</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('tornozeleiras feminina dourado')">Feminina</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('tornozeleiras infantil dourado')">Infantil</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Terço</span>
@@ -264,10 +312,8 @@
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Braceletes</span>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('braceletes feminino dourado')">Feminino</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('braceletes masculino dourado')">Masculino</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('braceletes feminino dourado')">Feminino</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('braceletes masculino dourado')">Masculino</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Anéis</span>
@@ -280,17 +326,13 @@
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Conjuntos</span>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('conjuntos brinco colar dourado')">Brinco +
-                  Colar</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('conjuntos completo dourado')">Completo</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('conjuntos brinco colar dourado')">Brinco + Colar</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('conjuntos completo dourado')">Completo</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Colar</span>
                 <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('colar feminino dourado')">Feminino</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('colar masculino dourado')">Masculino</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('colar masculino dourado')">Masculino</a>
                 <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('colar infantil dourado')">Infantil</a>
               </div>
             </div>
@@ -301,44 +343,33 @@
         <div class="dropdown-categoria relative group">
           <button
             class="menu-item-dropdown px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:bg-slate-100 text-slate-600 hover:text-slate-800 flex items-center gap-1 whitespace-nowrap">
-            <i class="fa-regular fa-gem text-slate-400 text-xs"></i>Prata
+            <i class="fa-regular fa-gem text-slate-400 text-xs"></i>Folheado Prata
             <i class="fa-solid fa-chevron-down text-[9px] ml-0.5 transition-transform duration-300 text-slate-300"></i>
           </button>
           <div class="dropdown-menu-categoria">
             <div class="dropdown-grid">
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Argolas</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas prateada pequena')">Argolas
-                  Pequenas</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas prateada média')">Argolas
-                  Médias</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas prateada grande')">Argolas
-                  Grandes</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas prateada click')">Argolas de
-                  Click</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas prateada pequena')">Argolas Pequenas</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas prateada média')">Argolas Médias</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas prateada grande')">Argolas Grandes</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas prateada click')">Argolas de Click</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Brincos</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('brinco de pressão prata')">Brinco de
-                  pressão</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('brincos de moda prata')">Brincos de
-                  moda</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('brinco de pressão prata')">Brinco de pressão</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('brincos de moda prata')">Brincos de moda</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Correntes</span>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('correntes masculina prata')">Masculina</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('correntes feminina prata')">Feminina</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('correntes masculina prata')">Masculina</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('correntes feminina prata')">Feminina</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Pulseiras</span>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('pulseiras feminina prata')">Feminina</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('pulseiras masculina prata')">Masculina</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('pulseiras infantil prata')">Infantil</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pulseiras feminina prata')">Feminina</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pulseiras masculina prata')">Masculina</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pulseiras infantil prata')">Infantil</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Pingentes</span>
@@ -346,10 +377,8 @@
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Tornozeleiras</span>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('tornozeleiras feminina prata')">Feminina</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('tornozeleiras infantil prata')">Infantil</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('tornozeleiras feminina prata')">Feminina</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('tornozeleiras infantil prata')">Infantil</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Terço</span>
@@ -357,10 +386,8 @@
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Braceletes</span>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('braceletes feminino prata')">Feminino</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('braceletes masculino prata')">Masculino</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('braceletes feminino prata')">Feminino</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('braceletes masculino prata')">Masculino</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Anéis</span>
@@ -373,10 +400,8 @@
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Conjuntos</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('conjuntos brinco colar prata')">Brinco
-                  + Colar</a>
-                <a href="#"
-                  onclick="event.preventDefault(); filtrarPorCategoria('conjuntos completo prata')">Completo</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('conjuntos brinco colar prata')">Brinco + Colar</a>
+                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('conjuntos completo prata')">Completo</a>
               </div>
               <div class="dropdown-group">
                 <span class="dropdown-group-title">Colar</span>
@@ -388,44 +413,8 @@
           </div>
         </div>
 
-        <button
-          class="menu-item-simple px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 text-slate-600 hover:text-primary hover:bg-primary/5 whitespace-nowrap"
-          onclick="filtrarPorCategoria('aneis')">Anéis</button>
-        <button
-          class="menu-item-simple px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 text-slate-600 hover:text-primary hover:bg-primary/5 whitespace-nowrap"
-          onclick="filtrarPorCategoria('brincos')">Brincos</button>
-        <button
-          class="menu-item-simple px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 text-slate-600 hover:text-primary hover:bg-primary/5 whitespace-nowrap"
-          onclick="filtrarPorCategoria('correntes')">Correntes</button>
-        <button
-          class="menu-item-simple px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 text-slate-600 hover:text-primary hover:bg-primary/5 whitespace-nowrap"
-          onclick="filtrarPorCategoria('pulseiras')">Pulseiras</button>
-        <button
-          class="menu-item-simple px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 text-slate-600 hover:text-primary hover:bg-primary/5 whitespace-nowrap"
-          onclick="filtrarPorCategoria('colares')">Colares</button>
-        <button
-          class="menu-item-simple px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 text-slate-600 hover:text-primary hover:bg-primary/5 whitespace-nowrap"
-          onclick="filtrarPorCategoria('gargantilhas')">Gargantilhas</button>
-        <button
-          class="menu-item-simple px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 text-slate-600 hover:text-primary hover:bg-primary/5 whitespace-nowrap"
-          onclick="filtrarPorCategoria('pingentes')">Pingentes</button>
-        <button
-          class="menu-item-simple px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 text-slate-600 hover:text-primary hover:bg-primary/5 whitespace-nowrap"
-          onclick="filtrarPorCategoria('braceletes')">Braceletes</button>
-        <button
-          class="menu-item-simple px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 text-slate-600 hover:text-primary hover:bg-primary/5 whitespace-nowrap"
-          onclick="filtrarPorCategoria('religiosos')">Religiosos</button>
-
       </nav>
-
-      <div class="search-container py-3">
-        <div class="relative">
-          <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-textMuted text-sm"></i>
-          <input type="text" id="search-input-desktop" placeholder="Buscar por nome ou referência..."
-            class="search-input pl-10" />
-        </div>
-      </div>
-    </div>
+  </div>
   </div>
 
   <!-- BUSCA MOBILE -->
@@ -446,7 +435,7 @@
     <div class="p-6 border-b border-primary/10 flex justify-between items-center bg-bgSoft">
       <div class="flex items-center gap-3">
         <div class="h-10 w-10 rounded-full overflow-hidden bg-white shadow-sm">
-          <img src="assets/logo_wrjoias.png" alt="WRJ Joias" class="w-full h-full object-cover" />
+          <img src="assets/papel_ivo_preto.png" alt="Ivo Pita Joias" class="w-full h-full object-cover" />
         </div>
         <div class="flex flex-col">
           <span class="text-primary font-black text-xl tracking-tighter font-serif">IVO PITA</span>
@@ -474,8 +463,7 @@
           <button
             class="w-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-amber-50/80 to-transparent hover:from-amber-100 text-amber-800 font-bold transition-all duration-300 border border-amber-200/30 hover:border-amber-400"
             onclick="toggleSubmenuMobile(this)">
-            <span class="flex items-center gap-3"><i class="fa-solid fa-crown text-amber-600"></i> Folheado
-              Dourado</span>
+            <span class="flex items-center gap-3"><i class="fa-solid fa-crown text-amber-600"></i> Folheado Dourado</span>
             <i class="fa-solid fa-chevron-down text-[10px] opacity-50 transition-transform duration-300"></i>
           </button>
           <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-300/40 pl-3 hidden">
@@ -483,180 +471,121 @@
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i>
-                  Argolas</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i> Argolas</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300"
-                  data-categoria="argolas dourada pequena">Argolas Pequenas</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300"
-                  data-categoria="argolas dourada média">Argolas Médias</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300"
-                  data-categoria="argolas dourada grande">Argolas Grandes</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300"
-                  data-categoria="argolas dourada click">Argolas de Click</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="argolas dourada pequena">Argolas Pequenas</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="argolas dourada média">Argolas Médias</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="argolas dourada grande">Argolas Grandes</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="argolas dourada click">Argolas de Click</button>
               </div>
             </div>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-gem text-amber-500 text-xs"></i>
-                  Brincos</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-gem text-amber-500 text-xs"></i> Brincos</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300"
-                  data-categoria="brinco de pressão dourado">Brinco de pressão</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300"
-                  data-categoria="brincos de moda dourado">Brincos de moda</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="brinco de pressão dourado">Brinco de pressão</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="brincos de moda dourado">Brincos de moda</button>
               </div>
             </div>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-solid fa-link text-amber-500 text-xs"></i>
-                  Correntes</span>
+                <span class="flex items-center gap-3"><i class="fa-solid fa-link text-amber-500 text-xs"></i> Correntes</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300"
-                  data-categoria="correntes masculina dourado">Masculina</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300"
-                  data-categoria="correntes feminina dourado">Feminina</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="correntes masculina dourado">Masculina</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="correntes feminina dourado">Feminina</button>
               </div>
             </div>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-clock text-amber-500 text-xs"></i>
-                  Pulseiras</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-clock text-amber-500 text-xs"></i> Pulseiras</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300"
-                  data-categoria="pulseiras feminina dourado">Feminina</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300"
-                  data-categoria="pulseiras masculina dourado">Masculina</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300"
-                  data-categoria="pulseiras infantil dourado">Infantil</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="pulseiras feminina dourado">Feminina</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="pulseiras masculina dourado">Masculina</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="pulseiras infantil dourado">Infantil</button>
               </div>
             </div>
-            <button
-              class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 transition-all duration-300"
-              data-categoria="pingentes dourado">
+            <button class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 transition-all duration-300" data-categoria="pingentes dourado">
               <i class="fa-regular fa-star text-amber-500 text-xs"></i> Pingentes (Diversos)
             </button>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i>
-                  Tornozeleiras</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i> Tornozeleiras</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500"
-                  data-categoria="tornozeleiras feminina dourado">Feminina</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500"
-                  data-categoria="tornozeleiras infantil dourado">Infantil</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="tornozeleiras feminina dourado">Feminina</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="tornozeleiras infantil dourado">Infantil</button>
               </div>
             </div>
-            <button
-              class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 transition-all duration-300"
-              data-categoria="terço dourado">
+            <button class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 transition-all duration-300" data-categoria="terço dourado">
               <i class="fa-solid fa-cross text-amber-500 text-xs"></i> Terço (Diversos)
             </button>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i>
-                  Braceletes</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i> Braceletes</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500"
-                  data-categoria="braceletes feminino dourado">Feminino</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500"
-                  data-categoria="braceletes masculino dourado">Masculino</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="braceletes feminino dourado">Feminino</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="braceletes masculino dourado">Masculino</button>
               </div>
             </div>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i>
-                  Anéis</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i> Anéis</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500"
-                  data-categoria="aneis adulto dourado">Adulto</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500"
-                  data-categoria="aneis infantil dourado">Infantis</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="aneis adulto dourado">Adulto</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="aneis infantil dourado">Infantis</button>
               </div>
             </div>
-            <button
-              class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 transition-all duration-300"
-              data-categoria="escapulário dourado">
+            <button class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 transition-all duration-300" data-categoria="escapulário dourado">
               <i class="fa-solid fa-pray text-amber-500 text-xs"></i> Escapulário (Diversos)
             </button>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i>
-                  Conjuntos</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i> Conjuntos</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500"
-                  data-categoria="conjuntos brinco colar dourado">Brinco + Colar</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500"
-                  data-categoria="conjuntos completo dourado">Completo</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="conjuntos brinco colar dourado">Brinco + Colar</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="conjuntos completo dourado">Completo</button>
               </div>
             </div>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-solid fa-link text-amber-500 text-xs"></i>
-                  Colar</span>
+                <span class="flex items-center gap-3"><i class="fa-solid fa-link text-amber-500 text-xs"></i> Colar</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500"
-                  data-categoria="colar feminino dourado">Feminino</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500"
-                  data-categoria="colar masculino dourado">Masculino</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500"
-                  data-categoria="colar infantil dourado">Infantil</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="colar feminino dourado">Feminino</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="colar masculino dourado">Masculino</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="colar infantil dourado">Infantil</button>
               </div>
             </div>
           </div>
@@ -675,180 +604,121 @@
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i>
-                  Argolas</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i> Argolas</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="argolas prateada pequena">Argolas Pequenas</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="argolas prateada média">Argolas Médias</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="argolas prateada grande">Argolas Grandes</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="argolas prateada click">Argolas de Click</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="argolas prateada pequena">Argolas Pequenas</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="argolas prateada média">Argolas Médias</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="argolas prateada grande">Argolas Grandes</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="argolas prateada click">Argolas de Click</button>
               </div>
             </div>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-gem text-slate-400 text-xs"></i>
-                  Brincos</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-gem text-slate-400 text-xs"></i> Brincos</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="brinco de pressão prata">Brinco de pressão</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="brincos de moda prata">Brincos de moda</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="brinco de pressão prata">Brinco de pressão</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="brincos de moda prata">Brincos de moda</button>
               </div>
             </div>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-solid fa-link text-slate-400 text-xs"></i>
-                  Correntes</span>
+                <span class="flex items-center gap-3"><i class="fa-solid fa-link text-slate-400 text-xs"></i> Correntes</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="correntes masculina prata">Masculina</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="correntes feminina prata">Feminina</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="correntes masculina prata">Masculina</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="correntes feminina prata">Feminina</button>
               </div>
             </div>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-clock text-slate-400 text-xs"></i>
-                  Pulseiras</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-clock text-slate-400 text-xs"></i> Pulseiras</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="pulseiras feminina prata">Feminina</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="pulseiras masculina prata">Masculina</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="pulseiras infantil prata">Infantil</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="pulseiras feminina prata">Feminina</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="pulseiras masculina prata">Masculina</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="pulseiras infantil prata">Infantil</button>
               </div>
             </div>
-            <button
-              class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600"
-              data-categoria="pingentes prata">
+            <button class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600" data-categoria="pingentes prata">
               <i class="fa-regular fa-star text-slate-400 text-xs"></i> Pingentes (Diversos)
             </button>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i>
-                  Tornozeleiras</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i> Tornozeleiras</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="tornozeleiras feminina prata">Feminina</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="tornozeleiras infantil prata">Infantil</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="tornozeleiras feminina prata">Feminina</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="tornozeleiras infantil prata">Infantil</button>
               </div>
             </div>
-            <button
-              class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600"
-              data-categoria="terço prata">
+            <button class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600" data-categoria="terço prata">
               <i class="fa-solid fa-cross text-slate-400 text-xs"></i> Terço (Diversos)
             </button>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i>
-                  Braceletes</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i> Braceletes</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="braceletes feminino prata">Feminino</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="braceletes masculino prata">Masculino</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="braceletes feminino prata">Feminino</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="braceletes masculino prata">Masculino</button>
               </div>
             </div>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i>
-                  Anéis</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i> Anéis</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="aneis adulto prata">Adulto</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="aneis infantil prata">Infantis</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="aneis adulto prata">Adulto</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="aneis infantil prata">Infantis</button>
               </div>
             </div>
-            <button
-              class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600"
-              data-categoria="escapulário prata">
+            <button class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600" data-categoria="escapulário prata">
               <i class="fa-solid fa-pray text-slate-400 text-xs"></i> Escapulário (Diversos)
             </button>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i>
-                  Conjuntos</span>
+                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i> Conjuntos</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="conjuntos brinco colar prata">Brinco + Colar</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="conjuntos completo prata">Completo</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="conjuntos brinco colar prata">Brinco + Colar</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="conjuntos completo prata">Completo</button>
               </div>
             </div>
             <div class="space-y-1">
               <button
                 class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
                 onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-solid fa-link text-slate-400 text-xs"></i>
-                  Colar</span>
+                <span class="flex items-center gap-3"><i class="fa-solid fa-link text-slate-400 text-xs"></i> Colar</span>
                 <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
               </button>
               <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="colar feminino prata">Feminino</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="colar masculino prata">Masculino</button>
-                <button
-                  class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500"
-                  data-categoria="colar infantil prata">Infantil</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="colar feminino prata">Feminino</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="colar masculino prata">Masculino</button>
+                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="colar infantil prata">Infantil</button>
               </div>
             </div>
           </div>
@@ -857,7 +727,7 @@
         <hr class="my-6 border-primary/10" />
         <a href="#sobre-empresa" id="link-sobre-mobile"
           class="w-full flex items-center gap-3 p-4 text-textMuted font-medium hover:text-primary transition-all duration-300">
-          <i class="fa-solid fa-circle-info"></i> IVO PITA
+          <i class="fa-solid fa-circle-info"></i> Sobre Ivo Pita
         </a>
       </nav>
     </div>
@@ -869,7 +739,8 @@
     </div>
   </div>
 
-  <section id="destaques" class="px-4 max-w-7xl mx-auto mt-28 mb-10 md:mt-4 md:mb-20">
+  <!--DESTAQUES-->
+ <section id="destaques" class="px-4 max-w-7xl mx-auto mt-4 mb-10 md:mt-4 md:mb-20">
     <div class="flex items-center justify-between mb-8">
       <h2 class="text-3xl md:text-4xl font-black tracking-tight font-serif text-accent">✨ Peças em Destaque</h2>
     </div>
@@ -880,7 +751,8 @@
     </div>
   </section>
 
-  <section id="hero" class="relative w-full h-[70vh] md:h-[85vh] overflow-hidden">
+  <!--BANNER-->
+  <section id="hero" class="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden bg-accent">
     <div class="swiper heroSwiper w-full h-full">
       <div class="swiper-wrapper"></div>
       <div class="swiper-pagination"></div>
