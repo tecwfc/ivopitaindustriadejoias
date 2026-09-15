@@ -9,9 +9,27 @@ const PRODUCTS_CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vTLGpr
 
 const BANNERS_CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vTLGpr1Vi2afbBxo2PfBx4CsKMxP_rDE0Rxhv4GZOeXh9tE693kakJocngzxL45rKhWZEQTquFt7KwA/pub?gid=2105649966&single=true&output=csv`;
 
-const ESTOQUE_API_URL =
-  "https://script.google.com/macros/s/AKfycbwls81nQKpHuFhvLpSqhfsXDn9nu4scA0Gf4qqS5skA3Rd84Nxp5rW_AbDOGmRb0TKguw/exec";
+const ESTOQUE_API_URL = "https://script.google.com/macros/s/AKfycbyb-HcYkxf4XyQRMNZ68zs4Tpbf7Q_Pzb8gd2kUI5fpaeFcdRG13zxzbhHTXfC9MD8yWw/exec";
 
+
+  // Logo após "let subtotal = 0;" e antes do "const FRETE_GRATIS_VALOR":
+  let siteConfig = {
+  whatsapp: "5588999049636",
+  whatsappDisplay: "(88) 99904-9636",
+  // instagram: "ivo_pita",
+  // instagramDisplay: "@ivopita",
+  email: "contato@ivopita.com.br",
+  endereco: "Juazeiro do Norte, CE",
+  telefone: "(88) 99909-9999",
+  sobreTexto: "A IVO PITA nasceu para celebrar momentos especiais com peças que unem design sofisticado e materiais nobres.",
+  freteGratisValor: 3500,
+  taxaFrete: 15,
+  pixDesconto: 5
+};
+
+// Trocar as constantes por variáveis (não pode mais ser const)
+let FRETE_GRATIS_VALOR = 3500;
+let TAXA_FRETE = 75;
 // ============================================
 // VARIÁVEIS GLOBAIS
 // ============================================
@@ -22,8 +40,6 @@ let tempProduct = null;
 let destaquesSwiper = null;
 let heroSwiper = null;
 let subtotal = 0;
-const FRETE_GRATIS_VALOR = 3500;
-const TAXA_FRETE = 15;
 let imagensZoom = [];
 let zoomIndex = 0;
 
@@ -554,6 +570,8 @@ async function loadProducts() {
     if (data.error) throw new Error(data.error);
 
     allProducts = data.produtos || [];
+    aplicarConfig(data.config || {});
+    renderizarMarquee(data.marquee || []);
 
     allProducts = allProducts.map((p) => {
       if (!p["Saldo Estoque"]) {
@@ -651,8 +669,8 @@ function renderProducts(products) {
                      onerror="this.src='https://via.placeholder.com/400?text=Sem+Imagem'"
                      onclick="abrirZoomDireto('${p["Imagem"]}')">
                 ${estoque <= 0 ? '<div class="product-card-sold-out"><span>ESGOTADO</span></div>' : ""}
-                //////${!temCores && estoque > 0 ? '<span class="product-card-tag-unico">Pronta Entrega</span>' : ""}
-            </div>
+            
+                </div>
             <div class="product-card-content">
                 <h3 class="product-card-title">${p["Nome do Produto"]}</h3>
                 ${p["referencia"] ? `<p class="product-card-ref">Ref: ${p["referencia"]}</p>` : ""}
@@ -665,7 +683,7 @@ function renderProducts(products) {
     container.appendChild(card);
   });
 }
-
+/////${!temCores && estoque > 0 ? '<span class="product-card-tag-unico">Pronta Entrega</span>' : ""}
 // ============================================
 // RENDERIZAR DESTAQUES
 // ============================================
@@ -744,6 +762,90 @@ function renderDestaques(products) {
   });
 }
 
+// ============================================
+// MARQUEE DINÂMICO
+// ============================================
+function renderizarMarquee(items) {
+  const track = document.getElementById('marquee-track');
+  if (!track) return;
+
+  // Fallback: se não vier nada do admin, usa frases padrão
+  if (!items || items.length === 0) {
+    items = [
+      { texto: "Frete Grátis acima de R$ 3.500", icone: "fa-solid fa-crown", cor: "dourado" },
+      { texto: "Enviamos para todo o Brasil", icone: "fa-solid fa-truck-fast", cor: "branco" },
+      { texto: "Joias Folheadas a Ouro e Prata", icone: "fa-solid fa-gem", cor: "dourado" },
+      { texto: "5% OFF no PIX", icone: "fa-solid fa-percent", cor: "branco" },
+      { texto: "@ivopita", icone: "fa-brands fa-instagram", cor: "dourado" },
+      { texto: "Qualidade e Elegância", icone: "fa-solid fa-star", cor: "branco" }
+    ];
+  }
+
+  // Duplica para o loop infinito ficar contínuo
+  const listaDuplicada = [...items, ...items];
+
+  track.innerHTML = listaDuplicada.map(item => {
+    const classeCor = item.cor === 'dourado' ? 'marquee-item-accent' : '';
+    return `
+      <span class="marquee-item ${classeCor}">
+        <i class="${item.icone || 'fa-solid fa-star'}"></i> ${item.texto}
+      </span>
+    `;
+  }).join('');
+}
+
+// ============================================
+// APLICAR CONFIGURAÇÕES DO SITE
+// ============================================
+function aplicarConfig(cfg) {
+  if (!cfg || typeof cfg !== 'object') return;
+
+  // Atualiza o objeto global
+  siteConfig = Object.assign({}, siteConfig, cfg);
+
+  // Atualiza variáveis de frete
+  if (cfg.freteGratisValor) FRETE_GRATIS_VALOR = parseFloat(cfg.freteGratisValor) || 3500;
+  if (cfg.taxaFrete) TAXA_FRETE = parseFloat(cfg.taxaFrete) || 15;
+
+  // Atualiza WhatsApp (botão flutuante + footer + checkout)
+  const whatsNumero = String(cfg.whatsapp || siteConfig.whatsapp).replace(/\D/g, '');
+  const whatsLink = `https://wa.me/${whatsNumero}`;
+
+  document.querySelectorAll('a[href*="wa.me"]').forEach(a => {
+    a.href = whatsLink;
+  });
+
+  // Atualiza Instagram (footer)
+  const instaUser = String(cfg.instagram || siteConfig.instagram).replace('@', '');
+  document.querySelectorAll('a[href*="instagram.com"]').forEach(a => {
+    a.href = `https://www.instagram.com/${instaUser}`;
+  });
+
+  // Atualiza textos do footer
+  const footerEndereco = document.querySelector('footer .fa-location-dot')?.parentElement;
+  if (footerEndereco && cfg.endereco) footerEndereco.innerHTML = `<i class="fa-solid fa-location-dot text-gold"></i> ${cfg.endereco}`;
+
+  const footerTelefone = document.querySelector('footer .fa-phone')?.parentElement;
+  if (footerTelefone && (cfg.telefone || cfg.whatsappDisplay)) {
+    footerTelefone.innerHTML = `<i class="fa-solid fa-phone text-gold"></i> ${cfg.telefone || cfg.whatsappDisplay}`;
+  }
+
+  const footerEmail = document.querySelector('footer .fa-envelope')?.parentElement;
+  if (footerEmail && cfg.email) {
+    footerEmail.innerHTML = `<i class="fa-solid fa-envelope text-gold"></i> ${cfg.email}`;
+  }
+
+  const sobreParagrafo = document.querySelector('footer p.text-slate-300');
+  if (sobreParagrafo && cfg.sobreTexto) {
+    sobreParagrafo.innerHTML = `<strong>IVO PITA</strong> ${cfg.sobreTexto.replace(/^A\s+IVO PITA\s*/i, '')}`;
+  }
+
+  // Atualiza mensagem do WhatsApp no PDF/checkout
+  window.__whatsappNumero = whatsNumero;
+
+  console.log('✅ Configurações aplicadas:', siteConfig);
+}
+window.aplicarConfig = aplicarConfig;
 // ============================================
 // ZOOM
 // ============================================
@@ -1164,9 +1266,9 @@ function gerarConteudoPDF() {
             <p style="font-size: 18px; margin-top: 10px;"><strong>TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}</strong></p>
         </div>
         <div class="pdf-footer">
-            <p>Ivo Pita - Indústria de Joias</p>
-            <p>(88) 99904-9636 | @ivopita</p>
-        </div>
+    <p>Ivo Pita - Indústria de Joias</p>
+    <p>${siteConfig.whatsappDisplay || '(88) 99904-9636'} | ${siteConfig.instagramDisplay || '@ivopita'}</p>
+</div>
     </div>`;
 }
 
@@ -1402,11 +1504,11 @@ async function finalizarPedidoDireto() {
 
     const mensagemWhats = `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n👤 *CLIENTE:* ${nomeCliente.toUpperCase()}\n📍 *ENDEREÇO:* ${endereco}\n\n*📦 ITENS DO PEDIDO:*\n${cart.map((i) => `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`).join("\n")}\n\n*💰 RESUMO DO PEDIDO:*\n─────────────────\nSubtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\nFrete: ${freteExibicao}\n─────────────────\n*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n─────────────────\n\n✨ *Obrigado pela preferência!*\n📲 *Indústria de Joias*`;
 
-    window.open(
-      `https://wa.me/5588999049636?text=${encodeURIComponent(mensagemWhats)}`,
-      "_blank",
-    );
-
+    const numeroWhats = (window.__whatsappNumero || String(siteConfig.whatsapp).replace(/\D/g, '') || '5588999049636');
+window.open(
+  `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`,
+  "_blank",
+);
     cart = [];
     updateCart();
     document.getElementById("customer-name").value = "";
@@ -1702,10 +1804,11 @@ document.addEventListener("keydown", function (e) {
   } catch (e) {}
 })();
 
-// ============================================
+
+/// ============================================
 // INICIALIZAÇÃO
 // ============================================
-window.onload = function () {
+document.addEventListener("DOMContentLoaded", function () {
   loadProducts();
   carregarBannerHero();
   updateCart();
@@ -1713,13 +1816,12 @@ window.onload = function () {
   const urlParams = new URLSearchParams(window.location.search);
   const searchParam = urlParams.get("busca");
   if (searchParam) {
-    document.getElementById("search-input-desktop").value = searchParam;
+    const el = document.getElementById("search-input-desktop");
+    if (el) el.value = searchParam;
     performSearch(searchParam);
   }
-};
+});
 
 console.log("✅ Script Ivo Pita Industria de Joias carregado!");
 console.log("📌 Filtros suportam: singular/plural, masculino/feminino");
-console.log(
-  "📌 Exemplo: 'argolas dourada pequena' encontra 'Argola Dourada Pequena'",
-);
+console.log("📌 Exemplo: 'argolas dourada pequena' encontra 'Argola Dourada Pequena'");
