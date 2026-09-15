@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Ivo Pita - Login Admin</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #2f6b4f;
+            --primary-dark: #1f4d38;
+            --gold: #c9a86a;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f2f22 0%, #1f4d38 50%, #2f6b4f 100%);
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #2f6b4f, #1f4d38);
+            padding: 40px 30px 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .login-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .login-subtitle {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-top: 4px;
+        }
+
+        .login-body {
+            padding: 30px;
+        }
+
+        .login-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .login-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(47, 107, 79, 0.1);
+        }
+
+        .login-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #2f6b4f, #1f4d38);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(47, 107, 79, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .login-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(47, 107, 79, 0.4);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .login-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .login-error.show { display: block; }
+
+        .login-footer {
+            text-align: center;
+            padding: 20px 30px;
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+            font-size: 10px;
+            color: #9ca3af;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary);
+        }
+
+        .spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .login-btn.loading .spinner { display: inline-block; }
+        .login-btn.loading .btn-icon { display: none; }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-logo">
+                <img src="assets/papel_ivo_preto.png" alt="Ivo Pita" onerror="this.style.display='none'">
+            </div>
+            <h1 class="login-title">IVO PITA</h1>
+            <p class="login-subtitle">Painel de Controle</p>
+        </div>
+
+        <div class="login-body">
+            <div id="loginError" class="login-error"></div>
+
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="login-label">E-mail</label>
+                    <input type="email" id="email" class="login-input" placeholder="seu@email.com" required autocomplete="username">
+                </div>
+
+                <div class="mb-6">
+                    <label class="login-label">Senha</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="senha" class="login-input" placeholder="••••••••" required autocomplete="current-password" style="padding-right: 44px;">
+                        <button type="button" class="toggle-password" onclick="toggleSenha()">
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <i class="fas fa-sign-in-alt btn-icon"></i>
+                    <span class="spinner"></span>
+                    <span>Entrar</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="login-footer">
+            &copy; 2026 Ivo Pita - Acesso Restrito
+        </div>
+    </div>
+
+    <script>
+        const ESTOQUE_API_URL = "https://script.google.com/macros/s/AKfycbyb-HcYkxf4XyQRMNZ68zs4Tpbf7Q_Pzb8gd2kUI5fpaeFcdRG13zxzbhHTXfC9MD8yWw/exec";
+
+        // Se já está logado, redireciona
+        if (sessionStorage.getItem("ivo_auth")) {
+            window.location.href = "admin.html";
+        }
+
+        function toggleSenha() {
+            const input = document.getElementById('senha');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        function mostrarErro(msg) {
+            const el = document.getElementById('loginError');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 5000);
+        }
+
+        document.getElementById('loginForm').onsubmit = function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value.trim();
+            const btn = document.getElementById('loginBtn');
+
+            if (!email || !senha) {
+                mostrarErro('Preencha email e senha');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.classList.add('loading');
+
+            const callbackName = 'login_callback_' + Date.now();
+
+            window[callbackName] = function(data) {
+                delete window[callbackName];
+                if (script.parentNode) script.parentNode.removeChild(script);
+                btn.disabled = false;
+                btn.classList.remove('loading');
+
+                if (data && data.success) {
+                    // Salva sessão
+                    sessionStorage.setItem("ivo_auth", JSON.stringify({
+                        email: data.usuario.email,
+                        nome: data.usuario.nome,
+                        nivel: data.usuario.nivel,
+                        loginAt: Date.now()
+                    }));
+
+                    // Redireciona
+                    window.location.href = "admin.html";
+                } else {
+                    mostrarErro(data.error || 'Email ou senha incorretos');
+                }
+            };
+
+            const script = document.createElement('script');
+            const params = `modo=publico&tipo=login&email=${encodeURIComponent(email)}&senha=${encodeURIComponent(senha)}&callback=${callbackName}`;
+            script.src = `${ESTOQUE_API_URL}?${params}`;
+
+            script.onerror = function() {
+                delete window[callbackName];
+                if (script.parentNode) script.parentNode.removeChild(script);
+                btn.disabled = false;
+                btn.classList.remove('loading');
+                mostrarErro('Erro de conexão. Tente novamente.');
+            };
+
+            const timeoutId = setTimeout(() => {
+                if (window[callbackName]) {
+                    delete window[callbackName];
+                    if (script.parentNode) script.parentNode.removeChild(script);
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                    mostrarErro('Timeout. Tente novamente.');
+                }
+            }, 15000);
+
+            const originalCb = window[callbackName];
+            window[callbackName] = function(data) {
+                clearTimeout(timeoutId);
+                originalCb(data);
+            };
+
+            document.body.appendChild(script);
+        };
+    </script>
+</body>
+
+</html>
