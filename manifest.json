@@ -9,13 +9,13 @@
   "background_color": "#f6f8f5",
   "icons": [
     {
-      "src": "assets/papel_ivo_preto",
+      "src": "assets/papel_ivo_preto.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/papel_ivo_preto",
+      "src": "assets/papel_ivo_preto.png",
       "sizes": "192x192",
       "type": "image/png"
     }
