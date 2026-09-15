@@ -651,7 +651,7 @@ function renderProducts(products) {
                      onerror="this.src='https://via.placeholder.com/400?text=Sem+Imagem'"
                      onclick="abrirZoomDireto('${p["Imagem"]}')">
                 ${estoque <= 0 ? '<div class="product-card-sold-out"><span>ESGOTADO</span></div>' : ""}
-                ${!temCores && estoque > 0 ? '<span class="product-card-tag-unico">Pronta Entrega</span>' : ""}
+                //////${!temCores && estoque > 0 ? '<span class="product-card-tag-unico">Pronta Entrega</span>' : ""}
             </div>
             <div class="product-card-content">
                 <h3 class="product-card-title">${p["Nome do Produto"]}</h3>
