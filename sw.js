@@ -1,14 +1,13 @@
-// sw.js - Service Worker para PWA (CORRIGIDO - Sem CORS)
-const CACHE_NAME ='ivo-pita-v1';
+// sw.js - Service Worker para PWA (VERSAO 3 - Sem cache de HTML)
+const CACHE_NAME = 'ivo-pita-v3';
 const urlsToCache = [
-  '/',
-  '/index.html',
   '/styles.css',
   '/script.js',
   '/manifest.json'
+  // ⚠️ NÃO cacheamos HTML — sempre vem da rede
 ];
 
-// INSTALL - Cacheia arquivos locais
+// INSTALL
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -25,7 +24,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// ACTIVATE - Limpa caches antigos
+// ACTIVATE — Limpa TODOS os caches antigos
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -41,12 +40,25 @@ self.addEventListener('activate', event => {
   );
 });
 
-// FETCH - Ignora CDNs e APIs
+// FETCH — HTML sempre da rede; CSS/JS podem usar cache
 self.addEventListener('fetch', event => {
   const url = event.request.url;
 
   if (event.request.method !== 'GET') return;
 
+  // 🚫 NUNCA cacheia HTML (index, login, admin, etc.)
+  if (
+    event.request.mode === 'navigate' ||
+    url.endsWith('.html') ||
+    url.endsWith('/') ||
+    url.includes('index.html') ||
+    url.includes('login.html') ||
+    url.includes('admin.html')
+  ) {
+    return; // deixa o navegador buscar sempre da rede
+  }
+
+  // 🚫 Ignora CDNs e APIs externas
   if (
     url.includes('cdn.tailwindcss.com') ||
     url.includes('cdn.jsdelivr.net') ||
@@ -62,29 +74,24 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // ✅ CSS, JS, imagens → Network First com fallback cache
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) return response;
-        
-        return fetch(event.request).then(networkResponse => {
-          if (
-            networkResponse &&
-            networkResponse.status === 200 &&
-            networkResponse.type === 'basic'
-          ) {
-            const responseClone = networkResponse.clone();
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, responseClone);
-            });
-          }
-          return networkResponse;
-        });
+    fetch(event.request)
+      .then(networkResponse => {
+        if (
+          networkResponse &&
+          networkResponse.status === 200 &&
+          networkResponse.type === 'basic'
+        ) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return networkResponse;
       })
       .catch(() => {
-        if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
-        }
+        return caches.match(event.request);
       })
   );
 });
