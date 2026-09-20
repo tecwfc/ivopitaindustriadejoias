@@ -111,7 +111,7 @@
         .modal-content {
             background: white;
             border-radius: 16px;
-            max-width: 1200px;
+            max-width: 760px;
             width: 100%;
             max-height: 95vh;
             overflow-y: auto;
@@ -1190,6 +1190,23 @@
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-600 outline-none text-sm"
                             placeholder="Ex: #produtos ou https://...">
                     </div>
+
+
+
+<div>
+    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Posição do Texto</label>
+    <select id="bannerPosicao"
+        class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-600 outline-none text-sm">
+        <option value="centro">🎯 Centro (padrão)</option>
+        <option value="esquerda">⬅️ Esquerda</option>
+        <option value="direita">➡️ Direita</option>
+    </select>
+    <small class="field-hint">Onde o texto aparece sobre a imagem</small>
+</div>
+
+
+
+
                     <div class="flex items-center gap-2">
                         <input type="checkbox" id="bannerAtivo" checked
                             class="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-600">
@@ -2016,30 +2033,31 @@ const SVG_PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000
         // ============================================
         // RENDERIZAR BANNERS
         // ============================================
-        function renderizarBanners() {
-            const container = document.getElementById("banners-list");
-            container.innerHTML = "";
-            if (!banners || banners.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm">Nenhum banner cadastrado.</p>';
-                return;
-            }
-            banners.forEach((b, index) => {
-                const imgSrc = getPlaceholderImage(b.imagem, 100);
-                const div = document.createElement("div");
-                div.className = "flex items-center justify-between bg-gray-50 p-3 rounded-lg border flex-wrap gap-2";
-                div.innerHTML = `
-                    <div class="flex items-center gap-3 min-w-0">
-                        <img src="${imgSrc}" class="w-10 h-10 rounded object-cover flex-shrink-0" alt="${b.titulo}" onerror="this.src='${SVG_PLACEHOLDER}'">
-                        <div class="min-w-0">
-                            <p class="font-bold text-sm truncate">${b.titulo}</p>
-                            <p class="text-xs text-gray-500 truncate">${b.btnText} - ${b.ativo === 'sim' ? '✅ Ativo' : '❌ Inativo'}</p>
-                        </div>
-                    </div>
-                    <button onclick="excluirBanner(${index})" class="text-red-500 hover:text-red-700 flex-shrink-0"><i class="fas fa-trash-alt"></i></button>
-                `;
-                container.appendChild(div);
-            });
-        }
+       function renderizarBanners() {
+    const container = document.getElementById("banners-list");
+    container.innerHTML = "";
+    if (!banners || banners.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm">Nenhum banner cadastrado.</p>';
+        return;
+    }
+    banners.forEach((b, index) => {
+        const imgSrc = getPlaceholderImage(b.imagem, 100);
+        const posLabel = { centro: '🎯 Centro', esquerda: '⬅️ Esquerda', direita: '➡️ Direita' }[b.posicao] || '🎯 Centro';
+        const div = document.createElement("div");
+        div.className = "flex items-center justify-between bg-gray-50 p-3 rounded-lg border flex-wrap gap-2";
+        div.innerHTML = `
+            <div class="flex items-center gap-3 min-w-0">
+                <img src="${imgSrc}" class="w-10 h-10 rounded object-cover flex-shrink-0" alt="${b.titulo}" onerror="this.src='${SVG_PLACEHOLDER}'">
+                <div class="min-w-0">
+                    <p class="font-bold text-sm truncate">${b.titulo}</p>
+                    <p class="text-xs text-gray-500 truncate">${b.btnText} • ${posLabel} • ${b.ativo === 'sim' ? '✅ Ativo' : '❌ Inativo'}</p>
+                </div>
+            </div>
+            <button onclick="excluirBanner(${index})" class="text-red-500 hover:text-red-700 flex-shrink-0"><i class="fas fa-trash-alt"></i></button>
+        `;
+        container.appendChild(div);
+    });
+}
 
         // ============================================
         // MARQUEE — ÍCONES
@@ -2660,15 +2678,16 @@ const SVG_PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000
         // ============================================
         // BANNERS
         // ============================================
-        document.getElementById('formBanner').onsubmit = async (e) => {
-            e.preventDefault();
-            const banner = {
-                imagem: document.getElementById('bannerImagem').value.trim(),
-                titulo: document.getElementById('bannerTitulo').value.trim(),
-                btnText: document.getElementById('bannerBtnText').value.trim(),
-                btnLink: document.getElementById('bannerBtnLink').value.trim(),
-                ativo: document.getElementById('bannerAtivo').checked ? 'sim' : 'nao'
-            };
+       document.getElementById('formBanner').onsubmit = async (e) => {
+    e.preventDefault();
+    const banner = {
+        imagem: document.getElementById('bannerImagem').value.trim(),
+        titulo: document.getElementById('bannerTitulo').value.trim(),
+        btnText: document.getElementById('bannerBtnText').value.trim(),
+        btnLink: document.getElementById('bannerBtnLink').value.trim(),
+        ativo: document.getElementById('bannerAtivo').checked ? 'sim' : 'nao',
+        posicao: document.getElementById('bannerPosicao').value || 'centro'  // ✅ Nova
+    };
             if (!banner.imagem || !banner.titulo) { alert('Preencha a imagem e o título'); return; }
             const result = await chamarAPI("salvar_banner", { banner: banner });
             if (result.success) {
