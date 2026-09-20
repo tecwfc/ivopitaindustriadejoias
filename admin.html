@@ -2795,14 +2795,17 @@ const SVG_PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000
             }
 
         function cancelarEdicaoUsuario() {
-        document.getElementById('usuarioEditIndex').value = -1;
-        document.getElementById('formUsuario').reset();
-        document.getElementById('usuarioAtivo').checked = true;
-        document.getElementById('usuarioSenha').required = true;
-        document.getElementById('usuarioSenha').placeholder = 'senha123';
-        document.getElementById('usuarioFormTitle').innerText = '➕ Adicionar Usuário';
-        document.getElementById('btnSalvarUsuarioText').innerText = 'Adicionar';
-        }
+    const el = (id) => document.getElementById(id);
+    if (el('usuarioEditIndex')) el('usuarioEditIndex').value = -1;
+    if (el('formUsuario')) el('formUsuario').reset();
+    if (el('usuarioAtivo')) el('usuarioAtivo').checked = true;
+    if (el('usuarioSenha')) {
+        el('usuarioSenha').required = true;
+        el('usuarioSenha').placeholder = 'senha123';
+    }
+    if (el('usuarioFormTitle')) el('usuarioFormTitle').innerText = '➕ Adicionar Usuário';
+    if (el('btnSalvarUsuarioText')) el('btnSalvarUsuarioText').innerText = 'Adicionar';
+}
 
         window.cancelarEdicaoUsuario = cancelarEdicaoUsuario;
         window.editarUsuario = editarUsuario;
@@ -2833,21 +2836,26 @@ const SVG_PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Salvando...';
 
-            try {
-                const result = await chamarAPI('salvar_usuario', { usuario });
-                if (result.success) {
-                    alert(isEdit ? '✅ Usuário atualizado!' : '✅ Usuário adicionado!');
-                    cancelarEdicaoUsuario();
-                    setTimeout(() => renderizarUsuariosAdmin(), 800);
-                } else {
-                    alert('❌ Erro: ' + (result.error || 'Erro desconhecido'));
-                }
-            } catch (error) {
-                alert('❌ Erro: ' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = original;
-            }
+           try {
+    const result = await chamarAPI('salvar_usuario', { usuario });
+    if (result && result.success) {
+        alert(isEdit ? '✅ Usuário atualizado!' : '✅ Usuário adicionado!');
+        try { cancelarEdicaoUsuario(); } catch (e) { console.warn('Erro no cancelar:', e); }
+        setTimeout(() => {
+            try { renderizarUsuariosAdmin(); } catch (e) { console.warn('Erro ao renderizar:', e); }
+        }, 800);
+    } else {
+        alert('❌ Erro: ' + ((result && result.error) || 'Erro desconhecido'));
+    }
+} catch (error) {
+    console.error('❌ Erro completo:', error);
+    alert('❌ Erro: ' + error.message);
+} finally {
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = original;
+    }
+}
         };
 
         async function excluirUsuario(index) {
@@ -2924,6 +2932,41 @@ const SVG_PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000
         });
 
         
+        // ============================================
+// 🛡️ ESCUDO CONTRA NULL
+// ============================================
+(function protegerInnerText() {
+  const original = Object.getOwnPropertyDescriptor(Element.prototype, 'innerText');
+  if (original && original.set) {
+    Object.defineProperty(Element.prototype, 'innerText', {
+      set: function(val) {
+        try {
+          original.set.call(this, val);
+        } catch (e) {
+          console.warn('⚠️ Tentou setar innerText em elemento inválido:', this);
+        }
+      },
+      get: original.get,
+      configurable: true
+    });
+  }
+
+  // Também protege innerHTML
+  const originalHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+  if (originalHTML && originalHTML.set) {
+    Object.defineProperty(Element.prototype, 'innerHTML', {
+      set: function(val) {
+        try {
+          originalHTML.set.call(this, val);
+        } catch (e) {
+          console.warn('⚠️ Tentou setar innerHTML em elemento inválido:', this);
+        }
+      },
+      get: originalHTML.get,
+      configurable: true
+    });
+  }
+})();
     </script>
 </body>
 
