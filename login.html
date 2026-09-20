@@ -92,9 +92,7 @@
             margin-top: 4px;
         }
 
-        .login-body {
-            padding: 30px;
-        }
+        .login-body { padding: 30px; }
 
         .login-label {
             font-size: 11px;
@@ -122,9 +120,7 @@
             box-shadow: 0 0 0 4px rgba(47, 107, 79, 0.1);
         }
 
-        .login-input::placeholder {
-            color: #9ca3af;
-        }
+        .login-input::placeholder { color: #9ca3af; }
 
         .login-btn {
             width: 100%;
@@ -182,9 +178,7 @@
             letter-spacing: 0.05em;
         }
 
-        .password-wrapper {
-            position: relative;
-        }
+        .password-wrapper { position: relative; }
 
         .toggle-password {
             position: absolute;
@@ -199,9 +193,7 @@
             padding: 4px;
         }
 
-        .toggle-password:hover {
-            color: var(--primary);
-        }
+        .toggle-password:hover { color: var(--primary); }
 
         .spinner {
             display: none;
@@ -213,9 +205,7 @@
             animation: spin 0.6s linear infinite;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .login-btn.loading .spinner { display: inline-block; }
         .login-btn.loading .btn-icon { display: none; }
@@ -266,102 +256,116 @@
     </div>
 
     <script>
-        const ESTOQUE_API_URL = "https://script.google.com/macros/s/AKfycbyb-HcYkxf4XyQRMNZ68zs4Tpbf7Q_Pzb8gd2kUI5fpaeFcdRG13zxzbhHTXfC9MD8yWw/exec";
+  const ESTOQUE_API_URL = "https://script.google.com/macros/s/AKfycbyb-HcYkxf4XyQRMNZ68zs4Tpbf7Q_Pzb8gd2kUI5fpaeFcdRG13zxzbhHTXfC9MD8yWw/exec";
 
-        // Se já está logado, redireciona
-        if (sessionStorage.getItem("ivo_auth")) {
-            window.location.href = "admin.html";
+  // ✅ Se já estiver logado (com token válido), vai direto para o admin
+  (function() {
+    try {
+      var auth = sessionStorage.getItem("ivo_auth");
+      if (auth) {
+        var user = JSON.parse(auth);
+        if (user && user.token && user.loginAt) {
+          window.location.href = "admin.html";
+        } else {
+          sessionStorage.removeItem("ivo_auth");
         }
+      }
+    } catch (e) {
+      sessionStorage.removeItem("ivo_auth");
+    }
+  })();
 
-        function toggleSenha() {
-            const input = document.getElementById('senha');
-            const icon = document.getElementById('eyeIcon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'fas fa-eye-slash';
-            } else {
-                input.type = 'password';
-                icon.className = 'fas fa-eye';
-            }
-        }
+  function toggleSenha() {
+    const input = document.getElementById('senha');
+    const icon = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'fas fa-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'fas fa-eye';
+    }
+  }
 
-        function mostrarErro(msg) {
-            const el = document.getElementById('loginError');
-            el.textContent = msg;
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 5000);
-        }
+  function mostrarErro(msg) {
+    const el = document.getElementById('loginError');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 5000);
+  }
 
-        document.getElementById('loginForm').onsubmit = function(e) {
-            e.preventDefault();
+  document.getElementById('loginForm').onsubmit = function(e) {
+    e.preventDefault();
 
-            const email = document.getElementById('email').value.trim();
-            const senha = document.getElementById('senha').value.trim();
-            const btn = document.getElementById('loginBtn');
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value.trim();
+    const btn = document.getElementById('loginBtn');
 
-            if (!email || !senha) {
-                mostrarErro('Preencha email e senha');
-                return;
-            }
+    if (!email || !senha) {
+      mostrarErro('Preencha email e senha');
+      return;
+    }
 
-            btn.disabled = true;
-            btn.classList.add('loading');
+    btn.disabled = true;
+    btn.classList.add('loading');
 
-            const callbackName = 'login_callback_' + Date.now();
+    const callbackName = 'login_callback_' + Date.now();
 
-            window[callbackName] = function(data) {
-                delete window[callbackName];
-                if (script.parentNode) script.parentNode.removeChild(script);
-                btn.disabled = false;
-                btn.classList.remove('loading');
+    window[callbackName] = function(data) {
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      btn.disabled = false;
+      btn.classList.remove('loading');
 
-                if (data && data.success) {
-                    // Salva sessão
-                    sessionStorage.setItem("ivo_auth", JSON.stringify({
-                        email: data.usuario.email,
-                        nome: data.usuario.nome,
-                        nivel: data.usuario.nivel,
-                        loginAt: Date.now()
-                    }));
+      console.log('📥 Resposta do login:', data);
 
-                    // Redireciona
-                    window.location.href = "admin.html";
-                } else {
-                    mostrarErro(data.error || 'Email ou senha incorretos');
-                }
-            };
+      if (data && data.success && data.token) {
+        // ✅ Salva o TOKEN (nunca a senha)
+        sessionStorage.setItem("ivo_auth", JSON.stringify({
+          token: data.token,
+          email: data.usuario.email,
+          nome: data.usuario.nome,
+          nivel: data.usuario.nivel,
+          loginAt: Date.now()
+        }));
+        window.location.href = "admin.html";
+      } else {
+        mostrarErro((data && data.error) ? data.error : 'Email ou senha incorretos');
+      }
+    };
 
-            const script = document.createElement('script');
-            const params = `modo=publico&tipo=login&email=${encodeURIComponent(email)}&senha=${encodeURIComponent(senha)}&callback=${callbackName}`;
-            script.src = `${ESTOQUE_API_URL}?${params}`;
+    const script = document.createElement('script');
+    const params = `modo=publico&tipo=login&email=${encodeURIComponent(email)}&senha=${encodeURIComponent(senha)}&callback=${callbackName}`;
+    script.src = `${ESTOQUE_API_URL}?${params}`;
 
-            script.onerror = function() {
-                delete window[callbackName];
-                if (script.parentNode) script.parentNode.removeChild(script);
-                btn.disabled = false;
-                btn.classList.remove('loading');
-                mostrarErro('Erro de conexão. Tente novamente.');
-            };
+    script.onerror = function() {
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      mostrarErro('Erro de conexão. Tente novamente.');
+    };
 
-            const timeoutId = setTimeout(() => {
-                if (window[callbackName]) {
-                    delete window[callbackName];
-                    if (script.parentNode) script.parentNode.removeChild(script);
-                    btn.disabled = false;
-                    btn.classList.remove('loading');
-                    mostrarErro('Timeout. Tente novamente.');
-                }
-            }, 15000);
+    const timeoutId = setTimeout(() => {
+      if (window[callbackName]) {
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        mostrarErro('Timeout. Tente novamente.');
+      }
+    }, 15000);
 
-            const originalCb = window[callbackName];
-            window[callbackName] = function(data) {
-                clearTimeout(timeoutId);
-                originalCb(data);
-            };
+    const originalCb = window[callbackName];
+    window[callbackName] = function(data) {
+      clearTimeout(timeoutId);
+      originalCb(data);
+    };
 
-            document.body.appendChild(script);
-        };
-    </script>
+    document.body.appendChild(script);
+  };
+</script>
+
 </body>
 
 </html>
