@@ -9,11 +9,11 @@ const PRODUCTS_CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vTLGpr
 
 const BANNERS_CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vTLGpr1Vi2afbBxo2PfBx4CsKMxP_rDE0Rxhv4GZOeXh9tE693kakJocngzxL45rKhWZEQTquFt7KwA/pub?gid=2105649966&single=true&output=csv`;
 
-const ESTOQUE_API_URL = "https://script.google.com/macros/s/AKfycbyb-HcYkxf4XyQRMNZ68zs4Tpbf7Q_Pzb8gd2kUI5fpaeFcdRG13zxzbhHTXfC9MD8yWw/exec";
+const ESTOQUE_API_URL =
+  "https://script.google.com/macros/s/AKfycbyb-HcYkxf4XyQRMNZ68zs4Tpbf7Q_Pzb8gd2kUI5fpaeFcdRG13zxzbhHTXfC9MD8yWw/exec";
 
-
-  // Logo após "let subtotal = 0;" e antes do "const FRETE_GRATIS_VALOR":
-  let siteConfig = {
+// Logo após "let subtotal = 0;" e antes do "const FRETE_GRATIS_VALOR":
+let siteConfig = {
   whatsapp: "5588999049636",
   whatsappDisplay: "(88) 99904-9636",
   // instagram: "ivo_pita",
@@ -21,10 +21,11 @@ const ESTOQUE_API_URL = "https://script.google.com/macros/s/AKfycbyb-HcYkxf4XyQR
   email: "contato@ivopita.com.br",
   endereco: "Juazeiro do Norte, CE",
   telefone: "(88) 99909-9999",
-  sobreTexto: "A IVO PITA nasceu para celebrar momentos especiais com peças que unem design sofisticado e materiais nobres.",
+  sobreTexto:
+    "A IVO PITA nasceu para celebrar momentos especiais com peças que unem design sofisticado e materiais nobres.",
   freteGratisValor: 3500,
   taxaFrete: 15,
-  pixDesconto: 5
+  pixDesconto: 5,
 };
 
 // Trocar as constantes por variáveis (não pode mais ser const)
@@ -186,9 +187,20 @@ function selectColor(cor) {
   window.atualizarResumoSelecao();
 
   Toastify({
-    text: `${qtd}x ${cor} adicionado`,
-    duration: 1500,
-    style: { background: "#2f6b4f" },
+    text: `🎨 ${qtd}x ${cor} adicionado`,
+    duration: 10,
+    gravity: "top",
+    position: "right",
+    close: true,
+    stopOnFocus: true,
+    style: {
+      background: "linear-gradient(135deg, #2f6b4f, #1f4d38)",
+      borderRadius: "14px",
+      padding: "12px 18px",
+      fontWeight: "700",
+      fontSize: "10px",
+      boxShadow: "0 10px 20px rgba(47, 107, 79, 0.35)",
+    },
   }).showToast();
 
   document
@@ -468,7 +480,11 @@ function updateCart() {
   }
 
   if (clearBtn) {
-    clearBtn.classList.toggle("hidden", cart.length === 0);
+    if (cart.length === 0) {
+      clearBtn.classList.add("hidden");
+    } else {
+      clearBtn.classList.remove("hidden");
+    }
   }
   if (cart.length === 0) {
     document.getElementById("cart-modal")?.classList.add("hidden");
@@ -766,84 +782,115 @@ function renderDestaques(products) {
 // MARQUEE DINÂMICO
 // ============================================
 function renderizarMarquee(items) {
-  const track = document.getElementById('marquee-track');
+  const track = document.getElementById("marquee-track");
   if (!track) return;
 
   // Fallback: se não vier nada do admin, usa frases padrão
   if (!items || items.length === 0) {
     items = [
-      { texto: "Frete Grátis acima de R$ 3.500", icone: "fa-solid fa-crown", cor: "dourado" },
-      { texto: "Enviamos para todo o Brasil", icone: "fa-solid fa-truck-fast", cor: "branco" },
-      { texto: "Joias Folheadas a Ouro e Prata", icone: "fa-solid fa-gem", cor: "dourado" },
+      {
+        texto: "Frete Grátis acima de R$ 3.500",
+        icone: "fa-solid fa-crown",
+        cor: "dourado",
+      },
+      {
+        texto: "Enviamos para todo o Brasil",
+        icone: "fa-solid fa-truck-fast",
+        cor: "branco",
+      },
+      {
+        texto: "Joias Folheadas a Ouro e Prata",
+        icone: "fa-solid fa-gem",
+        cor: "dourado",
+      },
       { texto: "5% OFF no PIX", icone: "fa-solid fa-percent", cor: "branco" },
       { texto: "@ivopita", icone: "fa-brands fa-instagram", cor: "dourado" },
-      { texto: "Qualidade e Elegância", icone: "fa-solid fa-star", cor: "branco" }
+      {
+        texto: "Qualidade e Elegância",
+        icone: "fa-solid fa-star",
+        cor: "branco",
+      },
     ];
   }
 
   // Duplica para o loop infinito ficar contínuo
   const listaDuplicada = [...items, ...items];
 
-  track.innerHTML = listaDuplicada.map(item => {
-    const classeCor = item.cor === 'dourado' ? 'marquee-item-accent' : '';
-    return `
+  track.innerHTML = listaDuplicada
+    .map((item) => {
+      const classeCor = item.cor === "dourado" ? "marquee-item-accent" : "";
+      return `
       <span class="marquee-item ${classeCor}">
-        <i class="${item.icone || 'fa-solid fa-star'}"></i> ${item.texto}
+        <i class="${item.icone || "fa-solid fa-star"}"></i> ${item.texto}
       </span>
     `;
-  }).join('');
+    })
+    .join("");
 }
 
 // ============================================
 // APLICAR CONFIGURAÇÕES DO SITE
 // ============================================
 function aplicarConfig(cfg) {
-  if (!cfg || typeof cfg !== 'object') return;
+  if (!cfg || typeof cfg !== "object") return;
 
   // Atualiza o objeto global
   siteConfig = Object.assign({}, siteConfig, cfg);
 
   // Atualiza variáveis de frete
-  if (cfg.freteGratisValor) FRETE_GRATIS_VALOR = parseFloat(cfg.freteGratisValor) || 3500;
+  if (cfg.freteGratisValor)
+    FRETE_GRATIS_VALOR = parseFloat(cfg.freteGratisValor) || 3500;
   if (cfg.taxaFrete) TAXA_FRETE = parseFloat(cfg.taxaFrete) || 15;
 
   // Atualiza WhatsApp (botão flutuante + footer + checkout)
-  const whatsNumero = String(cfg.whatsapp || siteConfig.whatsapp).replace(/\D/g, '');
+  const whatsNumero = String(cfg.whatsapp || siteConfig.whatsapp).replace(
+    /\D/g,
+    "",
+  );
   const whatsLink = `https://wa.me/${whatsNumero}`;
 
-  document.querySelectorAll('a[href*="wa.me"]').forEach(a => {
+  document.querySelectorAll('a[href*="wa.me"]').forEach((a) => {
     a.href = whatsLink;
   });
 
   // Atualiza Instagram (footer)
-  const instaUser = String(cfg.instagram || siteConfig.instagram).replace('@', '');
-  document.querySelectorAll('a[href*="instagram.com"]').forEach(a => {
+  const instaUser = String(cfg.instagram || siteConfig.instagram).replace(
+    "@",
+    "",
+  );
+  document.querySelectorAll('a[href*="instagram.com"]').forEach((a) => {
     a.href = `https://www.instagram.com/${instaUser}`;
   });
 
   // Atualiza textos do footer
-  const footerEndereco = document.querySelector('footer .fa-location-dot')?.parentElement;
-  if (footerEndereco && cfg.endereco) footerEndereco.innerHTML = `<i class="fa-solid fa-location-dot text-gold"></i> ${cfg.endereco}`;
+  const footerEndereco = document.querySelector(
+    "footer .fa-location-dot",
+  )?.parentElement;
+  if (footerEndereco && cfg.endereco)
+    footerEndereco.innerHTML = `<i class="fa-solid fa-location-dot text-gold"></i> ${cfg.endereco}`;
 
-  const footerTelefone = document.querySelector('footer .fa-phone')?.parentElement;
+  const footerTelefone =
+    document.querySelector("footer .fa-phone")?.parentElement;
   if (footerTelefone && (cfg.telefone || cfg.whatsappDisplay)) {
     footerTelefone.innerHTML = `<i class="fa-solid fa-phone text-gold"></i> ${cfg.telefone || cfg.whatsappDisplay}`;
   }
 
-  const footerEmail = document.querySelector('footer .fa-envelope')?.parentElement;
+  const footerEmail = document.querySelector(
+    "footer .fa-envelope",
+  )?.parentElement;
   if (footerEmail && cfg.email) {
     footerEmail.innerHTML = `<i class="fa-solid fa-envelope text-gold"></i> ${cfg.email}`;
   }
 
-  const sobreParagrafo = document.querySelector('footer p.text-slate-300');
+  const sobreParagrafo = document.querySelector("footer p.text-slate-300");
   if (sobreParagrafo && cfg.sobreTexto) {
-    sobreParagrafo.innerHTML = `<strong>IVO PITA</strong> ${cfg.sobreTexto.replace(/^A\s+IVO PITA\s*/i, '')}`;
+    sobreParagrafo.innerHTML = `<strong>IVO PITA</strong> ${cfg.sobreTexto.replace(/^A\s+IVO PITA\s*/i, "")}`;
   }
 
   // Atualiza mensagem do WhatsApp no PDF/checkout
   window.__whatsappNumero = whatsNumero;
 
-  console.log('✅ Configurações aplicadas:', siteConfig);
+  console.log("✅ Configurações aplicadas:", siteConfig);
 }
 window.aplicarConfig = aplicarConfig;
 // ============================================
@@ -1135,11 +1182,11 @@ async function carregarBannerHero() {
       hasBanners = true;
 
       const slide = document.createElement("div");
-slide.className = "swiper-slide";
-slide.style.position = "relative";
-slide.style.width = "100%";
-slide.style.height = "100%";
-slide.innerHTML = `
+      slide.className = "swiper-slide";
+      slide.style.position = "relative";
+      slide.style.width = "100%";
+      slide.style.height = "100%";
+      slide.innerHTML = `
     <div class="banner-slide-wrapper">
         <img src="${driveImg(b.imagem)}" 
              class="banner-slide-img" 
@@ -1159,12 +1206,12 @@ slide.innerHTML = `
     });
 
     if (!hasBanners) {
-    const slide = document.createElement("div");
-    slide.className = "swiper-slide";
-    slide.style.position = "relative";
-    slide.style.width = "100%";
-    slide.style.height = "100%";
-    slide.innerHTML = `
+      const slide = document.createElement("div");
+      slide.className = "swiper-slide";
+      slide.style.position = "relative";
+      slide.style.width = "100%";
+      slide.style.height = "100%";
+      slide.innerHTML = `
         <div class="banner-slide-wrapper">
             <img src="assets/papel_ivo_preto.png" 
                  class="banner-slide-img" 
@@ -1178,8 +1225,8 @@ slide.innerHTML = `
             </div>
         </div>
     `;
-    wrapper.appendChild(slide);
-}
+      wrapper.appendChild(slide);
+    }
 
     if (heroSwiper) heroSwiper.destroy();
     heroSwiper = new Swiper(".heroSwiper", {
@@ -1267,7 +1314,7 @@ function gerarConteudoPDF() {
         </div>
         <div class="pdf-footer">
     <p>Ivo Pita - Indústria de Joias</p>
-    <p>${siteConfig.whatsappDisplay || '(88) 99904-9636'} | ${siteConfig.instagramDisplay || '@ivopita'}</p>
+    <p>${siteConfig.whatsappDisplay || "(88) 99904-9636"} | ${siteConfig.instagramDisplay || "@ivopita"}</p>
 </div>
     </div>`;
 }
@@ -1309,12 +1356,53 @@ async function downloadPDF() {
     setTimeout(() => downloadPDF(), 500);
     return;
   }
+
+  // 🔒 Validações
+  const nomeCliente = document.getElementById("customer-name").value.trim();
+  const endereco = document.getElementById("address").value.trim();
+
+  if (cart.length === 0) {
+    Toastify({
+      text: "Sacola vazia!",
+      duration: 2000,
+      style: { background: "#ef4444" },
+    }).showToast();
+    return;
+  }
+  if (!nomeCliente) {
+    Toastify({
+      text: "Informe seu nome!",
+      duration: 2000,
+      style: { background: "#ef4444" },
+    }).showToast();
+    return;
+  }
+  if (!endereco) {
+    Toastify({
+      text: "Informe o endereço!",
+      duration: 2000,
+      style: { background: "#ef4444" },
+    }).showToast();
+    return;
+  }
+
+  const btn = document.getElementById("download-pdf-btn");
+  const original = btn ? btn.innerHTML : "";
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+  }
+
   Toastify({
     text: "Gerando PDF...",
     duration: 2000,
     style: { background: "#2f6b4f" },
   }).showToast();
+
   try {
+    // ============================================
+    // 1️⃣ BAIXAR O PDF
+    // ============================================
     const canvas = await html2canvas(element, {
       scale: 2,
       backgroundColor: "#ffffff",
@@ -1332,23 +1420,145 @@ async function downloadPDF() {
     pdf.save(
       `Pedido_IvoPita_${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.pdf`,
     );
+
+    // ============================================
+    // 2️⃣ DAR BAIXA NO ESTOQUE
+    // ============================================
+    const totalFinal =
+      subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
+
+    const itensParaBaixar = {};
+    cart.forEach((item) => {
+      const baseId = String(item.baseId || item.id.split("-")[0]);
+      if (!itensParaBaixar[baseId]) itensParaBaixar[baseId] = 0;
+      itensParaBaixar[baseId] += item.quantity;
+    });
+
+    const itemsArray = Object.keys(itensParaBaixar).map((id) => ({
+      id: id,
+      quantity: itensParaBaixar[id],
+    }));
+
+    console.log("📦 Baixando estoque:", itemsArray);
+
+    const resultadoBaixa = await new Promise((resolve, reject) => {
+      const callbackName = "baixa_estoque_" + Date.now();
+      window[callbackName] = function (response) {
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        resolve(response);
+      };
+      const script = document.createElement("script");
+      const params = `modo=admin&tipo=baixa_estoque&items=${encodeURIComponent(JSON.stringify(itemsArray))}&callback=${callbackName}`;
+      script.src = `${ESTOQUE_API_URL}?${params}`;
+      script.onerror = function () {
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        reject(new Error("Erro ao dar baixa no estoque"));
+      };
+      setTimeout(() => {
+        if (window[callbackName]) {
+          delete window[callbackName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+          reject(new Error("Timeout baixa estoque"));
+        }
+      }, 30000);
+      document.body.appendChild(script);
+    });
+
+    console.log("✅ Estoque baixado:", resultadoBaixa);
+
+    // ============================================
+    // 3️⃣ SALVAR A VENDA
+    // ============================================
+    const itensTexto = cart
+      .map(
+        (i) =>
+          `${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} (R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada)`,
+      )
+      .join(" | ");
+
+    const resultadoVenda = await new Promise((resolve, reject) => {
+      const callbackName = "salvar_venda_" + Date.now();
+      window[callbackName] = function (response) {
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        resolve(response);
+      };
+      const script = document.createElement("script");
+      const params =
+        `modo=admin&tipo=salvar_venda` +
+        `&cliente=${encodeURIComponent(nomeCliente)}` +
+        `&endereco=${encodeURIComponent(endereco)}` +
+        `&itens=${encodeURIComponent(itensTexto)}` +
+        `&subtotal=${subtotal}` +
+        `&frete=${subtotal >= FRETE_GRATIS_VALOR ? 0 : TAXA_FRETE}` +
+        `&total=${totalFinal}` +
+        `&data=${encodeURIComponent(new Date().toISOString())}` +
+        `&status=Pago` +
+        `&callback=${callbackName}`;
+      script.src = `${ESTOQUE_API_URL}?${params}`;
+      script.onerror = function () {
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        reject(new Error("Erro ao salvar venda"));
+      };
+      setTimeout(() => {
+        if (window[callbackName]) {
+          delete window[callbackName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+          reject(new Error("Timeout salvar venda"));
+        }
+      }, 30000);
+      document.body.appendChild(script);
+    });
+
+    console.log("✅ Venda salva:", resultadoVenda);
+
+    // ============================================
+    // 4️⃣ LIMPAR CARRINHO E FECHAR MODAIS
+    // ============================================
+    cart = [];
+    updateCart();
+    document.getElementById("customer-name").value = "";
+    document.getElementById("address").value = "";
+
+    document.getElementById("pdf-preview-modal")?.classList.add("hidden");
+    document.getElementById("pdf-preview-modal")?.classList.remove("flex");
+    document.getElementById("cart-modal")?.classList.add("hidden");
+    document.getElementById("cart-modal")?.classList.remove("flex");
+
     Toastify({
-      text: "PDF baixado!",
-      duration: 3000,
-      style: { background: "#1f4d38" },
+      text: "✅ Pedido finalizado! PDF baixado.",
+      duration: 4000,
+      gravity: "top",
+      position: "right",
+      offset: { y: 80, x: 20 },
+      style: {
+        background: "linear-gradient(135deg, #2f6b4f, #1f4d38)",
+        borderRadius: "14px",
+        fontWeight: "700",
+        boxShadow: "0 10px 30px rgba(47, 107, 79, 0.35)",
+      },
     }).showToast();
+
+    // 🔄 Atualiza estoque na tela
+    setTimeout(() => loadProducts(), 2000);
   } catch (error) {
+    console.error("❌ Erro:", error);
     Toastify({
-      text: "Erro ao gerar PDF",
-      duration: 3000,
+      text: "❌ Erro: " + error.message,
+      duration: 4000,
       style: { background: "#ef4444" },
     }).showToast();
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = original;
+    }
   }
 }
 
-// ============================================
-// FINALIZAR PEDIDO - COM BAIXA DE ESTOQUE
-// ============================================
 async function finalizarPedidoDireto() {
   const nomeCliente = document.getElementById("customer-name").value;
   const endereco = document.getElementById("address").value;
@@ -1395,14 +1605,11 @@ async function finalizarPedidoDireto() {
         ? "GRÁTIS"
         : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
 
-    console.log("📦 Dando baixa no estoque...");
-
+    // 1️⃣ BAIXA NO ESTOQUE
     const itensParaBaixar = {};
     cart.forEach((item) => {
       const baseId = String(item.baseId || item.id.split("-")[0]);
-      if (!itensParaBaixar[baseId]) {
-        itensParaBaixar[baseId] = 0;
-      }
+      if (!itensParaBaixar[baseId]) itensParaBaixar[baseId] = 0;
       itensParaBaixar[baseId] += item.quantity;
     });
 
@@ -1411,48 +1618,34 @@ async function finalizarPedidoDireto() {
       quantity: itensParaBaixar[id],
     }));
 
-    console.log("📦 Items para baixar:", itemsArray);
+    console.log("📦 Baixando estoque:", itemsArray);
 
-    const resultadoBaixa = await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       const callbackName = "baixa_estoque_" + Date.now();
-
       window[callbackName] = function (response) {
         delete window[callbackName];
         if (script.parentNode) script.parentNode.removeChild(script);
         resolve(response);
       };
-
       const script = document.createElement("script");
       const params = `modo=admin&tipo=baixa_estoque&items=${encodeURIComponent(JSON.stringify(itemsArray))}&callback=${callbackName}`;
       script.src = `${ESTOQUE_API_URL}?${params}`;
-
       script.onerror = function () {
         delete window[callbackName];
         if (script.parentNode) script.parentNode.removeChild(script);
         reject(new Error("Erro ao dar baixa no estoque"));
       };
-
-      const timeoutId = setTimeout(() => {
+      setTimeout(() => {
         if (window[callbackName]) {
           delete window[callbackName];
           if (script.parentNode) script.parentNode.removeChild(script);
-          reject(new Error("Timeout ao dar baixa no estoque"));
+          reject(new Error("Timeout baixa estoque"));
         }
       }, 30000);
-
       document.body.appendChild(script);
     });
 
-    console.log("📥 Resultado da baixa:", resultadoBaixa);
-
-    if (resultadoBaixa && resultadoBaixa.success) {
-      console.log("✅ Estoque baixado com sucesso!");
-    } else {
-      console.warn("⚠️ Baixa de estoque retornou erro:", resultadoBaixa?.error);
-    }
-
-    console.log("💰 Salvando venda...");
-
+    // 2️⃣ SALVAR A VENDA
     const itensTexto = cart
       .map(
         (i) =>
@@ -1460,15 +1653,13 @@ async function finalizarPedidoDireto() {
       )
       .join(" | ");
 
-    const resultadoVenda = await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       const callbackName = "salvar_venda_" + Date.now();
-
       window[callbackName] = function (response) {
         delete window[callbackName];
         if (script.parentNode) script.parentNode.removeChild(script);
         resolve(response);
       };
-
       const script = document.createElement("script");
       const params =
         `modo=admin&tipo=salvar_venda` +
@@ -1482,52 +1673,62 @@ async function finalizarPedidoDireto() {
         `&status=Pago` +
         `&callback=${callbackName}`;
       script.src = `${ESTOQUE_API_URL}?${params}`;
-
       script.onerror = function () {
         delete window[callbackName];
         if (script.parentNode) script.parentNode.removeChild(script);
         reject(new Error("Erro ao salvar venda"));
       };
-
-      const timeoutId = setTimeout(() => {
+      setTimeout(() => {
         if (window[callbackName]) {
           delete window[callbackName];
           if (script.parentNode) script.parentNode.removeChild(script);
-          reject(new Error("Timeout ao salvar venda"));
+          reject(new Error("Timeout salvar venda"));
         }
       }, 30000);
-
       document.body.appendChild(script);
     });
 
-    console.log("📥 Resultado da venda:", resultadoVenda);
+    // 3️⃣ MONTAR MENSAGEM WHATSAPP
+    const mensagemWhats = `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n👤 *CLIENTE:* ${nomeCliente.toUpperCase()}\n📍 *ENDEREÇO:* ${endereco}\n\n*📦 ITENS DO PEDIDO:*\n${cart.map((i) => `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`).join("\n")}\n\n*💰 RESUMO DO PEDIDO:*\n─────────────────\nSubtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\nFrete: ${freteExibicao}\n─────────────────\n*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n─────────────────\n\n✨ *Obrigado pela preferência!*`;
 
-    const mensagemWhats = `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n👤 *CLIENTE:* ${nomeCliente.toUpperCase()}\n📍 *ENDEREÇO:* ${endereco}\n\n*📦 ITENS DO PEDIDO:*\n${cart.map((i) => `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`).join("\n")}\n\n*💰 RESUMO DO PEDIDO:*\n─────────────────\nSubtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\nFrete: ${freteExibicao}\n─────────────────\n*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n─────────────────\n\n✨ *Obrigado pela preferência!*\n📲 *Indústria de Joias*`;
+    const numeroWhats =
+      window.__whatsappNumero ||
+      String(siteConfig.whatsapp).replace(/\D/g, "") ||
+      "5588999049636";
 
-    const numeroWhats = (window.__whatsappNumero || String(siteConfig.whatsapp).replace(/\D/g, '') || '5588999049636');
-window.open(
-  `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`,
-  "_blank",
-);
+    // 4️⃣ LIMPAR CARRINHO E FECHAR MODAIS (antes de abrir WhatsApp)
     cart = [];
     updateCart();
     document.getElementById("customer-name").value = "";
     document.getElementById("address").value = "";
-    document.getElementById("cart-modal").classList.add("hidden");
+    document.getElementById("cart-modal")?.classList.add("hidden");
+    document.getElementById("cart-modal")?.classList.remove("flex");
+
+    // 5️⃣ ABRIR WHATSAPP
+    window.open(
+      `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`,
+      "_blank",
+    );
 
     Toastify({
       text: "✅ Pedido enviado e estoque atualizado!",
       duration: 4000,
-      style: { background: "#1f4d38" },
+      gravity: "top",
+      position: "right",
+      offset: { y: 80, x: 20 },
+      style: {
+        background: "linear-gradient(135deg, #2f6b4f, #1f4d38)",
+        borderRadius: "14px",
+        fontWeight: "700",
+        boxShadow: "0 10px 30px rgba(47, 107, 79, 0.35)",
+      },
     }).showToast();
 
-    setTimeout(() => {
-      loadProducts();
-    }, 2000);
+    setTimeout(() => loadProducts(), 2000);
   } catch (error) {
-    console.error("❌ Erro ao processar pedido:", error);
+    console.error("❌ Erro:", error);
     Toastify({
-      text: "❌ Erro ao processar pedido: " + error.message,
+      text: "❌ Erro: " + error.message,
       duration: 4000,
       style: { background: "#ef4444" },
     }).showToast();
@@ -1804,7 +2005,6 @@ document.addEventListener("keydown", function (e) {
   } catch (e) {}
 })();
 
-
 /// ============================================
 // INICIALIZAÇÃO
 // ============================================
@@ -1824,4 +2024,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 console.log("✅ Script Ivo Pita Industria de Joias carregado!");
 console.log("📌 Filtros suportam: singular/plural, masculino/feminino");
-console.log("📌 Exemplo: 'argolas dourada pequena' encontra 'Argola Dourada Pequena'");
+console.log(
+  "📌 Exemplo: 'argolas dourada pequena' encontra 'Argola Dourada Pequena'",
+);
