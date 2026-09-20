@@ -23,25 +23,33 @@
 
     <!-- Proteção de acesso -->
 <script>
-    (function() {
-        var auth = sessionStorage.getItem("ivo_auth");
-        if (!auth) {
-            window.location.href = "login.html";
-            return;
-        }
-        try {
-            var user = JSON.parse(auth);
-            if (!user.email || !user.loginAt) {
-                sessionStorage.removeItem("ivo_auth");
-                window.location.href = "login.html";
-            }
-        } catch (e) {
-            sessionStorage.removeItem("ivo_auth");
-            window.location.href = "login.html";
-        }
-    })();
-</script>
+  (function() {
+    var auth = sessionStorage.getItem("ivo_auth");
+    if (!auth) {
+      window.location.href = "login.html";
+      return;
+    }
+    try {
+      var user = JSON.parse(auth);
+      // ✅ Agora exige TOKEN também
+      if (!user.token || !user.email || !user.loginAt) {
+        sessionStorage.removeItem("ivo_auth");
+        window.location.href = "login.html";
+      }
+    } catch (e) {
+      sessionStorage.removeItem("ivo_auth");
+      window.location.href = "login.html";
+    }
+  })();
 
+  // ✅ Helper global
+  window.getToken = function() {
+    try {
+      var auth = JSON.parse(sessionStorage.getItem("ivo_auth") || "{}");
+      return auth.token || "";
+    } catch (e) { return ""; }
+  };
+</script>
 
     <style>
         :root {
@@ -1328,9 +1336,9 @@
     <!-- ========================================== -->
     <script>
         // CONFIGURAÇÕES
-        const ESTOQUE_API_URL = "https://script.google.com/macros/s/AKfycbyb-HcYkxf4XyQRMNZ68zs4Tpbf7Q_Pzb8gd2kUI5fpaeFcdRG13zxzbhHTXfC9MD8yWw/exec";
+const ESTOQUE_API_URL ="https://script.google.com/macros/s/AKfycbyb-HcYkxf4XyQRMNZ68zs4Tpbf7Q_Pzb8gd2kUI5fpaeFcdRG13zxzbhHTXfC9MD8yWw/exec";
        
-        const SVG_PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f3f4f6"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="10" text-anchor="middle" dy=".3em" fill="%239ca3af"%3ESem Imagem%3C/text%3E%3C/svg%3E`;
+const SVG_PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f3f4f6"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="10" text-anchor="middle" dy=".3em" fill="%239ca3af"%3ESem Imagem%3C/text%3E%3C/svg%3E`;
 
         const CATEGORIAS_OFICIAIS = [
             "Brinco de Pressão Dourado",
@@ -1637,89 +1645,101 @@
         // ============================================
         // API
         // ============================================
-        function chamarAPI(tipo, dados) {
-            return new Promise((resolve, reject) => {
-                try {
-                    const callbackName = 'jsonp_callback_' + Date.now();
-                    window[callbackName] = function (data) {
-                        delete window[callbackName];
-                        if (script.parentNode) script.parentNode.removeChild(script);
-                        resolve(data);
-                    };
+       function chamarAPI(tipo, dados) {
+  return new Promise((resolve, reject) => {
+    try {
+      const callbackName = 'jsonp_callback_' + Date.now();
+      const token = window.getToken();
 
-                    let params = `modo=admin&tipo=${tipo}`;
+      if (!token) {
+        reject(new Error('Sessão expirada. Faça login novamente.'));
+        return;
+      }
 
-                    if (tipo === 'cadastrar' || tipo === 'atualizar') {
-                        const p = dados.produto || {};
-                        params += `&nome=${encodeURIComponent(p["Nome do Produto"] || p.nome || '')}`;
-                        params += `&ref=${encodeURIComponent(p.referencia || '')}`;
-                        params += `&preco=${p.Preço || p.preco || 0}`;
-                        params += `&quantidade=${encodeURIComponent(p.Quantidade || p.quantidade || '')}`;
-                        params += `&categoria=${encodeURIComponent(p.Categoria || p.categoria || '')}`;
-                        params += `&subcategoria=${encodeURIComponent(p.Subcategoria || p.subcategoria || '')}`;
-                        params += `&cores=${encodeURIComponent(p.Cores || p.cores || '')}`;
-                        params += `&tamanho=${encodeURIComponent(p.Tamanho || p.tamanho || '')}`;
-                        params += `&imagem=${encodeURIComponent(p.Imagem || p.imagem || '')}`;
-                        params += `&disponivel=${p.Disponível || p.disponivel || 'sim'}`;
-                        params += `&destaque=${p.Destaque || p.destaque || 'nao'}`;
-                        params += `&estoque=${p.Estoque || p.estoque || 0}`;
-                        params += `&vendidos=${p.Vendidos || p.vendidos || 0}`;
-                        params += `&saldo_estoque=${p["Saldo Estoque"] || p.saldo_estoque || 0}`;
-                        if (p.ID) params += `&id=${p.ID}`;
-                    } else if (tipo === 'excluir') {
-                        params += `&id=${dados.id || ''}`;
-                    } else if (tipo === 'salvar_categoria') {
-                        params += `&categoria=${encodeURIComponent(dados.categoria?.nome || '')}`;
-                    } else if (tipo === 'salvar_banner') {
-                        params += `&banner=${encodeURIComponent(JSON.stringify(dados.banner || {}))}`;
-                    } else if (tipo === 'excluir_banner') {
-                        params += `&index=${dados.index || ''}`;
-                    } else if (tipo === 'salvar_marquee') {
-                        params += `&marquee=${encodeURIComponent(JSON.stringify(dados.marquee || {}))}`;
-                    } else if (tipo === 'excluir_marquee') {
-                        params += `&index=${dados.index || ''}`;
-                    } else if (tipo === 'editar_marquee') {
-                        params += `&index=${dados.index}`;
-                        params += `&marquee=${encodeURIComponent(JSON.stringify(dados.marquee || {}))}`;
-                    } else if (tipo === 'salvar_config') {
-                        params += `&config=${encodeURIComponent(JSON.stringify(dados.config || {}))}`;
-                    
-                    } else if (tipo === 'listar_usuarios') {
-                  
-                    } else if (tipo === 'salvar_usuario') {
-                        params += `&usuario=${encodeURIComponent(JSON.stringify(dados.usuario || {}))}`;
-                    } else if (tipo === 'excluir_usuario') {
-                        params += `&index=${dados.index}`;
-                    }
+      window[callbackName] = function (data) {
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
 
-                    const script = document.createElement('script');
-                    script.src = `${ESTOQUE_API_URL}?${params}&callback=${callbackName}`;
-
-                    script.onerror = function () {
-                        delete window[callbackName];
-                        if (script.parentNode) script.parentNode.removeChild(script);
-                        reject(new Error('Erro na requisição JSONP'));
-                    };
-
-                    const timeoutId = setTimeout(() => {
-                        if (window[callbackName]) {
-                            delete window[callbackName];
-                            if (script.parentNode) script.parentNode.removeChild(script);
-                            reject(new Error('Timeout na requisição'));
-                        }
-                    }, 30000);
-
-                    const originalCallback = window[callbackName];
-                    window[callbackName] = function (data) {
-                        clearTimeout(timeoutId);
-                        originalCallback(data);
-                    };
-
-                    document.body.appendChild(script);
-                } catch (error) { reject(error); }
-            });
+        // ✅ Se backend responder "não autorizado", desloga
+        if (data && data.error && String(data.error).toLowerCase().includes('autorizado')) {
+          alert('Sessão expirada. Faça login novamente.');
+          sessionStorage.removeItem("ivo_auth");
+          window.location.href = "login.html";
+          return;
         }
 
+        resolve(data);
+      };
+
+      let params = `modo=admin&token=${encodeURIComponent(token)}&tipo=${tipo}`;
+
+      if (tipo === 'cadastrar' || tipo === 'atualizar') {
+        const p = dados.produto || {};
+        params += `&nome=${encodeURIComponent(p["Nome do Produto"] || p.nome || '')}`;
+        params += `&ref=${encodeURIComponent(p.referencia || '')}`;
+        params += `&preco=${p.Preço || p.preco || 0}`;
+        params += `&quantidade=${encodeURIComponent(p.Quantidade || p.quantidade || '')}`;
+        params += `&categoria=${encodeURIComponent(p.Categoria || p.categoria || '')}`;
+        params += `&subcategoria=${encodeURIComponent(p.Subcategoria || p.subcategoria || '')}`;
+        params += `&cores=${encodeURIComponent(p.Cores || p.cores || '')}`;
+        params += `&tamanho=${encodeURIComponent(p.Tamanho || p.tamanho || '')}`;
+        params += `&imagem=${encodeURIComponent(p.Imagem || p.imagem || '')}`;
+        params += `&disponivel=${p.Disponível || p.disponivel || 'sim'}`;
+        params += `&destaque=${p.Destaque || p.destaque || 'nao'}`;
+        params += `&estoque=${p.Estoque || p.estoque || 0}`;
+        params += `&vendidos=${p.Vendidos || p.vendidos || 0}`;
+        params += `&saldo_estoque=${p["Saldo Estoque"] || p.saldo_estoque || 0}`;
+        if (p.ID) params += `&id=${p.ID}`;
+      } else if (tipo === 'excluir') {
+        params += `&id=${dados.id || ''}`;
+      } else if (tipo === 'salvar_categoria') {
+        params += `&categoria=${encodeURIComponent(dados.categoria?.nome || '')}`;
+      } else if (tipo === 'salvar_banner') {
+        params += `&banner=${encodeURIComponent(JSON.stringify(dados.banner || {}))}`;
+      } else if (tipo === 'excluir_banner') {
+        params += `&index=${dados.index || ''}`;
+      } else if (tipo === 'salvar_marquee') {
+        params += `&marquee=${encodeURIComponent(JSON.stringify(dados.marquee || {}))}`;
+      } else if (tipo === 'excluir_marquee') {
+        params += `&index=${dados.index || ''}`;
+      } else if (tipo === 'editar_marquee') {
+        params += `&index=${dados.index}`;
+        params += `&marquee=${encodeURIComponent(JSON.stringify(dados.marquee || {}))}`;
+      } else if (tipo === 'salvar_config') {
+        params += `&config=${encodeURIComponent(JSON.stringify(dados.config || {}))}`;
+      } else if (tipo === 'salvar_usuario') {
+        params += `&usuario=${encodeURIComponent(JSON.stringify(dados.usuario || {}))}`;
+      } else if (tipo === 'excluir_usuario') {
+        params += `&index=${dados.index}`;
+      }
+
+      const script = document.createElement('script');
+      script.src = `${ESTOQUE_API_URL}?${params}&callback=${callbackName}`;
+
+      script.onerror = function () {
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        reject(new Error('Erro na requisição JSONP'));
+      };
+
+      const timeoutId = setTimeout(() => {
+        if (window[callbackName]) {
+          delete window[callbackName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+          reject(new Error('Timeout na requisição'));
+        }
+      }, 15000);
+
+      const originalCallback = window[callbackName];
+      window[callbackName] = function (data) {
+        clearTimeout(timeoutId);
+        originalCallback(data);
+      };
+
+      document.body.appendChild(script);
+    } catch (error) { reject(error); }
+  });
+}
         // ============================================
         // CATEGORIAS
         // ============================================
@@ -1807,93 +1827,110 @@
         // CARREGAR PRODUTOS
         // ============================================
         async function carregarProdutos() {
-            try {
-                const data = await new Promise((resolve, reject) => {
-                    const callbackName = 'listar_callback_' + Date.now();
-                    window[callbackName] = function (data) {
-                        delete window[callbackName];
-                        if (script.parentNode) script.parentNode.removeChild(script);
-                        resolve(data);
-                    };
-                    const script = document.createElement('script');
-                    script.src = `${ESTOQUE_API_URL}?modo=admin&tipo=listar&callback=${callbackName}`;
-                    script.onerror = function () {
-                        delete window[callbackName];
-                        if (script.parentNode) script.parentNode.removeChild(script);
-                        reject(new Error('Erro ao listar produtos'));
-                    };
-                    const timeoutId = setTimeout(() => {
-                        if (window[callbackName]) {
-                            delete window[callbackName];
-                            if (script.parentNode) script.parentNode.removeChild(script);
-                            reject(new Error('Timeout'));
-                        }
-                    }, 30000);
-                    const originalResolve = resolve;
-                    resolve = function (data) { clearTimeout(timeoutId); originalResolve(data); };
-                    document.body.appendChild(script);
-                });
-
-                if (data.error) throw new Error(data.error);
-
-                if (data.produtos) {
-                    produtos = data.produtos.map(p => ({
-                        ID: p.ID || p.id,
-                        "Nome do Produto": p["Nome do Produto"] || p.nome,
-                        referencia: p.referencia || p.ref,
-                        Preço: p.Preço || p.preco,
-                        Quantidade: p.Quantidade || p.quantidade,
-                        Categoria: p.Categoria || p.categoria,
-                        Subcategoria: p.Subcategoria || p.subcategoria || '',
-                        Cores: p.Cores || p.cores,
-                        Tamanho: p.Tamanho || p.tamanho,
-                        Imagem: p.Imagem || p.imagem,
-                        Disponível: String(p.Disponível || p.disponivel || '').toLowerCase().trim(),
-                        Destaque: String(p.Destaque || p.destaque || '').toLowerCase().trim(),
-                        Estoque: p.Estoque || p.estoque || 0,
-                        Vendidos: p.Vendidos || p.vendidos || 0,
-                        "Saldo Estoque": p["Saldo Estoque"] || p.saldo_estoque || 0
-                    }));
-                } else {
-                    produtos = [];
-                }
-
-                banners = data.banners || [];
-                marqueeItems = data.marquee || [];
-                siteConfig = data.config || siteConfig;
-
-                const totalEstoque = produtos.reduce((s, p) => s + (p.Estoque || 0), 0);
-                const baixoEstoque = produtos.filter(p => (p["Saldo Estoque"] || 0) <= 3 && (p["Saldo Estoque"] || 0) > 0).length;
-                const destaques = produtos.filter(p => p.Destaque === 'sim').length;
-
-                document.getElementById('total-produtos').innerText = produtos.length;
-                document.getElementById('total-estoque').innerText = totalEstoque;
-                document.getElementById('estoque-baixo').innerText = baixoEstoque;
-                document.getElementById('total-destaques').innerText = destaques;
-                document.getElementById('total-registros').innerText = `${produtos.length} registros`;
-
-                renderizarTabelaProdutos();
-                renderizarBanners();
-                renderizarMarqueeAdmin();
-                carregarCategoriasFixas();
-                atualizarGraficos();
-
-            } catch (error) {
-                console.error("❌ Erro ao carregar produtos:", error);
-                document.getElementById('produtos-tbody').innerHTML = `
-                    <tr>
-                        <td colspan="16" class="text-center py-8 text-red-500 text-sm">
-                            <i class="fas fa-exclamation-triangle text-2xl block mb-2"></i>
-                            Erro ao carregar produtos: ${error.message}
-                            <br>
-                            <button onclick="carregarProdutos()" class="mt-2 bg-primary text-white px-4 py-2 rounded-lg text-xs font-bold">
-                                <i class="fas fa-sync-alt mr-1"></i> Tentar novamente
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }
+    try {
+        const token = window.getToken();
+        if (!token) {
+            alert('Sessão expirada. Faça login novamente.');
+            sessionStorage.removeItem("ivo_auth");
+            window.location.href = "login.html";
+            return;
         }
+
+        const data = await new Promise((resolve, reject) => {
+            const callbackName = 'listar_callback_' + Date.now();
+            window[callbackName] = function (data) {
+                delete window[callbackName];
+                if (script.parentNode) script.parentNode.removeChild(script);
+                resolve(data);
+            };
+            const script = document.createElement('script');
+            // ✅ AGORA COM TOKEN
+            script.src = `${ESTOQUE_API_URL}?modo=admin&tipo=listar&token=${encodeURIComponent(token)}&callback=${callbackName}`;
+            script.onerror = function () {
+                delete window[callbackName];
+                if (script.parentNode) script.parentNode.removeChild(script);
+                reject(new Error('Erro ao listar produtos'));
+            };
+            const timeoutId = setTimeout(() => {
+                if (window[callbackName]) {
+                    delete window[callbackName];
+                    if (script.parentNode) script.parentNode.removeChild(script);
+                    reject(new Error('Timeout'));
+                }
+            }, 15000);
+            const originalResolve = resolve;
+            resolve = function (data) { clearTimeout(timeoutId); originalResolve(data); };
+            document.body.appendChild(script);
+        });
+
+        // ✅ Se o backend responder "não autorizado", desloga
+        if (data && data.error && String(data.error).toLowerCase().includes('autorizado')) {
+            alert('Sessão expirada. Faça login novamente.');
+            sessionStorage.removeItem("ivo_auth");
+            window.location.href = "login.html";
+            return;
+        }
+
+        if (data.error) throw new Error(data.error);
+
+        if (data.produtos) {
+            produtos = data.produtos.map(p => ({
+                ID: p.ID || p.id,
+                "Nome do Produto": p["Nome do Produto"] || p.nome,
+                referencia: p.referencia || p.ref,
+                Preço: p.Preço || p.preco,
+                Quantidade: p.Quantidade || p.quantidade,
+                Categoria: p.Categoria || p.categoria,
+                Subcategoria: p.Subcategoria || p.subcategoria || '',
+                Cores: p.Cores || p.cores,
+                Tamanho: p.Tamanho || p.tamanho,
+                Imagem: p.Imagem || p.imagem,
+                Disponível: String(p.Disponível || p.disponivel || '').toLowerCase().trim(),
+                Destaque: String(p.Destaque || p.destaque || '').toLowerCase().trim(),
+                Estoque: p.Estoque || p.estoque || 0,
+                Vendidos: p.Vendidos || p.vendidos || 0,
+                "Saldo Estoque": p["Saldo Estoque"] || p.saldo_estoque || 0
+            }));
+        } else {
+            produtos = [];
+        }
+
+        banners = data.banners || [];
+        marqueeItems = data.marquee || [];
+        siteConfig = data.config || siteConfig;
+
+        const totalEstoque = produtos.reduce((s, p) => s + (p.Estoque || 0), 0);
+        const baixoEstoque = produtos.filter(p => (p["Saldo Estoque"] || 0) <= 3 && (p["Saldo Estoque"] || 0) > 0).length;
+        const destaques = produtos.filter(p => p.Destaque === 'sim').length;
+
+        document.getElementById('total-produtos').innerText = produtos.length;
+        document.getElementById('total-estoque').innerText = totalEstoque;
+        document.getElementById('estoque-baixo').innerText = baixoEstoque;
+        document.getElementById('total-destaques').innerText = destaques;
+        document.getElementById('total-registros').innerText = `${produtos.length} registros`;
+
+        renderizarTabelaProdutos();
+        renderizarBanners();
+        renderizarMarqueeAdmin();
+        carregarCategoriasFixas();
+        atualizarGraficos();
+
+    } catch (error) {
+        console.error("❌ Erro ao carregar produtos:", error);
+        document.getElementById('produtos-tbody').innerHTML = `
+            <tr>
+                <td colspan="16" class="text-center py-8 text-red-500 text-sm">
+                    <i class="fas fa-exclamation-triangle text-2xl block mb-2"></i>
+                    Erro ao carregar produtos: ${error.message}
+                    <br>
+                    <button onclick="carregarProdutos()" class="mt-2 bg-primary text-white px-4 py-2 rounded-lg text-xs font-bold">
+                        <i class="fas fa-sync-alt mr-1"></i> Tentar novamente
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
+}
 
         // ============================================
         // RENDERIZAR TABELA PRODUTOS
@@ -2745,24 +2782,28 @@
 
             document.getElementById('usuarioEditIndex').value = index;
             document.getElementById('usuarioEmail').value = u.email || '';
-            document.getElementById('usuarioSenha').value = u.senha || '';
+            document.getElementById('usuarioSenha').value = ''; // ✅ NUNCA preencher
+            document.getElementById('usuarioSenha').placeholder = 'Deixe em branco para manter';
+            document.getElementById('usuarioSenha').required = false;
             document.getElementById('usuarioNome').value = u.nome || '';
             document.getElementById('usuarioNivel').value = u.nivel || 'vendedor';
             document.getElementById('usuarioAtivo').checked = u.ativo;
 
             document.getElementById('usuarioFormTitle').innerText = '✏️ Editando usuário';
             document.getElementById('btnSalvarUsuarioText').innerText = 'Salvar Edição';
-
             document.getElementById('formUsuario').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+            }
 
         function cancelarEdicaoUsuario() {
-            document.getElementById('usuarioEditIndex').value = -1;
-            document.getElementById('formUsuario').reset();
-            document.getElementById('usuarioAtivo').checked = true;
-            document.getElementById('usuarioFormTitle').innerText = '➕ Adicionar Usuário';
-            document.getElementById('btnSalvarUsuarioText').innerText = 'Adicionar';
+        document.getElementById('usuarioEditIndex').value = -1;
+        document.getElementById('formUsuario').reset();
+        document.getElementById('usuarioAtivo').checked = true;
+        document.getElementById('usuarioSenha').required = true;
+        document.getElementById('usuarioSenha').placeholder = 'senha123';
+        document.getElementById('usuarioFormTitle').innerText = '➕ Adicionar Usuário';
+        document.getElementById('btnSalvarUsuarioText').innerText = 'Adicionar';
         }
+
         window.cancelarEdicaoUsuario = cancelarEdicaoUsuario;
         window.editarUsuario = editarUsuario;
 
@@ -2828,14 +2869,21 @@
         }
         window.excluirUsuario = excluirUsuario;
 
-                // ============================================
+        // ============================================
         // LOGOUT
         // ============================================
         function logout() {
-            if (confirm("Deseja realmente sair?")) {
-                sessionStorage.removeItem("ivo_auth");
-                window.location.href = "login.html";
+        if (confirm("Deseja realmente sair?")) {
+            try {
+            const token = window.getToken();
+            if (token) {
+                // Avisa o backend para limpar o token
+                chamarAPI('logout', {}).catch(() => {});
             }
+            } catch (e) {}
+            sessionStorage.removeItem("ivo_auth");
+            window.location.href = "login.html";
+        }
         }
         window.logout = logout;
 
