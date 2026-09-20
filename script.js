@@ -1,23 +1,18 @@
 // ============================================
-// IVO PITA JOIAS - SCRIPT COMPLETO (VERSÃO FINAL CORRIGIDA)
-// ============================================// ============================================
+// IVO PITA JOIAS - SCRIPT COMPLETO
+// ============================================
+
+// ============================================
 // CONFIGURAÇÕES
 // ============================================
 const PLANILHA_ID = "1VL7XznHudpbE3TUXwtqcFVAoPq3v8dAa5QW8nNl2NG4";
 
-const PRODUCTS_CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vTLGpr1Vi2afbBxo2PfBx4CsKMxP_rDE0Rxhv4GZOeXh9tE693kakJocngzxL45rKhWZEQTquFt7KwA/pub?gid=525658135&single=true&output=csv`;
-
-const BANNERS_CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vTLGpr1Vi2afbBxo2PfBx4CsKMxP_rDE0Rxhv4GZOeXh9tE693kakJocngzxL45rKhWZEQTquFt7KwA/pub?gid=2105649966&single=true&output=csv`;
-
 const ESTOQUE_API_URL =
   "https://script.google.com/macros/s/AKfycbyb-HcYkxf4XyQRMNZ68zs4Tpbf7Q_Pzb8gd2kUI5fpaeFcdRG13zxzbhHTXfC9MD8yWw/exec";
 
-// Logo após "let subtotal = 0;" e antes do "const FRETE_GRATIS_VALOR":
 let siteConfig = {
   whatsapp: "5588999049636",
   whatsappDisplay: "(88) 99904-9636",
-  // instagram: "ivo_pita",
-  // instagramDisplay: "@ivopita",
   email: "contato@ivopita.com.br",
   endereco: "Juazeiro do Norte, CE",
   telefone: "(88) 99909-9999",
@@ -28,9 +23,9 @@ let siteConfig = {
   pixDesconto: 5,
 };
 
-// Trocar as constantes por variáveis (não pode mais ser const)
 let FRETE_GRATIS_VALOR = 3500;
 let TAXA_FRETE = 75;
+
 // ============================================
 // VARIÁVEIS GLOBAIS
 // ============================================
@@ -38,7 +33,6 @@ let allProducts = [];
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let selectedColor = "";
 let tempProduct = null;
-let destaquesSwiper = null;
 let heroSwiper = null;
 let subtotal = 0;
 let imagensZoom = [];
@@ -51,46 +45,6 @@ let coresDisponiveis = [];
 // ============================================
 // FUNÇÕES AUXILIARES
 // ============================================
-
-function parseCSV(text) {
-  const lines = [];
-  let currentLine = [];
-  let currentField = "";
-  let insideQuotes = false;
-
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    const nextChar = text[i + 1];
-
-    if (char === '"') {
-      if (insideQuotes && nextChar === '"') {
-        currentField += '"';
-        i++;
-      } else {
-        insideQuotes = !insideQuotes;
-      }
-    } else if (char === "," && !insideQuotes) {
-      currentLine.push(currentField.trim());
-      currentField = "";
-    } else if (char === "\n" || char === "\r") {
-      if (char === "\r" && nextChar === "\n") i++;
-      currentLine.push(currentField.trim());
-      if (currentLine.some((field) => field !== "")) lines.push(currentLine);
-      currentLine = [];
-      currentField = "";
-    } else {
-      currentField += char;
-    }
-  }
-
-  if (currentField || currentLine.length > 0) {
-    currentLine.push(currentField.trim());
-    if (currentLine.some((field) => field !== "")) lines.push(currentLine);
-  }
-
-  return lines;
-}
-
 function normalizar(texto) {
   if (!texto) return "";
   return texto
@@ -100,14 +54,14 @@ function normalizar(texto) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-// 🔥 NOVO: Normaliza palavra para busca (remove plural/gênero)
+// Normaliza palavra para busca (remove plural/gênero)
 function normalizarPalavraBusca(palavra) {
   return palavra
-    .replace(/s$/, "") // remove "s" final (plural)
-    .replace(/a$/, "") // remove "a" final (feminino)
-    .replace(/o$/, "") // remove "o" final (masculino)
-    .replace(/es$/, "") // remove "es" final
-    .replace(/ns$/, "m"); // "ns" → "m" (ex: aneis → aneim)
+    .replace(/s$/, "")
+    .replace(/a$/, "")
+    .replace(/o$/, "")
+    .replace(/es$/, "")
+    .replace(/ns$/, "m");
 }
 
 function driveImg(url) {
@@ -122,7 +76,6 @@ function driveImg(url) {
 // ============================================
 // FUNÇÕES DO MODAL DE CORES
 // ============================================
-
 function renderizarCores() {
   const container = document.getElementById("colors-container");
 
@@ -134,11 +87,7 @@ function renderizarCores() {
   container.innerHTML = "";
 
   if (!Array.isArray(coresDisponiveis) || coresDisponiveis.length === 0) {
-    container.innerHTML = `
-            <p class="text-sm text-gray-500">
-                Nenhuma cor disponível.
-            </p>
-        `;
+    container.innerHTML = `<p class="text-sm text-gray-500">Nenhuma cor disponível.</p>`;
     return;
   }
 
@@ -401,7 +350,6 @@ window.closeSizeModal = function () {
 // ============================================
 // CARRINHO
 // ============================================
-
 function updateCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
   const cartCount = document.getElementById("cart-count");
@@ -614,7 +562,6 @@ async function loadProducts() {
     console.log(`✅ ${allProducts.length} produtos carregados`);
 
     renderProducts(allProducts);
-    renderDestaques(allProducts);
   } catch (err) {
     console.error("Erro ao carregar produtos:", err);
     const container = document.getElementById("produtos-container");
@@ -685,7 +632,6 @@ function renderProducts(products) {
                      onerror="this.src='https://via.placeholder.com/400?text=Sem+Imagem'"
                      onclick="abrirZoomDireto('${p["Imagem"]}')">
                 ${estoque <= 0 ? '<div class="product-card-sold-out"><span>ESGOTADO</span></div>' : ""}
-            
                 </div>
             <div class="product-card-content">
                 <h3 class="product-card-title">${p["Nome do Produto"]}</h3>
@@ -699,9 +645,9 @@ function renderProducts(products) {
     container.appendChild(card);
   });
 }
-/////${!temCores && estoque > 0 ? '<span class="product-card-tag-unico">Pronta Entrega</span>' : ""}
+
 // ============================================
-// RENDERIZAR DESTAQUES
+// RENDERIZAR DESTAQUES (mantida para reativação futura)
 // ============================================
 function renderDestaques(products) {
   const destaques = products
@@ -766,16 +712,20 @@ function renderDestaques(products) {
     container.appendChild(slide);
   });
 
-  if (destaquesSwiper) destaquesSwiper.destroy();
-  destaquesSwiper = new Swiper(".destaquesSwiper", {
-    slidesPerView: 2,
-    spaceBetween: 16,
-    breakpoints: {
-      640: { slidesPerView: 3 },
-      1024: { slidesPerView: 4 },
-    },
-    navigation: { nextEl: ".destaque-next", prevEl: ".destaque-prev" },
-  });
+  // Só inicializa o Swiper se a seção existir no HTML
+  const swiperEl = document.querySelector(".destaquesSwiper");
+  if (swiperEl) {
+    if (window.destaquesSwiper) window.destaquesSwiper.destroy();
+    window.destaquesSwiper = new Swiper(".destaquesSwiper", {
+      slidesPerView: 2,
+      spaceBetween: 16,
+      breakpoints: {
+        640: { slidesPerView: 3 },
+        1024: { slidesPerView: 4 },
+      },
+      navigation: { nextEl: ".destaque-next", prevEl: ".destaque-prev" },
+    });
+  }
 }
 
 // ============================================
@@ -785,7 +735,6 @@ function renderizarMarquee(items) {
   const track = document.getElementById("marquee-track");
   if (!track) return;
 
-  // Fallback: se não vier nada do admin, usa frases padrão
   if (!items || items.length === 0) {
     items = [
       {
@@ -813,7 +762,6 @@ function renderizarMarquee(items) {
     ];
   }
 
-  // Duplica para o loop infinito ficar contínuo
   const listaDuplicada = [...items, ...items];
 
   track.innerHTML = listaDuplicada
@@ -834,15 +782,12 @@ function renderizarMarquee(items) {
 function aplicarConfig(cfg) {
   if (!cfg || typeof cfg !== "object") return;
 
-  // Atualiza o objeto global
   siteConfig = Object.assign({}, siteConfig, cfg);
 
-  // Atualiza variáveis de frete
   if (cfg.freteGratisValor)
     FRETE_GRATIS_VALOR = parseFloat(cfg.freteGratisValor) || 3500;
   if (cfg.taxaFrete) TAXA_FRETE = parseFloat(cfg.taxaFrete) || 15;
 
-  // Atualiza WhatsApp (botão flutuante + footer + checkout)
   const whatsNumero = String(cfg.whatsapp || siteConfig.whatsapp).replace(
     /\D/g,
     "",
@@ -853,7 +798,6 @@ function aplicarConfig(cfg) {
     a.href = whatsLink;
   });
 
-  // Atualiza Instagram (footer)
   const instaUser = String(cfg.instagram || siteConfig.instagram).replace(
     "@",
     "",
@@ -862,7 +806,6 @@ function aplicarConfig(cfg) {
     a.href = `https://www.instagram.com/${instaUser}`;
   });
 
-  // Atualiza textos do footer
   const footerEndereco = document.querySelector(
     "footer .fa-location-dot",
   )?.parentElement;
@@ -887,12 +830,12 @@ function aplicarConfig(cfg) {
     sobreParagrafo.innerHTML = `<strong>IVO PITA</strong> ${cfg.sobreTexto.replace(/^A\s+IVO PITA\s*/i, "")}`;
   }
 
-  // Atualiza mensagem do WhatsApp no PDF/checkout
   window.__whatsappNumero = whatsNumero;
 
   console.log("✅ Configurações aplicadas:", siteConfig);
 }
 window.aplicarConfig = aplicarConfig;
+
 // ============================================
 // ZOOM
 // ============================================
@@ -1176,13 +1119,19 @@ async function carregarBannerHero() {
     wrapper.innerHTML = "";
 
     let hasBanners = false;
+
     banners.forEach((b) => {
       if (b.ativo && b.ativo.toLowerCase() === "nao") return;
       if (!b.titulo) return;
       hasBanners = true;
 
+      const posicaoBruta = (b.posicao || "centro").toLowerCase().trim();
+      const posicao = ["centro", "esquerda", "direita"].includes(posicaoBruta)
+        ? posicaoBruta
+        : "centro";
+
       const slide = document.createElement("div");
-      slide.className = "swiper-slide";
+      slide.className = `swiper-slide banner-pos-${posicao}`;
       slide.style.position = "relative";
       slide.style.width = "100%";
       slide.style.height = "100%";
@@ -1191,23 +1140,23 @@ async function carregarBannerHero() {
         <img src="${driveImg(b.imagem)}" 
              class="banner-slide-img" 
              alt="${b.titulo}"
+             onload="this.parentElement.style.aspectRatio = this.naturalWidth + ' / ' + this.naturalHeight;"
              onerror="this.src='https://via.placeholder.com/1200x800?text=Ivo+Pita'">
-        
-        <!-- Faixa escura sólida no rodapé -->
-        <div class="banner-slide-bar">
-            <div class="banner-slide-content">
-                <h2 class="banner-slide-title">${b.titulo}</h2>
-                ${b.btnText && b.btnLink ? `<a href="${b.btnLink}" class="banner-slide-btn">${b.btnText}</a>` : ""}
+            
+            <div class="banner-slide-bar">
+                <div class="banner-slide-content">
+                    <h2 class="banner-slide-title">${b.titulo}</h2>
+                    ${b.btnText && b.btnLink ? `<a href="${b.btnLink}" class="banner-slide-btn">${b.btnText}</a>` : ""}
+                </div>
             </div>
         </div>
-    </div>
-`;
+      `;
       wrapper.appendChild(slide);
     });
 
     if (!hasBanners) {
       const slide = document.createElement("div");
-      slide.className = "swiper-slide";
+      slide.className = "swiper-slide banner-pos-centro";
       slide.style.position = "relative";
       slide.style.width = "100%";
       slide.style.height = "100%";
@@ -1224,14 +1173,18 @@ async function carregarBannerHero() {
                 </div>
             </div>
         </div>
-    `;
+      `;
       wrapper.appendChild(slide);
     }
 
     if (heroSwiper) heroSwiper.destroy();
     heroSwiper = new Swiper(".heroSwiper", {
       loop: true,
-      autoplay: { delay: 5000, disableOnInteraction: false },
+      effect: "fade",
+      fadeEffect: { crossFade: true },
+      speed: 1200,
+      autoHeight: true,
+      autoplay: { delay: 6000, disableOnInteraction: false },
       pagination: { el: ".swiper-pagination", clickable: true },
     });
   } catch (err) {
@@ -1357,7 +1310,6 @@ async function downloadPDF() {
     return;
   }
 
-  // 🔒 Validações
   const nomeCliente = document.getElementById("customer-name").value.trim();
   const endereco = document.getElementById("address").value.trim();
 
@@ -1400,9 +1352,6 @@ async function downloadPDF() {
   }).showToast();
 
   try {
-    // ============================================
-    // 1️⃣ BAIXAR O PDF
-    // ============================================
     const canvas = await html2canvas(element, {
       scale: 2,
       backgroundColor: "#ffffff",
@@ -1421,9 +1370,6 @@ async function downloadPDF() {
       `Pedido_IvoPita_${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.pdf`,
     );
 
-    // ============================================
-    // 2️⃣ DAR BAIXA NO ESTOQUE
-    // ============================================
     const totalFinal =
       subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
 
@@ -1441,7 +1387,7 @@ async function downloadPDF() {
 
     console.log("📦 Baixando estoque:", itemsArray);
 
-    const resultadoBaixa = await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       const callbackName = "baixa_estoque_" + Date.now();
       window[callbackName] = function (response) {
         delete window[callbackName];
@@ -1466,11 +1412,6 @@ async function downloadPDF() {
       document.body.appendChild(script);
     });
 
-    console.log("✅ Estoque baixado:", resultadoBaixa);
-
-    // ============================================
-    // 3️⃣ SALVAR A VENDA
-    // ============================================
     const itensTexto = cart
       .map(
         (i) =>
@@ -1478,7 +1419,7 @@ async function downloadPDF() {
       )
       .join(" | ");
 
-    const resultadoVenda = await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       const callbackName = "salvar_venda_" + Date.now();
       window[callbackName] = function (response) {
         delete window[callbackName];
@@ -1513,11 +1454,6 @@ async function downloadPDF() {
       document.body.appendChild(script);
     });
 
-    console.log("✅ Venda salva:", resultadoVenda);
-
-    // ============================================
-    // 4️⃣ LIMPAR CARRINHO E FECHAR MODAIS
-    // ============================================
     cart = [];
     updateCart();
     document.getElementById("customer-name").value = "";
@@ -1542,7 +1478,6 @@ async function downloadPDF() {
       },
     }).showToast();
 
-    // 🔄 Atualiza estoque na tela
     setTimeout(() => loadProducts(), 2000);
   } catch (error) {
     console.error("❌ Erro:", error);
@@ -1605,7 +1540,6 @@ async function finalizarPedidoDireto() {
         ? "GRÁTIS"
         : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
 
-    // 1️⃣ BAIXA NO ESTOQUE
     const itensParaBaixar = {};
     cart.forEach((item) => {
       const baseId = String(item.baseId || item.id.split("-")[0]);
@@ -1645,7 +1579,6 @@ async function finalizarPedidoDireto() {
       document.body.appendChild(script);
     });
 
-    // 2️⃣ SALVAR A VENDA
     const itensTexto = cart
       .map(
         (i) =>
@@ -1688,7 +1621,6 @@ async function finalizarPedidoDireto() {
       document.body.appendChild(script);
     });
 
-    // 3️⃣ MONTAR MENSAGEM WHATSAPP
     const mensagemWhats = `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n👤 *CLIENTE:* ${nomeCliente.toUpperCase()}\n📍 *ENDEREÇO:* ${endereco}\n\n*📦 ITENS DO PEDIDO:*\n${cart.map((i) => `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`).join("\n")}\n\n*💰 RESUMO DO PEDIDO:*\n─────────────────\nSubtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\nFrete: ${freteExibicao}\n─────────────────\n*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n─────────────────\n\n✨ *Obrigado pela preferência!*`;
 
     const numeroWhats =
@@ -1696,7 +1628,6 @@ async function finalizarPedidoDireto() {
       String(siteConfig.whatsapp).replace(/\D/g, "") ||
       "5588999049636";
 
-    // 4️⃣ LIMPAR CARRINHO E FECHAR MODAIS (antes de abrir WhatsApp)
     cart = [];
     updateCart();
     document.getElementById("customer-name").value = "";
@@ -1704,7 +1635,6 @@ async function finalizarPedidoDireto() {
     document.getElementById("cart-modal")?.classList.add("hidden");
     document.getElementById("cart-modal")?.classList.remove("flex");
 
-    // 5️⃣ ABRIR WHATSAPP
     window.open(
       `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`,
       "_blank",
@@ -1757,7 +1687,7 @@ function toggleSubmenuMobile(btn) {
 window.toggleSubmenuMobile = toggleSubmenuMobile;
 
 // ============================================
-// FILTRAR POR CATEGORIA (CORRIGIDO)
+// FILTRAR POR CATEGORIA
 // ============================================
 function filtrarPorCategoria(categoria) {
   if (
@@ -1771,14 +1701,12 @@ function filtrarPorCategoria(categoria) {
   const catFiltro = normalizar(categoria);
   const palavrasFiltro = catFiltro.split(/\s+/).filter((p) => p.length > 0);
 
-  // 🔥 Normaliza cada palavra do filtro (remove plural/gênero)
   const palavrasFiltroNorm = palavrasFiltro.map(normalizarPalavraBusca);
 
   const filtrados =
     categoria === "todos"
       ? allProducts
       : allProducts.filter((p) => {
-          // Combina Categoria + Subcategoria + Nome + Referência
           const catProduto = normalizar(p["Categoria"] || "");
           const subcatProduto = normalizar(p["Subcategoria"] || "");
           const nomeProduto = normalizar(p["Nome do Produto"] || "");
@@ -1792,13 +1720,11 @@ function filtrarPorCategoria(categoria) {
             " " +
             refProduto;
 
-          // 🔥 Normaliza o combinado também
           const combinadoNorm = combinado
             .split(/\s+/)
             .map(normalizarPalavraBusca)
             .join(" ");
 
-          // Verifica se TODAS as palavras do filtro estão no combinado
           return palavrasFiltroNorm.every((palavra) =>
             combinadoNorm.includes(palavra),
           );
@@ -1841,7 +1767,6 @@ document.querySelectorAll(".filtro-menu-btn").forEach((btn) =>
     document.getElementById("mobile-menu")?.classList.add("translate-x-full");
     document.getElementById("mobile-overlay")?.classList.add("hidden");
 
-    // 🔥 Usa a mesma função filtrarPorCategoria (com normalização)
     filtrarPorCategoria(categoria);
   }),
 );
@@ -1853,7 +1778,6 @@ document
   .getElementById("search-input-mobile")
   ?.addEventListener("input", (e) => performSearch(e.target.value));
 
-// Botão de busca mobile
 document.getElementById("mobile-search-btn")?.addEventListener("click", () => {
   document
     .getElementById("search-overlay")
@@ -1987,7 +1911,7 @@ document.addEventListener("keydown", function (e) {
   if (e.key === "ArrowRight") zoomProximo();
 });
 
-// 🔥 LIMPAR CARRINHO COM FORMATO ANTIGO (roda uma vez)
+// Limpar carrinho com formato antigo (roda uma vez)
 (function limparCarrinhoAntigo() {
   try {
     const stored = localStorage.getItem("cart");
@@ -2005,7 +1929,7 @@ document.addEventListener("keydown", function (e) {
   } catch (e) {}
 })();
 
-/// ============================================
+// ============================================
 // INICIALIZAÇÃO
 // ============================================
 document.addEventListener("DOMContentLoaded", function () {
