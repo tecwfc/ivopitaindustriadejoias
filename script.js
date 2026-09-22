@@ -94,13 +94,13 @@ window.toggleSidebarSubgroup = toggleSidebarSubgroup;
 // SIDEBAR - ABRIR/FECHAR MOBILE
 // ============================================
 function abrirSidebarMobile() {
-  // Fecha o menu mobile antigo (caso esteja aberto)
+  // Fecha o menu mobile antigo
   const mobileMenu = document.getElementById('mobile-menu');
   const mobileOverlay = document.getElementById('mobile-overlay');
   if (mobileMenu) mobileMenu.classList.add('translate-x-full');
   if (mobileOverlay) mobileOverlay.classList.add('hidden');
 
-  // ✅ NO MOBILE: reseta os grupos (deixa colapsados)
+  // No mobile, garante que os grupos estejam fechados
   if (window.innerWidth <= 900) {
     document.querySelectorAll('.sidebar-group').forEach(g => g.classList.remove('open'));
     document.querySelectorAll('.sidebar-subgroup').forEach(sg => sg.classList.remove('open'));
@@ -160,18 +160,16 @@ function atualizarContadorProdutos() {
 function atualizarContadoresSidebar() {
   if (!allProducts || allProducts.length === 0) return;
 
-  // Contador "Todos"
   const totalEl = document.getElementById('count-todos');
   if (totalEl) totalEl.textContent = allProducts.length;
 
-  // Contar por cada subcategoria da sidebar
+  // Contar por cada subcategoria
   document.querySelectorAll('.sidebar-item-sub[data-categoria]').forEach(btn => {
     const categoria = btn.getAttribute('data-categoria');
     if (!categoria) return;
 
     const quantidade = contarProdutosPorCategoria(categoria);
 
-    // Adiciona/atualiza o span de contador dentro do botão
     let countSpan = btn.querySelector('.sidebar-count');
     if (!countSpan) {
       countSpan = document.createElement('span');
@@ -180,7 +178,6 @@ function atualizarContadoresSidebar() {
     }
     countSpan.textContent = quantidade;
 
-    // Se não tiver produtos, deixa o botão com opacidade reduzida
     if (quantidade === 0) {
       btn.style.opacity = '0.5';
     } else {
@@ -188,12 +185,9 @@ function atualizarContadoresSidebar() {
     }
   });
 
-  // Contar por cada grupo principal (Folheado Dourado / Prata)
+  // Contar por grupo principal
   document.querySelectorAll('.sidebar-group-title').forEach(groupTitle => {
-    const grupoTexto = groupTitle.querySelector('span:nth-child(2)')?.textContent || '';
     let total = 0;
-
-    // Percorre todas as subcategorias deste grupo
     const content = groupTitle.parentElement.querySelector('.sidebar-group-content');
     if (content) {
       content.querySelectorAll('.sidebar-item-sub[data-categoria]').forEach(btn => {
@@ -202,7 +196,6 @@ function atualizarContadoresSidebar() {
       });
     }
 
-    // Adiciona/atualiza contador no título do grupo
     let countSpan = groupTitle.querySelector('.sidebar-count');
     if (!countSpan) {
       countSpan = document.createElement('span');
@@ -212,7 +205,7 @@ function atualizarContadoresSidebar() {
     countSpan.textContent = total;
   });
 
-  // Contar por cada subgrupo (Argolas, Brincos, etc.)
+  // Contar por subgrupo
   document.querySelectorAll('.sidebar-subgroup').forEach(subgroup => {
     const subgroupTitle = subgroup.querySelector('.sidebar-subgroup-title');
     const content = subgroup.querySelector('.sidebar-subgroup-content');
@@ -228,7 +221,6 @@ function atualizarContadoresSidebar() {
     if (!countSpan) {
       countSpan = document.createElement('span');
       countSpan.className = 'sidebar-count';
-      // Inserir antes do ícone chevron
       const icon = subgroupTitle.querySelector('i');
       if (icon) {
         subgroupTitle.insertBefore(countSpan, icon);
@@ -475,15 +467,34 @@ function adicionarSemCor(quantidade) {
 window.adicionarSemCor = adicionarSemCor;
 
 function confirmarSelecao() {
+  // ✅ Se o produto NÃO tem cores, adiciona direto com a quantidade escolhida
   if (coresDisponiveis.length === 0) {
-    Toastify({ text: "Este produto não requer seleção de cor", duration: 2000, style: { background: "#ef4444" } }).showToast();
+    // Pega a quantidade: primeiro tenta do input, depois tenta do botão selecionado
+    const inputCustom = document.getElementById("custom-quantity");
+    let qtd = parseInt(inputCustom?.value) || 0;
+
+    if (!qtd || qtd <= 0) {
+      Toastify({
+        text: "Digite uma quantidade válida",
+        duration: 2000,
+        style: { background: "#ef4444" },
+      }).showToast();
+      return;
+    }
+
+    window.adicionarSemCor(qtd);
     return;
   }
 
+  // ✅ Produto COM cores: valida seleção
   const entradas = Object.entries(coresSelecionadas).filter(([_, qtd]) => qtd > 0);
 
   if (entradas.length === 0) {
-    Toastify({ text: "Selecione pelo menos uma cor!", duration: 2000, style: { background: "#ef4444" } }).showToast();
+    Toastify({
+      text: "Selecione pelo menos uma cor!",
+      duration: 2000,
+      style: { background: "#ef4444" },
+    }).showToast();
     return;
   }
 
@@ -498,6 +509,7 @@ function confirmarSelecao() {
   window.closeSizeModal();
 }
 window.confirmarSelecao = confirmarSelecao;
+
 
 window.closeSizeModal = function () {
   const modal = document.getElementById("size-modal");
@@ -719,7 +731,7 @@ async function loadProducts() {
 
     renderProducts(allProducts);
 
-       // ✅ Atualiza contadores
+    // Atualiza contadores
     setTimeout(atualizarContadoresSidebar, 500);
     setTimeout(atualizarContadorProdutos, 500);
 
@@ -812,7 +824,6 @@ function renderProducts(products) {
     container.appendChild(card);
   });
 
-  // Atualiza contador depois de renderizar
   setTimeout(atualizarContadorProdutos, 100);
 }
 
@@ -978,7 +989,6 @@ window.openSizeSelector = function (id, name, ref, price, img) {
     return;
   }
 
-  // ✅ CORREÇÃO: garantir que preço seja número
   const priceNum = parseFloat(price) || 0;
   tempProduct = { id: p["ID"], name: name, price: priceNum, img: img, ref: ref };
 
@@ -1001,7 +1011,7 @@ window.openSizeSelector = function (id, name, ref, price, img) {
     `;
   }
 
-    // ✅ NOVO: Preenche a imagem no header do modal
+    // ✅ NOVO MODAL: a imagem fica no header (#size-product-image-container)
   const imgContainer = document.getElementById("size-product-image-container");
   if (imgContainer) {
     imgContainer.innerHTML = `
@@ -1020,13 +1030,13 @@ window.openSizeSelector = function (id, name, ref, price, img) {
     : [];
   const temCores = coresDisponiveis.length > 0;
 
-  const colorStep = document.getElementById("color-step");
+    const colorStep = document.getElementById("color-step");
   const sizeStep = document.getElementById("size-step");
   const summaryContainer = document.getElementById("selection-summary");
   const btnAddCustomQty = document.getElementById("add-custom-qty");
-  const btnConfirmar = document.querySelector('#size-modal button[onclick="confirmarSelecao()"]');
 
   if (temCores) {
+    // COM CORES
     if (colorStep) colorStep.classList.remove("hidden");
     if (sizeStep) sizeStep.classList.remove("hidden");
     if (summaryContainer) summaryContainer.classList.remove("hidden");
@@ -1039,13 +1049,9 @@ window.openSizeSelector = function (id, name, ref, price, img) {
       btnAddCustomQty.classList.remove("btn-direct-add");
     }
 
-    if (btnConfirmar) {
-      btnConfirmar.style.display = "block";
-      btnConfirmar.innerHTML = '<i class="fas fa-shopping-bag mr-1"></i> Adicionar';
-    }
-
     window.renderizarCores();
   } else {
+    // SEM CORES
     if (colorStep) colorStep.classList.add("hidden");
     if (sizeStep) sizeStep.classList.remove("hidden");
     if (summaryContainer) summaryContainer.classList.add("hidden");
@@ -1058,7 +1064,6 @@ window.openSizeSelector = function (id, name, ref, price, img) {
       btnAddCustomQty.classList.add("btn-direct-add");
     }
 
-    if (btnConfirmar) btnConfirmar.style.display = "none";
     selectedColor = "Único";
   }
 
@@ -1107,7 +1112,6 @@ window.openSizeSelector = function (id, name, ref, price, img) {
 // ============================================
 // CARREGAR BANNER HERO
 // ============================================
-
 async function carregarBannerHero() {
   try {
     console.log("🔄 Carregando banners via JSONP...");
@@ -1301,6 +1305,74 @@ async function visualizarPDF() {
   document.getElementById("pdf-preview-modal").classList.add("flex");
 }
 
+// ============================================
+// FUNÇÃO: Finalizar Pedido via ROTA PÚBLICA
+// ============================================
+async function processarPedidoPublico(nomeCliente, endereco) {
+  const itensParaBaixar = {};
+  cart.forEach((item) => {
+    const baseId = String(item.baseId || item.id.split("-")[0]);
+    if (!itensParaBaixar[baseId]) itensParaBaixar[baseId] = 0;
+    itensParaBaixar[baseId] += item.quantity;
+  });
+
+  const itemsArray = Object.keys(itensParaBaixar).map((id) => ({
+    id: id,
+    quantity: itensParaBaixar[id]
+  }));
+
+  const itensTexto = cart
+    .map((i) => `${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} (R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada)`)
+    .join(" | ");
+
+  const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
+  const freteAplicado = subtotal >= FRETE_GRATIS_VALOR ? 0 : TAXA_FRETE;
+
+  return new Promise((resolve, reject) => {
+    const callbackName = "fazer_pedido_" + Date.now();
+
+    window[callbackName] = function (response) {
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      resolve(response);
+    };
+
+    const script = document.createElement("script");
+    const params =
+      `modo=publico&tipo=fazer_pedido` +
+      `&cliente=${encodeURIComponent(nomeCliente)}` +
+      `&endereco=${encodeURIComponent(endereco)}` +
+      `&itens=${encodeURIComponent(itensTexto)}` +
+      `&subtotal=${subtotal}` +
+      `&frete=${freteAplicado}` +
+      `&total=${totalFinal}` +
+      `&data=${encodeURIComponent(new Date().toISOString())}` +
+      `&items=${encodeURIComponent(JSON.stringify(itemsArray))}` +
+      `&callback=${callbackName}`;
+
+    script.src = `${ESTOQUE_API_URL}?${params}`;
+
+    script.onerror = function () {
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      reject(new Error("Erro ao processar pedido"));
+    };
+
+    setTimeout(() => {
+      if (window[callbackName]) {
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        reject(new Error("Timeout ao processar pedido"));
+      }
+    }, 30000);
+
+    document.body.appendChild(script);
+  });
+}
+
+// ============================================
+// DOWNLOAD PDF
+// ============================================
 async function downloadPDF() {
   let element = document.getElementById("pdf-content-to-print");
   if (!element) {
@@ -1335,6 +1407,7 @@ async function downloadPDF() {
   Toastify({ text: "Gerando PDF...", duration: 2000, style: { background: "#2f6b4f" } }).showToast();
 
   try {
+    // 1️⃣ Gera PDF
     const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#ffffff" });
     const imgData = canvas.toDataURL("image/png");
     const { jsPDF } = window.jspdf;
@@ -1344,81 +1417,17 @@ async function downloadPDF() {
     pdf.addImage(imgData, "PNG", 10, 0, imgWidth, imgHeight);
     pdf.save(`Pedido_IvoPita_${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.pdf`);
 
-    const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
+    // 2️⃣ Chama rota pública única (baixa + venda)
+    console.log("📦 Enviando pedido...");
+    const resultado = await processarPedidoPublico(nomeCliente, endereco);
 
-    const itensParaBaixar = {};
-    cart.forEach((item) => {
-      const baseId = String(item.baseId || item.id.split("-")[0]);
-      if (!itensParaBaixar[baseId]) itensParaBaixar[baseId] = 0;
-      itensParaBaixar[baseId] += item.quantity;
-    });
+    console.log("📥 Resultado:", resultado);
 
-    const itemsArray = Object.keys(itensParaBaixar).map((id) => ({ id: id, quantity: itensParaBaixar[id] }));
+    if (!resultado || !resultado.success) {
+      throw new Error((resultado && resultado.error) || "Erro ao salvar pedido");
+    }
 
-    await new Promise((resolve, reject) => {
-      const callbackName = "baixa_estoque_" + Date.now();
-      window[callbackName] = function (response) {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        resolve(response);
-      };
-      const script = document.createElement("script");
-      const params = `modo=admin&tipo=baixa_estoque&items=${encodeURIComponent(JSON.stringify(itemsArray))}&callback=${callbackName}`;
-      script.src = `${ESTOQUE_API_URL}?${params}`;
-      script.onerror = function () {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        reject(new Error("Erro ao dar baixa no estoque"));
-      };
-      setTimeout(() => {
-        if (window[callbackName]) {
-          delete window[callbackName];
-          if (script.parentNode) script.parentNode.removeChild(script);
-          reject(new Error("Timeout baixa estoque"));
-        }
-      }, 30000);
-      document.body.appendChild(script);
-    });
-
-    const itensTexto = cart
-      .map((i) => `${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} (R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada)`)
-      .join(" | ");
-
-    await new Promise((resolve, reject) => {
-      const callbackName = "salvar_venda_" + Date.now();
-      window[callbackName] = function (response) {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        resolve(response);
-      };
-      const script = document.createElement("script");
-      const params =
-        `modo=admin&tipo=salvar_venda` +
-        `&cliente=${encodeURIComponent(nomeCliente)}` +
-        `&endereco=${encodeURIComponent(endereco)}` +
-        `&itens=${encodeURIComponent(itensTexto)}` +
-        `&subtotal=${subtotal}` +
-        `&frete=${subtotal >= FRETE_GRATIS_VALOR ? 0 : TAXA_FRETE}` +
-        `&total=${totalFinal}` +
-        `&data=${encodeURIComponent(new Date().toISOString())}` +
-        `&status=Pago` +
-        `&callback=${callbackName}`;
-      script.src = `${ESTOQUE_API_URL}?${params}`;
-      script.onerror = function () {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        reject(new Error("Erro ao salvar venda"));
-      };
-      setTimeout(() => {
-        if (window[callbackName]) {
-          delete window[callbackName];
-          if (script.parentNode) script.parentNode.removeChild(script);
-          reject(new Error("Timeout salvar venda"));
-        }
-      }, 30000);
-      document.body.appendChild(script);
-    });
-
+    // 3️⃣ Limpa carrinho
     cart = [];
     updateCart();
     document.getElementById("customer-name").value = "";
@@ -1442,6 +1451,7 @@ async function downloadPDF() {
     }).showToast();
 
     setTimeout(() => loadProducts(), 2000);
+
   } catch (error) {
     console.error("❌ Erro:", error);
     Toastify({ text: "❌ Erro: " + error.message, duration: 4000, style: { background: "#ef4444" } }).showToast();
@@ -1453,6 +1463,9 @@ async function downloadPDF() {
   }
 }
 
+// ============================================
+// FINALIZAR PEDIDO VIA WHATSAPP
+// ============================================
 async function finalizarPedidoDireto() {
   const nomeCliente = document.getElementById("customer-name").value;
   const endereco = document.getElementById("address").value;
@@ -1482,79 +1495,17 @@ async function finalizarPedidoDireto() {
     const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
     const freteExibicao = subtotal >= FRETE_GRATIS_VALOR ? "GRÁTIS" : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
 
-    const itensParaBaixar = {};
-    cart.forEach((item) => {
-      const baseId = String(item.baseId || item.id.split("-")[0]);
-      if (!itensParaBaixar[baseId]) itensParaBaixar[baseId] = 0;
-      itensParaBaixar[baseId] += item.quantity;
-    });
+    // Chama rota pública (baixa + venda)
+    console.log("📦 Enviando pedido...");
+    const resultado = await processarPedidoPublico(nomeCliente, endereco);
 
-    const itemsArray = Object.keys(itensParaBaixar).map((id) => ({ id: id, quantity: itensParaBaixar[id] }));
+    console.log("📥 Resultado:", resultado);
 
-    await new Promise((resolve, reject) => {
-      const callbackName = "baixa_estoque_" + Date.now();
-      window[callbackName] = function (response) {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        resolve(response);
-      };
-      const script = document.createElement("script");
-      const params = `modo=admin&tipo=baixa_estoque&items=${encodeURIComponent(JSON.stringify(itemsArray))}&callback=${callbackName}`;
-      script.src = `${ESTOQUE_API_URL}?${params}`;
-      script.onerror = function () {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        reject(new Error("Erro ao dar baixa no estoque"));
-      };
-      setTimeout(() => {
-        if (window[callbackName]) {
-          delete window[callbackName];
-          if (script.parentNode) script.parentNode.removeChild(script);
-          reject(new Error("Timeout baixa estoque"));
-        }
-      }, 30000);
-      document.body.appendChild(script);
-    });
+    if (!resultado || !resultado.success) {
+      throw new Error((resultado && resultado.error) || "Erro ao salvar pedido");
+    }
 
-    const itensTexto = cart
-      .map((i) => `${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} (R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada)`)
-      .join(" | ");
-
-    await new Promise((resolve, reject) => {
-      const callbackName = "salvar_venda_" + Date.now();
-      window[callbackName] = function (response) {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        resolve(response);
-      };
-      const script = document.createElement("script");
-      const params =
-        `modo=admin&tipo=salvar_venda` +
-        `&cliente=${encodeURIComponent(nomeCliente)}` +
-        `&endereco=${encodeURIComponent(endereco)}` +
-        `&itens=${encodeURIComponent(itensTexto)}` +
-        `&subtotal=${subtotal}` +
-        `&frete=${subtotal >= FRETE_GRATIS_VALOR ? 0 : TAXA_FRETE}` +
-        `&total=${totalFinal}` +
-        `&data=${encodeURIComponent(new Date().toISOString())}` +
-        `&status=Pago` +
-        `&callback=${callbackName}`;
-      script.src = `${ESTOQUE_API_URL}?${params}`;
-      script.onerror = function () {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        reject(new Error("Erro ao salvar venda"));
-      };
-      setTimeout(() => {
-        if (window[callbackName]) {
-          delete window[callbackName];
-          if (script.parentNode) script.parentNode.removeChild(script);
-          reject(new Error("Timeout salvar venda"));
-        }
-      }, 30000);
-      document.body.appendChild(script);
-    });
-
+    // Mensagem WhatsApp
     const mensagemWhats = `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n👤 *CLIENTE:* ${nomeCliente.toUpperCase()}\n📍 *ENDEREÇO:* ${endereco}\n\n*📦 ITENS DO PEDIDO:*\n${cart.map((i) => `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`).join("\n")}\n\n*💰 RESUMO DO PEDIDO:*\n─────────────────\nSubtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\nFrete: ${freteExibicao}\n─────────────────\n*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n─────────────────\n\n✨ *Obrigado pela preferência!*`;
 
     const numeroWhats = window.__whatsappNumero || String(siteConfig.whatsapp).replace(/\D/g, "") || "5588999049636";
@@ -1621,17 +1572,14 @@ function filtrarPorCategoria(categoria) {
 
   renderProducts(filtrados);
 
-  // ✅ Atualiza contadores
   setTimeout(atualizarContadorProdutos, 100);
   setTimeout(atualizarContadoresSidebar, 100);
 
   const produtosSection = document.getElementById("produtos");
   if (produtosSection) produtosSection.scrollIntoView({ behavior: "smooth", block: "start" });
 
-  // ✅ Marca item ativo na sidebar
   marcarItemSidebarAtivo(categoria);
 
-  // ✅ Atualiza título
   const titleEl = document.getElementById('products-title');
   const subtitleEl = document.getElementById('products-subtitle');
 
@@ -1664,50 +1612,45 @@ function toggleSubmenuMobile(btn) {
 window.toggleSubmenuMobile = toggleSubmenuMobile;
 
 // ============================================
-// INICIALIZAÇÃO ÚNICA
+// INICIALIZAÇÃO
 // ============================================
 document.addEventListener("DOMContentLoaded", function () {
   console.log("🚀 Ivo Pita - Inicializando...");
 
-  // ---- Carrega dados ----
   loadProducts();
   carregarBannerHero();
   updateCart();
 
-  // ---- Sidebar mobile ----
+  // Sidebar mobile
   document.getElementById('sidebar-open-btn')?.addEventListener('click', abrirSidebarMobile);
   document.getElementById('sidebar-close-mobile')?.addEventListener('click', fecharSidebarMobile);
   document.getElementById('sidebar-overlay')?.addEventListener('click', fecharSidebarMobile);
 
-  // ---- Itens raiz da sidebar ----
+  // Itens raiz da sidebar
   document.querySelectorAll('.sidebar-item').forEach(btn => {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       const categoria = this.getAttribute('data-categoria');
       if (!categoria) return;
-
       marcarItemSidebarAtivo(categoria);
       filtrarPorCategoria(categoria);
-
       if (window.innerWidth <= 900) fecharSidebarMobile();
     });
   });
 
-  // ---- Itens folha da sidebar ----
+  // Itens folha da sidebar
   document.querySelectorAll('.sidebar-item-sub').forEach(btn => {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       const categoria = this.getAttribute('data-categoria');
       if (!categoria) return;
-
       marcarItemSidebarAtivo(categoria);
       filtrarPorCategoria(categoria);
-
       if (window.innerWidth <= 900) fecharSidebarMobile();
     });
   });
 
-  // ---- Busca na sidebar ----
+  // Busca na sidebar
   document.getElementById('sidebar-search')?.addEventListener('input', function (e) {
     const termo = normalizar(e.target.value);
     document.querySelectorAll('.sidebar-item, .sidebar-item-sub, .sidebar-group-title, .sidebar-subgroup-title').forEach(el => {
@@ -1717,12 +1660,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // ---- Ordenação ----
+  // Ordenação
   document.getElementById('sort-select')?.addEventListener('change', function () {
     ordenarProdutos(this.value);
   });
 
-  // ---- Buscas (header) ----
+  // Buscas (header)
   document.getElementById("search-input-desktop")?.addEventListener("input", (e) => performSearch(e.target.value));
   document.getElementById("search-input-mobile")?.addEventListener("input", (e) => performSearch(e.target.value));
 
@@ -1737,7 +1680,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("search-overlay")?.classList.add("-translate-y-full");
   });
 
-  // ---- Carrinho ----
+  // Carrinho
   document.getElementById("cart-btn")?.addEventListener("click", () => {
     document.getElementById("cart-modal")?.classList.remove("hidden");
     document.getElementById("cart-modal")?.classList.add("flex");
@@ -1758,7 +1701,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("download-pdf-btn")?.addEventListener("click", downloadPDF);
 
-  // ---- Limpar carrinho ----
+  // Limpar carrinho
   const clearBtn = document.getElementById("clear-cart-btn");
   const confirmModal = document.getElementById("confirm-clear-modal");
   if (clearBtn && confirmModal) {
@@ -1771,15 +1714,12 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   }
 
-  // ---- Menu mobile ----
-  const mobileMenuBtn = document.getElementById("mobile-menu-btn");
-
-  mobileMenuBtn?.addEventListener("click", () => {
-    // ✅ Abre direto a sidebar de categorias no mobile
+  // Menu mobile (☰) abre direto a sidebar
+  document.getElementById("mobile-menu-btn")?.addEventListener("click", () => {
     abrirSidebarMobile();
   });
 
-  // ---- Fechar modais ao clicar fora ----
+  // Fechar modais ao clicar fora
   document.getElementById("cart-modal")?.addEventListener("click", (e) => {
     if (e.target === document.getElementById("cart-modal")) {
       document.getElementById("cart-modal").classList.add("hidden");
@@ -1795,7 +1735,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.target === document.getElementById("image-zoom-modal")) fecharZoom();
   });
 
-  // ---- Input custom quantity ----
+  // Input custom quantity
   document.getElementById("add-custom-qty")?.addEventListener("click", () => {
     const input = document.getElementById("custom-quantity");
     const qty = parseInt(input.value);
@@ -1820,7 +1760,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // ---- Atalhos de teclado ----
+  // Atalhos de teclado
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
       fecharZoom();
@@ -1835,7 +1775,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.key === "ArrowRight") zoomProximo();
   });
 
-  // ---- MutationObserver no grid de produtos ----
+  // MutationObserver
   const produtosContainer = document.getElementById('produtos-container');
   if (produtosContainer) {
     const observer = new MutationObserver(() => {
@@ -1844,10 +1784,9 @@ document.addEventListener("DOMContentLoaded", function () {
     observer.observe(produtosContainer, { childList: true, subtree: true });
   }
 
-  // ---- Atualiza contadores após carregar produtos ----
   setTimeout(atualizarContadoresSidebar, 3000);
 
-  // ---- Verifica parâmetro de busca na URL ----
+  // Busca via URL
   const urlParams = new URLSearchParams(window.location.search);
   const searchParam = urlParams.get("busca");
   if (searchParam) {
@@ -1856,12 +1795,10 @@ document.addEventListener("DOMContentLoaded", function () {
     performSearch(searchParam);
   }
 
-
-  
   console.log("✅ Ivo Pita - Sistema pronto!");
 });
 
-// Limpar carrinho com formato antigo
+// Limpar carrinho antigo
 (function limparCarrinhoAntigo() {
   try {
     const stored = localStorage.getItem("cart");
