@@ -1441,7 +1441,7 @@ const SVG_PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000
 
         let produtos = [];
         let banners = [];
-        let marqueeItems = [];
+        let marqueeItems = [];       // ✅ ADICIONAR ESTA LINHA
         let siteConfig = {};
         let vendas = [];
         let vendasFiltradas = [];
@@ -1450,7 +1450,7 @@ const SVG_PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000
         let categoriasCache = [];
         let chartCategorias = null;
         let chartEstoque = null;
-
+        
         // ============================================
         // SISTEMA DE COLUNAS VISÍVEIS
         // ============================================
@@ -2504,8 +2504,23 @@ const SVG_PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000
             } else if (tipo === 'modalMarquee') {
                 document.getElementById('modalMarquee').classList.add('active');
                 document.body.style.overflow = 'hidden';
-                renderizarMarqueeAdmin();
-                renderizarIconesGrid();
+                
+                // ✅ Sempre carrega do backend antes de renderizar
+                const token = window.getToken();
+                const cb = 'marquee_reload_' + Date.now();
+                window[cb] = function (data) {
+                    if (data && data.marquee) {
+                        marqueeItems = data.marquee;
+                        console.log("✅ Marquee carregado:", marqueeItems.length, "frases");
+                    }
+                    delete window[cb];
+                    renderizarMarqueeAdmin();
+                    renderizarIconesGrid();
+                };
+                const script = document.createElement('script');
+                script.src = `${ESTOQUE_API_URL}?modo=admin&tipo=listar&token=${encodeURIComponent(token)}&callback=${cb}`;
+                document.body.appendChild(script);
+            
             } else if (tipo === 'modalConfig') {
                 document.getElementById('modalConfig').classList.add('active');
                 document.body.style.overflow = 'hidden';
