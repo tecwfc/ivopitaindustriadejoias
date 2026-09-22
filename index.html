@@ -49,344 +49,107 @@
 
   <link rel="icon" type="image/png" href="assets/papel_ivo_preto.png" />
   <link rel="apple-touch-icon" href="assets/papel_ivo_preto.png" />
-
-  <style>
-    @media (min-width: 769px) {
-      .dropdown-categoria {
-        position: relative !important;
-        display: inline-block !important;
-        padding-bottom: 12px;
-        margin-bottom: -12px;
-      }
-
-      .dropdown-categoria .dropdown-menu-categoria {
-        position: absolute !important;
-        top: 100% !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        background: #ffffff !important;
-        min-width: 750px !important;
-        padding: 24px 28px !important;
-        border-radius: 20px !important;
-        box-shadow: 0 30px 80px -20px rgba(15, 47, 34, 0.25), 0 8px 32px rgba(15, 47, 34, 0.06) !important;
-        border: 1px solid rgba(47, 107, 79, 0.08) !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-        pointer-events: none !important;
-        transition: opacity 0.25s ease, visibility 0.25s ease !important;
-        z-index: 999999 !important;
-        display: block !important;
-        margin-top: 0 !important;
-      }
-
-      .dropdown-categoria .dropdown-menu-categoria::before {
-        content: '';
-        position: absolute;
-        top: -20px;
-        left: 0;
-        right: 0;
-        height: 20px;
-        background: transparent;
-      }
-
-      .dropdown-categoria:hover .dropdown-menu-categoria {
-        opacity: 1 !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-      }
-
-      .dropdown-categoria:hover .fa-chevron-down {
-        transform: rotate(180deg) !important;
-      }
-
-      .dropdown-categoria .dropdown-grid {
-        display: grid !important;
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 14px 20px !important;
-      }
-
-      .dropdown-categoria .dropdown-group {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 3px !important;
-      }
-
-      .dropdown-categoria .dropdown-group-title {
-        font-size: 10px !important;
-        font-weight: 700 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.06em !important;
-        color: #2f6b4f !important;
-        padding-bottom: 5px !important;
-        border-bottom: 1.5px solid rgba(47, 107, 79, 0.1) !important;
-        margin-bottom: 4px !important;
-        display: block !important;
-      }
-
-      .dropdown-categoria .dropdown-group a {
-        font-size: 13px !important;
-        font-weight: 500 !important;
-        color: #4a5a52 !important;
-        text-decoration: none !important;
-        padding: 4px 8px !important;
-        border-radius: 6px !important;
-        transition: all 0.2s ease !important;
-        cursor: pointer !important;
-        border-left: 2px solid transparent !important;
-        display: block !important;
-      }
-
-      .dropdown-categoria .dropdown-group a:hover {
-        color: #2f6b4f !important;
-        background: rgba(47, 107, 79, 0.05) !important;
-        border-left-color: #2f6b4f !important;
-        padding-left: 12px !important;
-      }
-
-      #navbar-desktop nav {
-        overflow: visible !important;
-        flex-wrap: wrap;
-      }
-    }
-
-    @media (max-width: 768px) {
-      #navbar-desktop {
-        display: none !important;
-      }
-    }
-  </style>
 </head>
 
 <body class="bg-bgSoft text-textDark">
+  <!-- ========================================== -->
+  <!-- HEADER FIXO -->
+  <!-- ========================================== -->
+    <!-- ========================================== -->
+  <!-- HEADER FIXO -->
+  <!-- ========================================== -->
   <header
-  class="glass fixed top-0 w-full z-[100] px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-3 md:gap-6 border-b border-primary/10">
-  <!-- LOGO + NOME (esquerda) -->
-  <div class="flex items-center gap-3 group cursor-pointer shrink-0"
-    onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
-    <div class="relative">
-      <div
-        class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-20 group-hover:opacity-60 transition duration-1000">
+    class="glass fixed top-0 w-full z-[100] px-4 md:px-6 border-b border-primary/10 flex items-center justify-between gap-4 md:gap-6">
+
+    <!-- LOGO + NOME -->
+    <div class="flex items-center gap-3 group cursor-pointer shrink-0"
+      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+      <div class="relative">
+        <div
+          class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-20 group-hover:opacity-60 transition duration-1000">
+        </div>
+        <div
+          class="relative h-12 w-12 md:h-14 lg:h-16 md:w-14 lg:w-16 rounded-full border-2 border-white shadow-soft bg-white flex items-center justify-center overflow-hidden">
+          <img src="assets/papel_ivo_preto.png" alt="Ivo Pita Joias" class="w-full h-full object-cover rounded-full" />
+        </div>
       </div>
-      <div
-        class="relative h-12 w-12 md:h-14 lg:h-16 md:w-14 lg:w-16 rounded-full border-2 border-white shadow-soft bg-white flex items-center justify-center overflow-hidden">
-        <img src="assets/papel_ivo_preto.png" alt="Ivo Pita Joias" class="w-full h-full object-cover rounded-full" />
+      <div class="flex flex-col leading-tight hidden sm:flex">
+        <h1 class="font-black text-2xl md:text-3xl lg:text-4xl text-primary tracking-tighter font-serif">IVO PITA</h1>
+        <span class="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-gold opacity-90">Indústria de
+          Joias</span>
       </div>
     </div>
-    <div class="flex flex-col leading-tight hidden sm:flex">
-      <h1 class="font-black text-2xl md:text-3xl lg:text-4xl text-primary tracking-tighter font-serif">IVO PITA</h1>
-      <span class="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-gold opacity-90">Indústria de
-        Joias</span>
+
+    <!-- ========================================== -->
+    <!-- VERSÃO DESKTOP (título + busca) -->
+    <!-- ========================================== -->
+    <div class="flex-1 items-center justify-center gap-6 lg:gap-8 catalogo-desktop-group">
+
+      <!-- Título Catálogo -->
+      <div class="catalogo-inline">
+        <span class="catalogo-heading">
+          <i class="fas fa-book-open"></i> Catálogo
+        </span>
+        <span class="catalogo-separator">—</span>
+        <span class="catalogo-subheading">faça seu pedido online</span>
+      </div>
+
+      <!-- Barra de busca ÚNICA -->
+      <div class="relative shrink-0 search-compact">
+        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-textMuted text-xs"></i>
+        <input type="text" id="search-input-desktop" placeholder="Buscar..."
+          class="w-full pl-8 pr-3 py-2 rounded-full border border-primary/20 bg-bgSoft text-xs outline-none transition-all focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/15" />
+      </div>
+
     </div>
-  </div>
 
-  <!-- BARRA DE BUSCA (centro) -->
-  <div class="flex-1 max-w-2xl hidden md:block">
-    <div class="relative">
-      <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-textMuted text-sm"></i>
-      <input type="text" id="search-input-desktop"
-        placeholder="Buscar por nome ou referência..."
-        class="w-full pl-10 pr-4 py-2.5 rounded-full border border-primary/20 bg-bgSoft text-sm outline-none transition-all focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/15" />
+      <!-- ========================================== -->
+    <!-- VERSÃO MOBILE (só título compacto) -->
+    <!-- ========================================== -->
+    <div class="flex-1 items-center justify-center catalogo-mobile">
+      <span class="catalogo-heading-mobile">
+        <i class="fas fa-book-open"></i> Catálogo
+      </span>
+      <span class="catalogo-separator-mobile">·</span>
+      <span class="catalogo-subheading-mobile">faça seu pedido</span>
     </div>
-  </div>
 
-  <!-- BOTÕES (direita) -->
-  <div class="flex items-center gap-1 md:gap-4 shrink-0">
-    <!-- Busca mobile (abre overlay) -->
-    <button id="mobile-search-btn"
-      class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
-      <i class="fas fa-search text-xl"></i>
-    </button>
+    <!-- ========================================== -->
+    <!-- BOTÕES DIREITA -->
+    <!-- ========================================== -->
+    <div class="flex items-center gap-1 md:gap-3 shrink-0">
 
-    <button id="cart-btn"
-      class="relative bg-primary text-white p-3 md:p-2.5 rounded-xl md:rounded-full hover:bg-primaryDark transition shadow-card active:scale-95">
-      <i class="fas fa-shopping-bag text-lg md:text-base"></i>
-      <span id="cart-count"
-        class="absolute -top-1 -right-1 bg-white text-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">0</span>
-    </button>
+      <!-- Busca mobile (lupa) -->
+      <button id="mobile-search-btn"
+        class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
+        <i class="fas fa-search text-xl"></i>
+      </button>
 
-    <button id="mobile-menu-btn"
-      class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
-      <i class="fa-solid fa-bars-staggered text-xl"></i>
-    </button>
-  </div>
+      <!-- Carrinho -->
+      <button id="cart-btn"
+        class="relative bg-primary text-white p-3 md:p-2.5 rounded-xl md:rounded-full hover:bg-primaryDark transition shadow-card active:scale-95">
+        <i class="fas fa-shopping-bag text-lg md:text-base"></i>
+        <span id="cart-count"
+          class="absolute -top-1 -right-1 bg-white text-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">0</span>
+      </button>
 
+      <!-- Menu mobile -->
+      <button id="mobile-menu-btn"
+        class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
+        <i class="fa-solid fa-bars-staggered text-xl"></i>
+      </button>
+    </div>
   </header>
-
- 
-
-  <!-- BARRA MARQUEE PROMOCIONAL (dinâmica) -->
-<div class="marquee-bar">
-  <div class="marquee-track" id="marquee-track">
-    <!-- Preenchido via JavaScript -->
-  </div>
-</div>
-
-
-
-  <!-- MENU DESKTOP -->
-  <div id="navbar-desktop" class="hidden md:block bg-white shadow-card border-b border-primary/5">
-    <div class="max-w-7xl mx-auto px-4">
-      <nav class="flex items-center justify-center gap-2 py-3 no-scrollbar flex-wrap" style="overflow: visible !important;">
-
-        <button
-          class="menu-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 bg-primary text-white shadow-md hover:shadow-lg hover:scale-105 whitespace-nowrap"
-          data-categoria="todos" onclick="filtrarPorCategoria('todos')">
-          Todas
-        </button>
-
-        <!-- DOURADO -->
-        <div class="dropdown-categoria relative group">
-          <button
-            class="menu-item-dropdown px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:bg-amber-50 text-amber-700 hover:text-amber-800 flex items-center gap-1 whitespace-nowrap">
-            <i class="fa-solid fa-crown text-amber-500 text-xs"></i>Folheado Dourado
-            <i class="fa-solid fa-chevron-down text-[9px] ml-0.5 transition-transform duration-300 text-amber-400"></i>
-          </button>
-          <div class="dropdown-menu-categoria">
-            <div class="dropdown-grid">
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Argolas</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas dourada pequena')">Argolas Pequenas</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas dourada média')">Argolas Médias</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas dourada grande')">Argolas Grandes</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas dourada click')">Argolas de Click</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Brincos</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('brinco de pressão dourado')">Brinco de pressão</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('brincos de moda dourado')">Brincos de moda</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Correntes</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('correntes masculina dourado')">Masculina</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('correntes feminina dourado')">Feminina</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Pulseiras</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pulseiras feminina dourado')">Feminina</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pulseiras masculina dourado')">Masculina</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pulseiras infantil dourado')">Infantil</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Pingentes</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pingentes dourado')">Diversos</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Tornozeleiras</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('tornozeleiras feminina dourado')">Feminina</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('tornozeleiras infantil dourado')">Infantil</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Terço</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('terço dourado')">Diversos</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Braceletes</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('braceletes feminino dourado')">Feminino</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('braceletes masculino dourado')">Masculino</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Anéis</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('aneis adulto dourado')">Adulto</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('aneis infantil dourado')">Infantis</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Escapulário</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('escapulário dourado')">Diversos</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Conjuntos</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('conjuntos brinco colar dourado')">Brinco + Colar</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('conjuntos completo dourado')">Completo</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Colar</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('colar feminino dourado')">Feminino</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('colar masculino dourado')">Masculino</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('colar infantil dourado')">Infantil</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PRATA -->
-        <div class="dropdown-categoria relative group">
-          <button
-            class="menu-item-dropdown px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:bg-slate-100 text-slate-600 hover:text-slate-800 flex items-center gap-1 whitespace-nowrap">
-            <i class="fa-regular fa-gem text-slate-400 text-xs"></i>Folheado Prata
-            <i class="fa-solid fa-chevron-down text-[9px] ml-0.5 transition-transform duration-300 text-slate-300"></i>
-          </button>
-          <div class="dropdown-menu-categoria">
-            <div class="dropdown-grid">
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Argolas</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas prateada pequena')">Argolas Pequenas</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas prateada média')">Argolas Médias</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas prateada grande')">Argolas Grandes</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('argolas prateada click')">Argolas de Click</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Brincos</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('brinco de pressão prata')">Brinco de pressão</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('brincos de moda prata')">Brincos de moda</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Correntes</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('correntes masculina prata')">Masculina</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('correntes feminina prata')">Feminina</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Pulseiras</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pulseiras feminina prata')">Feminina</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pulseiras masculina prata')">Masculina</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pulseiras infantil prata')">Infantil</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Pingentes</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('pingentes prata')">Diversos</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Tornozeleiras</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('tornozeleiras feminina prata')">Feminina</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('tornozeleiras infantil prata')">Infantil</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Terço</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('terço prata')">Diversos</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Braceletes</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('braceletes feminino prata')">Feminino</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('braceletes masculino prata')">Masculino</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Anéis</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('aneis adulto prata')">Adulto</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('aneis infantil prata')">Infantis</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Escapulário</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('escapulário prata')">Diversos</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Conjuntos</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('conjuntos brinco colar prata')">Brinco + Colar</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('conjuntos completo prata')">Completo</a>
-              </div>
-              <div class="dropdown-group">
-                <span class="dropdown-group-title">Colar</span>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('colar feminino prata')">Feminino</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('colar masculino prata')">Masculino</a>
-                <a href="#" onclick="event.preventDefault(); filtrarPorCategoria('colar infantil prata')">Infantil</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </nav>
-  </div>
+  <!-- ========================================== -->
+  <!-- MARQUEE PROMOCIONAL -->
+  <!-- ========================================== -->
+  <div class="marquee-bar">
+    <div class="marquee-track" id="marquee-track"></div>
   </div>
 
+  <!-- ========================================== -->
   <!-- BUSCA MOBILE -->
+  <!-- ========================================== -->
   <div id="search-overlay"
     class="fixed inset-x-0 top-0 h-20 bg-white z-[100] transform -translate-y-full transition-transform duration-300 ease-in-out shadow-xl flex items-center px-4 gap-3 md:hidden">
     <div class="flex-1 flex items-center bg-primary/5 rounded-2xl px-4 py-3 border border-primary/20">
@@ -397,7 +160,9 @@
     <button id="mobile-search-close" class="p-2 text-slate-400 font-bold text-sm uppercase">Fechar</button>
   </div>
 
+  <!-- ========================================== -->
   <!-- MENU MOBILE -->
+  <!-- ========================================== -->
   <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-[60] hidden backdrop-blur-sm"></div>
   <div id="mobile-menu"
     class="fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
@@ -418,287 +183,24 @@
     </div>
     <div class="flex-1 overflow-y-auto p-6">
       <nav class="space-y-2">
-        <p class="text-[10px] font-bold text-textMuted uppercase tracking-widest mb-4">Categorias</p>
+  <p class="text-[10px] font-bold text-textMuted uppercase tracking-widest mb-4">Navegação</p>
 
-        <button
-          class="filtro-menu-btn w-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-primary/5 to-transparent hover:from-primary/10 text-slate-700 font-bold transition-all duration-300 border border-primary/5 hover:border-primary/20"
-          data-categoria="todos">
-          <span class="flex items-center gap-3"><i class="fa-solid fa-gem text-primary/60"></i> Todas as Joias</span>
-          <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
-        </button>
+  <!-- ✅ BOTÃO ÚNICO: Abre a sidebar de categorias -->
+  <button type="button" onclick="abrirSidebarMobile()"
+    class="w-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-amber-50/80 to-transparent hover:from-amber-100 text-amber-800 font-bold transition-all duration-300 border border-amber-200/30">
+    <span class="flex items-center gap-3">
+      <i class="fa-solid fa-crown text-amber-600"></i> Categorias & Joias
+    </span>
+    <i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i>
+  </button>
 
-        <!-- DOURADO MOBILE -->
-        <div class="space-y-1">
-          <button
-            class="w-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-amber-50/80 to-transparent hover:from-amber-100 text-amber-800 font-bold transition-all duration-300 border border-amber-200/30 hover:border-amber-400"
-            onclick="toggleSubmenuMobile(this)">
-            <span class="flex items-center gap-3"><i class="fa-solid fa-crown text-amber-600"></i> Folheado Dourado</span>
-            <i class="fa-solid fa-chevron-down text-[10px] opacity-50 transition-transform duration-300"></i>
-          </button>
-          <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-300/40 pl-3 hidden">
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i> Argolas</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="argolas dourada pequena">Argolas Pequenas</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="argolas dourada média">Argolas Médias</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="argolas dourada grande">Argolas Grandes</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="argolas dourada click">Argolas de Click</button>
-              </div>
-            </div>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-gem text-amber-500 text-xs"></i> Brincos</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="brinco de pressão dourado">Brinco de pressão</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="brincos de moda dourado">Brincos de moda</button>
-              </div>
-            </div>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-solid fa-link text-amber-500 text-xs"></i> Correntes</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="correntes masculina dourado">Masculina</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="correntes feminina dourado">Feminina</button>
-              </div>
-            </div>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-clock text-amber-500 text-xs"></i> Pulseiras</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="pulseiras feminina dourado">Feminina</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="pulseiras masculina dourado">Masculina</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500 transition-all duration-300" data-categoria="pulseiras infantil dourado">Infantil</button>
-              </div>
-            </div>
-            <button class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 transition-all duration-300" data-categoria="pingentes dourado">
-              <i class="fa-regular fa-star text-amber-500 text-xs"></i> Pingentes (Diversos)
-            </button>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i> Tornozeleiras</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="tornozeleiras feminina dourado">Feminina</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="tornozeleiras infantil dourado">Infantil</button>
-              </div>
-            </div>
-            <button class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 transition-all duration-300" data-categoria="terço dourado">
-              <i class="fa-solid fa-cross text-amber-500 text-xs"></i> Terço (Diversos)
-            </button>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i> Braceletes</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="braceletes feminino dourado">Feminino</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="braceletes masculino dourado">Masculino</button>
-              </div>
-            </div>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i> Anéis</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="aneis adulto dourado">Adulto</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="aneis infantil dourado">Infantis</button>
-              </div>
-            </div>
-            <button class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 transition-all duration-300" data-categoria="escapulário dourado">
-              <i class="fa-solid fa-pray text-amber-500 text-xs"></i> Escapulário (Diversos)
-            </button>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-amber-500 text-xs"></i> Conjuntos</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="conjuntos brinco colar dourado">Brinco + Colar</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="conjuntos completo dourado">Completo</button>
-              </div>
-            </div>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 text-sm text-slate-600 font-semibold transition-all duration-300"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-solid fa-link text-amber-500 text-xs"></i> Colar</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-amber-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="colar feminino dourado">Feminino</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="colar masculino dourado">Masculino</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-amber-50 text-xs text-slate-500" data-categoria="colar infantil dourado">Infantil</button>
-              </div>
-            </div>
-          </div>
-        </div>
+  <hr class="my-6 border-primary/10" />
 
-        <!-- PRATA MOBILE -->
-        <div class="space-y-1">
-          <button
-            class="w-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-slate-100/80 to-transparent hover:from-slate-200 text-slate-700 font-bold transition-all duration-300 border border-slate-200/50 hover:border-slate-400"
-            onclick="toggleSubmenuMobile(this)">
-            <span class="flex items-center gap-3"><i class="fa-regular fa-gem text-slate-500"></i> Folheado Prata</span>
-            <i class="fa-solid fa-chevron-down text-[10px] opacity-50 transition-transform duration-300"></i>
-          </button>
-          <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-300/40 pl-3 hidden">
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i> Argolas</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="argolas prateada pequena">Argolas Pequenas</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="argolas prateada média">Argolas Médias</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="argolas prateada grande">Argolas Grandes</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="argolas prateada click">Argolas de Click</button>
-              </div>
-            </div>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-gem text-slate-400 text-xs"></i> Brincos</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="brinco de pressão prata">Brinco de pressão</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="brincos de moda prata">Brincos de moda</button>
-              </div>
-            </div>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-solid fa-link text-slate-400 text-xs"></i> Correntes</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="correntes masculina prata">Masculina</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="correntes feminina prata">Feminina</button>
-              </div>
-            </div>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-clock text-slate-400 text-xs"></i> Pulseiras</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="pulseiras feminina prata">Feminina</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="pulseiras masculina prata">Masculina</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="pulseiras infantil prata">Infantil</button>
-              </div>
-            </div>
-            <button class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600" data-categoria="pingentes prata">
-              <i class="fa-regular fa-star text-slate-400 text-xs"></i> Pingentes (Diversos)
-            </button>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i> Tornozeleiras</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="tornozeleiras feminina prata">Feminina</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="tornozeleiras infantil prata">Infantil</button>
-              </div>
-            </div>
-            <button class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600" data-categoria="terço prata">
-              <i class="fa-solid fa-cross text-slate-400 text-xs"></i> Terço (Diversos)
-            </button>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i> Braceletes</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="braceletes feminino prata">Feminino</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="braceletes masculino prata">Masculino</button>
-              </div>
-            </div>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i> Anéis</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="aneis adulto prata">Adulto</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="aneis infantil prata">Infantis</button>
-              </div>
-            </div>
-            <button class="filtro-menu-btn w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600" data-categoria="escapulário prata">
-              <i class="fa-solid fa-pray text-slate-400 text-xs"></i> Escapulário (Diversos)
-            </button>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-regular fa-circle text-slate-400 text-xs"></i> Conjuntos</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="conjuntos brinco colar prata">Brinco + Colar</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="conjuntos completo prata">Completo</button>
-              </div>
-            </div>
-            <div class="space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-sm text-slate-600 font-semibold"
-                onclick="toggleSubmenuMobile(this)">
-                <span class="flex items-center gap-3"><i class="fa-solid fa-link text-slate-400 text-xs"></i> Colar</span>
-                <i class="fa-solid fa-chevron-down text-[8px] opacity-40"></i>
-              </button>
-              <div class="submenu-mobile ml-6 space-y-1 border-l-2 border-slate-200/40 pl-3 hidden">
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="colar feminino prata">Feminino</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="colar masculino prata">Masculino</button>
-                <button class="filtro-menu-btn w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 text-xs text-slate-500" data-categoria="colar infantil prata">Infantil</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <hr class="my-6 border-primary/10" />
-        <a href="#sobre-empresa" id="link-sobre-mobile"
-          class="w-full flex items-center gap-3 p-4 text-textMuted font-medium hover:text-primary transition-all duration-300">
-          <i class="fa-solid fa-circle-info"></i> Sobre Ivo Pita
-        </a>
-      </nav>
+  <a href="#sobre-empresa"
+    class="w-full flex items-center gap-3 p-4 text-textMuted font-medium hover:text-primary transition-all duration-300">
+    <i class="fa-solid fa-circle-info"></i> Sobre Ivo Pita
+  </a>
+</nav>
     </div>
     <div class="p-6 border-t border-primary/10">
       <a href="https://wa.me/5588999049636" target="_blank"
@@ -707,42 +209,381 @@
       </a>
     </div>
   </div>
- <section id="hero" class="relative w-full overflow-hidden bg-accent">
-  <div class="swiper heroSwiper w-full h-full">
-    <div class="swiper-wrapper"></div>
-    <div class="swiper-pagination"></div>
+
+  <!-- ========================================== -->
+  <!-- LAYOUT PRINCIPAL COM SIDEBAR -->
+  <!-- ========================================== -->
+  <div class="main-layout">
+
+    <!-- ========================================== -->
+    <!-- SIDEBAR DE CATEGORIAS -->
+    <!-- ========================================== -->
+    <aside id="sidebar-categorias" class="sidebar-categorias">
+
+      <div class="sidebar-header">
+        <h3 class="sidebar-title">
+          <i class="fas fa-gem"></i>
+          Categorias
+        </h3>
+        <button id="sidebar-close-mobile" class="sidebar-close-btn">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="sidebar-search" placeholder="Buscar categoria..." />
+      </div>
+
+      <div class="sidebar-scroll">
+
+        <!-- TODAS -->
+        <button class="sidebar-item sidebar-item-active" data-categoria="todos">
+          <span class="sidebar-icon"><i class="fas fa-gem"></i></span>
+          <span class="sidebar-label">Todas as Joias</span>
+          <span class="sidebar-count" id="count-todos">0</span>
+        </button>
+
+        <!-- ========================================== -->
+        <!-- FOLHEADO DOURADO -->
+        <!-- ========================================== -->
+        <div class="sidebar-group">
+          <button class="sidebar-group-title" onclick="toggleSidebarGroup(this)">
+            <span class="sidebar-group-icon" style="background: linear-gradient(135deg, #fef3c7, #fcd34d);">
+              <i class="fa-solid fa-crown" style="color: #92400e;"></i>
+            </span>
+            <span>Folheado Dourado</span>
+            <i class="fas fa-chevron-down sidebar-group-arrow"></i>
+          </button>
+          <div class="sidebar-group-content">
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Argolas</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="argolas dourada pequena"><span>Pequenas</span></button>
+                <button class="sidebar-item-sub" data-categoria="argolas dourada média"><span>Médias</span></button>
+                <button class="sidebar-item-sub" data-categoria="argolas dourada grande"><span>Grandes</span></button>
+                <button class="sidebar-item-sub" data-categoria="argolas dourada click"><span>Click</span></button>
+              </div>
+            </div>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Brincos</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="brinco de pressão dourado"><span>Brinco de Pressão</span></button>
+                <button class="sidebar-item-sub" data-categoria="brincos de moda dourado"><span>Brincos de Moda</span></button>
+              </div>
+            </div>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Correntes</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="correntes masculina dourado"><span>Masculina</span></button>
+                <button class="sidebar-item-sub" data-categoria="correntes feminina dourado"><span>Feminina</span></button>
+              </div>
+            </div>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Pulseiras</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="pulseiras feminina dourado"><span>Feminina</span></button>
+                <button class="sidebar-item-sub" data-categoria="pulseiras masculina dourado"><span>Masculina</span></button>
+                <button class="sidebar-item-sub" data-categoria="pulseiras infantil dourado"><span>Infantil</span></button>
+              </div>
+            </div>
+
+            <button class="sidebar-item-sub" data-categoria="pingentes dourado">
+              <span><i class="fas fa-star" style="font-size: 10px;"></i> Pingentes</span>
+            </button>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Tornozeleiras</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="tornozeleiras feminina dourado"><span>Feminina</span></button>
+                <button class="sidebar-item-sub" data-categoria="tornozeleiras infantil dourado"><span>Infantil</span></button>
+              </div>
+            </div>
+
+            <button class="sidebar-item-sub" data-categoria="terço dourado">
+              <span><i class="fas fa-cross" style="font-size: 10px;"></i> Terço</span>
+            </button>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Braceletes</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="braceletes feminino dourado"><span>Feminino</span></button>
+                <button class="sidebar-item-sub" data-categoria="braceletes masculino dourado"><span>Masculino</span></button>
+              </div>
+            </div>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Anéis</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="aneis adulto dourado"><span>Adulto</span></button>
+                <button class="sidebar-item-sub" data-categoria="aneis infantil dourado"><span>Infantis</span></button>
+              </div>
+            </div>
+
+            <button class="sidebar-item-sub" data-categoria="escapulário dourado">
+              <span><i class="fas fa-pray" style="font-size: 10px;"></i> Escapulário</span>
+            </button>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Conjuntos</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="conjuntos brinco colar dourado"><span>Brinco + Colar</span></button>
+                <button class="sidebar-item-sub" data-categoria="conjuntos completo dourado"><span>Completo</span></button>
+              </div>
+            </div>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Colar</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="colar feminino dourado"><span>Feminino</span></button>
+                <button class="sidebar-item-sub" data-categoria="colar masculino dourado"><span>Masculino</span></button>
+                <button class="sidebar-item-sub" data-categoria="colar infantil dourado"><span>Infantil</span></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- FOLHEADO PRATA -->
+        <!-- ========================================== -->
+        <div class="sidebar-group">
+          <button class="sidebar-group-title" onclick="toggleSidebarGroup(this)">
+            <span class="sidebar-group-icon" style="background: linear-gradient(135deg, #f1f5f9, #cbd5e1);">
+              <i class="fa-regular fa-gem" style="color: #475569;"></i>
+            </span>
+            <span>Folheado Prata</span>
+            <i class="fas fa-chevron-down sidebar-group-arrow"></i>
+          </button>
+          <div class="sidebar-group-content">
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Argolas</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="argolas prateada pequena"><span>Pequenas</span></button>
+                <button class="sidebar-item-sub" data-categoria="argolas prateada média"><span>Médias</span></button>
+                <button class="sidebar-item-sub" data-categoria="argolas prateada grande"><span>Grandes</span></button>
+                <button class="sidebar-item-sub" data-categoria="argolas prateada click"><span>Click</span></button>
+              </div>
+            </div>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Brincos</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="brinco de pressão prata"><span>Brinco de Pressão</span></button>
+                <button class="sidebar-item-sub" data-categoria="brincos de moda prata"><span>Brincos de Moda</span></button>
+              </div>
+            </div>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Correntes</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="correntes masculina prata"><span>Masculina</span></button>
+                <button class="sidebar-item-sub" data-categoria="correntes feminina prata"><span>Feminina</span></button>
+              </div>
+            </div>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Pulseiras</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="pulseiras feminina prata"><span>Feminina</span></button>
+                <button class="sidebar-item-sub" data-categoria="pulseiras masculina prata"><span>Masculina</span></button>
+                <button class="sidebar-item-sub" data-categoria="pulseiras infantil prata"><span>Infantil</span></button>
+              </div>
+            </div>
+
+            <button class="sidebar-item-sub" data-categoria="pingentes prata">
+              <span><i class="fas fa-star" style="font-size: 10px;"></i> Pingentes</span>
+            </button>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Tornozeleiras</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="tornozeleiras feminina prata"><span>Feminina</span></button>
+                <button class="sidebar-item-sub" data-categoria="tornozeleiras infantil prata"><span>Infantil</span></button>
+              </div>
+            </div>
+
+            <button class="sidebar-item-sub" data-categoria="terço prata">
+              <span><i class="fas fa-cross" style="font-size: 10px;"></i> Terço</span>
+            </button>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Braceletes</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="braceletes feminino prata"><span>Feminino</span></button>
+                <button class="sidebar-item-sub" data-categoria="braceletes masculino prata"><span>Masculino</span></button>
+              </div>
+            </div>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Anéis</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="aneis adulto prata"><span>Adulto</span></button>
+                <button class="sidebar-item-sub" data-categoria="aneis infantil prata"><span>Infantis</span></button>
+              </div>
+            </div>
+
+            <button class="sidebar-item-sub" data-categoria="escapulário prata">
+              <span><i class="fas fa-pray" style="font-size: 10px;"></i> Escapulário</span>
+            </button>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Conjuntos</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="conjuntos brinco colar prata"><span>Brinco + Colar</span></button>
+                <button class="sidebar-item-sub" data-categoria="conjuntos completo prata"><span>Completo</span></button>
+              </div>
+            </div>
+
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Colar</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="colar feminino prata"><span>Feminino</span></button>
+                <button class="sidebar-item-sub" data-categoria="colar masculino prata"><span>Masculino</span></button>
+                <button class="sidebar-item-sub" data-categoria="colar infantil prata"><span>Infantil</span></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="sidebar-footer">
+        <a href="https://wa.me/5588999049636" target="_blank" class="sidebar-whatsapp">
+          <i class="fa-brands fa-whatsapp"></i>
+          Fale Conosco
+        </a>
+      </div>
+
+    </aside>
+
+    <!-- OVERLAY MOBILE -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <!-- ========================================== -->
+    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- ========================================== -->
+    <main class="main-content">
+
+       <!-- ========================================== -->
+      <!-- BANNER HERO - LIMPO E BAIXO -->
+      <!-- ========================================== -->
+      <section id="hero" class="hero-clean">
+        <div class="swiper heroSwiper">
+          <div class="swiper-wrapper"></div>
+          <div class="swiper-pagination"></div>
+        </div>
+      </section>
+
+      <!-- PRODUTOS -->
+      <section id="produtos" class="px-4 max-w-full mx-auto pb-20">
+
+        <div class="products-header">
+          <div>
+            <h2 class="products-title" id="products-title">Nossas Joias</h2>
+            <p class="products-subtitle" id="products-subtitle">Explore nossa coleção exclusiva</p>
+          </div>
+          <div class="products-header-info">
+            <span class="products-count" id="products-count">0 produtos</span>
+            <select id="sort-select" class="products-sort">
+              <option value="relevancia">Relevância</option>
+              <option value="menor-preco">Menor Preço</option>
+              <option value="maior-preco">Maior Preço</option>
+              <option value="nome-az">Nome (A-Z)</option>
+              <option value="nome-za">Nome (Z-A)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="produtos-container" class="produtos-grid-5"></div>
+
+      </section>
+
+    </main>
+
   </div>
-</section>
 
-  <section id="produtos" class="px-4 max-w-7xl mx-auto pb-20">
-    <div class="text-center mb-10">
-      <h2 class="text-4xl font-black mb-8 tracking-tight font-serif text-accent">Nossas Joias</h2>
-    </div>
-    <div id="produtos-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
-  </section>
-
+  <!-- ========================================== -->
   <!-- MODAL DO CARRINHO -->
+  <!-- ========================================== -->
   <div id="cart-modal" class="fixed inset-0 bg-accent/60 backdrop-blur-sm hidden items-center justify-center p-2 sm:p-4"
     style="z-index: 99999">
     <div
       class="bg-white w-full max-w-md rounded-[32px] flex flex-col h-auto max-h-[97vh] shadow-2xl overflow-hidden animate-scale">
       <div class="p-4 sm:p-6 pb-2 flex justify-between items-center flex-shrink-0">
-  <h2 class="text-sm font-black uppercase tracking-widest text-slate-800">
-    <i class="fas fa-shopping-bag text-primary mr-2"></i>Sua Sacola
-  </h2>
-  <div class="flex items-center gap-4">
-
-    <!-- ✅ BOTÃO LIMPAR SACOLA MOVIDO PARA CÁ -->
-
-    <button id="clear-cart-btn"
-  class="text-[10px] font-bold text-red-400 uppercase hover:text-red-600 transition-colors hidden mr-3">
-  <i class="fas fa-trash-alt mr-1"></i>Limpar
-</button>
-    <button id="close-modal-btn" class="text-slate-400 hover:text-primary transition-colors p-2">
-      <i class="fa-solid fa-xmark text-xl"></i>
-    </button>
-  </div>
-</div>
+        <h2 class="text-sm font-black uppercase tracking-widest text-slate-800">
+          <i class="fas fa-shopping-bag text-primary mr-2"></i>Sua Sacola
+        </h2>
+        <div class="flex items-center gap-4">
+          <button id="clear-cart-btn"
+            class="text-[10px] font-bold text-red-400 uppercase hover:text-red-600 transition-colors hidden mr-3">
+            <i class="fas fa-trash-alt mr-1"></i>Limpar
+          </button>
+          <button id="close-modal-btn" class="text-slate-400 hover:text-primary transition-colors p-2">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+      </div>
       <div class="px-4 sm:px-6 py-2 flex-shrink-0">
         <div id="free-shipping-text" class="text-[10px] font-bold mb-1 text-textMuted uppercase tracking-tight"></div>
         <div class="w-full bg-primary/10 h-1.5 rounded-full overflow-hidden">
@@ -780,11 +621,13 @@
             <i class="fab fa-whatsapp"></i> Finalizar
           </button>
         </div>
-        </div>
+      </div>
     </div>
   </div>
 
+  <!-- ========================================== -->
   <!-- MODAL PDF -->
+  <!-- ========================================== -->
   <div id="pdf-preview-modal" class="fixed inset-0 bg-accent/70 backdrop-blur-sm hidden items-center justify-center p-4"
     style="z-index: 99999">
     <div
@@ -799,15 +642,17 @@
       </div>
       <div id="pdf-preview-content" class="overflow-y-auto p-4" style="max-height: 60vh"></div>
       <div class="p-4 border-t border-primary/10">
-  <button id="download-pdf-btn"
-    class="w-full bg-primary text-white py-3 rounded-2xl font-bold text-xs uppercase tracking-wider hover:bg-primaryDark transition-all flex items-center justify-center gap-2">
-    <i class="fas fa-download"></i> Baixar PDF e Finalizar Pedido
-  </button>
-</div>
+        <button id="download-pdf-btn"
+          class="w-full bg-primary text-white py-3 rounded-2xl font-bold text-xs uppercase tracking-wider hover:bg-primaryDark transition-all flex items-center justify-center gap-2">
+          <i class="fas fa-download"></i> Baixar PDF e Finalizar Pedido
+        </button>
+      </div>
     </div>
   </div>
 
+  <!-- ========================================== -->
   <!-- MODAL CONFIRM LIMPAR -->
+  <!-- ========================================== -->
   <div id="confirm-clear-modal" class="fixed inset-0 hidden items-center justify-center bg-accent/50"
     style="z-index: 99999">
     <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
@@ -822,50 +667,67 @@
     </div>
   </div>
 
-  <!-- MODAL DE SELEÇÃO DE COR E QUANTIDADE -->
+  <!-- ========================================== -->
+  <!-- MODAL DE SELEÇÃO (NOVO VISUAL COMPACTO) -->
+  <!-- ========================================== -->
   <div id="size-modal" class="fixed inset-0 bg-accent/60 backdrop-blur-sm hidden items-center justify-center p-4"
     style="z-index: 99999">
-    <div
-      class="bg-white w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl text-center animate-scale max-h-[95vh] overflow-y-auto">
-      <h3 id="modal-step-title" class="text-xl font-black mb-1 font-serif text-accent">Selecione a Quantidade</h3>
-      <p id="size-product-name" class="text-xs text-textMuted mb-2"></p>
-      <p id="size-product-ref" class="text-xs font-bold text-primary mb-2"></p>
-      <p id="size-product-price" class="text-lg font-black text-primary mb-4">R$ 0,00 cada</p>
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl animate-scale overflow-hidden flex flex-col">
 
-      <div id="size-step" class="mb-6">
-        <p class="text-[10px] text-textMuted font-bold uppercase tracking-widest mb-3">Escolha a Quantidade:</p>
-        <div id="options-container" class="grid grid-cols-3 gap-2 mb-4"></div>
-        <div class="relative">
-          <p class="text-[10px] text-textMuted/70 uppercase tracking-widest mb-2">ou digite a quantidade desejada:</p>
-          <div class="flex gap-2">
-            <input type="number" id="custom-quantity" min="1" value="1"
-              class="flex-1 p-3 border border-primary/15 rounded-xl text-center font-bold text-sm focus:ring-2 focus:ring-primary outline-none" />
-            <button id="add-custom-qty"
-              class="bg-primary text-white px-4 py-3 rounded-xl font-bold text-xs hover:bg-primaryDark transition">Selecionar</button>
-          </div>
+      <!-- ============ HEADER: IMAGEM + PRODUTO ============ -->
+      <div class="size-modal-header">
+        <div class="size-modal-thumb" id="size-product-image-container">
+          <!-- Imagem inserida via JS -->
+        </div>
+        <div class="size-modal-info">
+          <p class="size-modal-ref" id="size-product-ref">Ref: —</p>
+          <h3 class="size-modal-name" id="size-product-name">Produto</h3>
+          <p class="size-modal-price" id="size-product-price">
+            R$ 0,00 cada
+            <small>0 unidades disponíveis</small>
+          </p>
         </div>
       </div>
 
-      <div id="color-step" class="mb-6">
-        <p id="color-instruction" class="text-[10px] text-textMuted font-bold uppercase tracking-widest mb-3">Escolha a
-          quantidade primeiro</p>
-        <div id="colors-container" class="flex flex-wrap justify-center gap-3 mb-4"></div>
+      <!-- ============ CORPO ============ -->
+      <div class="size-modal-body">
+
+        <!-- QUANTIDADE -->
+        <div id="size-step">
+          <p class="size-section-label">Quantidade</p>
+          <div id="options-container"></div>
+
+          <div class="size-custom-row">
+            <input type="number" id="custom-quantity" min="1" value="1" placeholder="Digitar" />
+            <button id="add-custom-qty">Selecionar</button>
+          </div>
+        </div>
+
+        <!-- CORES -->
+        <div id="color-step" style="margin-top: 16px;">
+          <p class="size-section-label" id="color-instruction">Escolha a quantidade primeiro</p>
+          <div id="colors-container"></div>
+        </div>
+
+        <!-- RESUMO -->
+        <div id="selection-summary" class="selection-summary hidden"></div>
       </div>
 
-      <div id="selection-summary" class="selection-summary hidden mb-4"></div>
-
-      <div class="flex gap-3">
-        <button onclick="closeSizeModal()"
-          class="flex-1 py-3 rounded-xl font-bold text-xs uppercase tracking-wider bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Cancelar</button>
-        <button onclick="confirmarSelecao()"
-          class="flex-1 py-3 rounded-xl font-bold text-xs uppercase tracking-wider bg-primary text-white hover:bg-primaryDark transition">
+      <!-- ============ RODAPÉ FIXO ============ -->
+      <div class="size-modal-footer">
+        <button onclick="closeSizeModal()" class="btn-cancel">
+          Cancelar
+        </button>
+        <button onclick="confirmarSelecao()" class="btn-add">
           <i class="fas fa-shopping-bag mr-1"></i> Adicionar
         </button>
       </div>
+
     </div>
   </div>
-
+  <!-- ========================================== -->
   <!-- MODAL ZOOM -->
+  <!-- ========================================== -->
   <div id="image-zoom-modal" class="image-zoom-modal">
     <button class="close-zoom" onclick="fecharZoom()"><i class="fas fa-times"></i></button>
     <div class="nav-arrows">
@@ -877,11 +739,15 @@
       id="zoom-thumbnails"></div>
   </div>
 
+  <!-- BOTÃO WHATSAPP -->
   <a href="https://wa.me/5588999049636" target="_blank"
     class="fixed bottom-6 right-6 bg-[#25d366] text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-xl animate-breathe z-[9999]">
     <i class="fa-brands fa-whatsapp"></i>
   </a>
 
+  <!-- ========================================== -->
+  <!-- FOOTER -->
+  <!-- ========================================== -->
   <footer id="sobre-empresa" class="bg-accent text-white pt-20 pb-10 px-6 mt-20 border-t border-white/5">
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
       <div>
@@ -892,9 +758,6 @@
           materiais nobres.
         </p>
         <div class="flex gap-4">
-          <!-- <a href="https://www.instagram.com/ivo_pita" target="_blank"
-            class="w-10 h-10 bg-white/5 flex items-center justify-center rounded-full hover:bg-primary transition"><i
-              class="fa-brands fa-instagram"></i></a> -->
           <a href="https://wa.me/5588999049636" target="_blank"
             class="w-10 h-10 bg-white/5 flex items-center justify-center rounded-full hover:bg-primary transition"><i
               class="fa-brands fa-whatsapp"></i></a>
@@ -927,6 +790,7 @@
     </div>
   </footer>
 
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script src="script.js"></script>
@@ -940,6 +804,7 @@
       });
     }
   </script>
+
 </body>
 
 </html>
