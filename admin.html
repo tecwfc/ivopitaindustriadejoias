@@ -2690,7 +2690,9 @@
             }
 
             vendasFiltradas.forEach((v, index) => {
-                const statusClass = v.status === 'Pago' ? 'status-pago' : (v.status === 'Pendente' ? 'status-pendente' : 'status-cancelado');
+                const statusReal = v.status || 'Pago';
+                const statusClass = statusReal === 'Pago' ? 'status-pago' : (statusReal === 'Pendente' ? 'status-pendente' : 'status-cancelado');
+                
                 const tr = document.createElement('tr');
                 tr.className = 'border-b hover:bg-gray-50';
                 const dataFormatada = formatarData(v.data);
@@ -2704,7 +2706,7 @@
                     <td class="py-2 px-2 text-xs text-right">R$ ${(parseFloat(v.subtotal) || 0).toFixed(2).replace('.', ',')}</td>
                     <td class="py-2 px-2 text-xs text-right">${parseFloat(v.frete) === 0 ? 'GRÁTIS' : `R$ ${(parseFloat(v.frete) || 0).toFixed(2).replace('.', ',')}`}</td>
                     <td class="py-2 px-2 text-xs font-bold text-primary text-right">R$ ${(parseFloat(v.total) || 0).toFixed(2).replace('.', ',')}</td>
-                    <td class="py-2 px-2 text-center"><span class="${statusClass}">${v.status || 'Pendente'}</span></td>
+                    <td class="py-2 px-2 text-center"><span class="${statusClass}">${statusReal}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -3022,7 +3024,8 @@
                         document.getElementById('Saldo Estoque').value = 0;
                     }
                     fecharModal('modalProduto');
-                    setTimeout(() => carregarProdutos(), 2000);
+                    carregarProdutos();
+                    setTimeout(() => carregarProdutos(), 1500);
                 } else {
                     alert('❌ Erro: ' + (result.error || 'Erro desconhecido'));
                 }
@@ -3090,7 +3093,8 @@
                 const result = await chamarAPI("excluir", { id: id });
                 if (result.success) {
                     alert('Produto excluído!');
-                    setTimeout(() => carregarProdutos(), 2000);
+                    carregarProdutos();
+                    setTimeout(() => carregarProdutos(), 1500);
                 } else {
                     alert('❌ Erro: ' + (result.error || 'Erro desconhecido'));
                 }
@@ -3117,7 +3121,8 @@
                 alert('Banner adicionado!');
                 document.getElementById('formBanner').reset();
                 document.getElementById('bannerAtivo').checked = true;
-                setTimeout(() => carregarProdutos(), 2000);
+                carregarProdutos();
+                setTimeout(() => carregarProdutos(), 1500);
             } else {
                 alert('❌ Erro: ' + (result.error || 'Erro desconhecido'));
             }
@@ -3128,7 +3133,8 @@
                 const result = await chamarAPI("excluir_banner", { index: index });
                 if (result.success) {
                     alert('Banner excluído!');
-                    setTimeout(() => carregarProdutos(), 2000);
+                   carregarProdutos();
+                    setTimeout(() => carregarProdutos(), 1500);
                 } else {
                     alert('❌ Erro: ' + (result.error || 'Erro desconhecido'));
                 }
