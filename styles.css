@@ -47,12 +47,12 @@ body {
   background: var(--bg-soft);
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
-  padding-top: calc(var(--header-h) + var(--marquee-h)); /* 128px */
+  padding-top: calc(var(--header-h) + var(--marquee-h));
 }
 
 @media (max-width: 768px) {
   body {
-    padding-top: calc(var(--header-mobile-h) + var(--marquee-mobile-h)); /* 118px */
+    padding-top: calc(var(--header-mobile-h) + var(--marquee-mobile-h));
   }
 }
 
@@ -728,19 +728,18 @@ header.glass #search-input-desktop::placeholder {
   min-width: 0;
 }
 
-/* ✅ ESCONDE NO DESKTOP — sem depender do Tailwind */
 @media (min-width: 769px) {
   .catalogo-mobile {
     display: none !important;
   }
 }
 
-/* ✅ ESCONDE O TÍTULO DESKTOP NO MOBILE */
 @media (max-width: 768px) {
   .catalogo-inline {
     display: none !important;
   }
 }
+
 .catalogo-heading-mobile {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.15rem;
@@ -1176,21 +1175,70 @@ header.glass #search-input-desktop::placeholder {
 
 .product-card:hover .product-card-image img { transform: scale(1.08); }
 
+/* ========================================== */
+/* SELO "ESGOTADO" — CLÁSSICO ELEGANTE         */
+/* ========================================== */
 .product-card-sold-out {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(15, 47, 34, 0.72);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 2;
 }
 
 .product-card-sold-out span {
-  color: white;
-  font-weight: 800;
-  font-size: 16px;
-  letter-spacing: 2px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.35em;
   text-transform: uppercase;
+  text-indent: 0.35em;
+  padding: 10px 24px;
+  border-top: 2px solid #c9a86a;
+  border-bottom: 2px solid #c9a86a;
+  position: relative;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(201, 168, 106, 0.15) 50%,
+    transparent 100%
+  );
+}
+
+.product-card-sold-out span::before,
+.product-card-sold-out span::after {
+  content: '◆';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c9a86a;
+  font-size: 0.6rem;
+}
+
+.product-card-sold-out span::before { left: -8px; }
+.product-card-sold-out span::after { right: -8px; }
+
+/* ========================================== */
+/* ESGOTADO — RESPONSIVO MOBILE (VERSÃO 1)     */
+/* ========================================== */
+@media (max-width: 640px) {
+  .product-card-sold-out span {
+    font-size: 1.1rem;
+    letter-spacing: 0.25em;
+    text-indent: 0.25em;
+    padding: 8px 16px;
+  }
+
+  .product-card-sold-out span::before,
+  .product-card-sold-out span::after {
+    font-size: 0.5rem;
+  }
 }
 
 .product-card-content {
@@ -2157,12 +2205,10 @@ header.glass #search-input-desktop::placeholder {
     font-size: 1.8rem;
   }
 
-  /* Esconde o título "Catálogo" no desktop (a versão mobile entra) */
   .catalogo-inline {
     display: none !important;
   }
 
-  /* Ajuste para o título mobile */
   .catalogo-mobile {
     gap: 8px;
   }
@@ -2216,7 +2262,6 @@ header.glass #search-input-desktop::placeholder {
   .banner-slide-subtitle { font-size: 0.55rem; }
   .banner-slide-btn { padding: 8px 18px; font-size: 0.55rem; letter-spacing: 0.14em; }
 
-  /* Ajustes do título catálogo no mobile pequeno */
   .catalogo-heading-mobile {
     font-size: 1.1rem;
   }
@@ -2252,7 +2297,6 @@ header.glass #search-input-desktop::placeholder {
   .produtos-grid-5 .product-card-price { font-size: 13px; }
   .produtos-grid-5 .product-card-btn { font-size: 9.5px; padding: 7px; }
 
-  /* Esconde subtítulo no mobile ultra pequeno */
   .catalogo-subheading-mobile,
   .catalogo-separator-mobile {
     display: none;
@@ -2261,11 +2305,10 @@ header.glass #search-input-desktop::placeholder {
     font-size: 1.05rem;
   }
 }
+
 /* ========================================== */
 /* CONTROLE DE VISIBILIDADE - DESKTOP x MOBILE */
 /* ========================================== */
-
-/* Grupo desktop: título + busca */
 .catalogo-desktop-group {
   display: flex;
 }
@@ -2276,7 +2319,6 @@ header.glass #search-input-desktop::placeholder {
   }
 }
 
-/* Título mobile */
 .catalogo-mobile {
   display: none;
 }
@@ -2286,11 +2328,10 @@ header.glass #search-input-desktop::placeholder {
     display: flex !important;
   }
 }
+
 /* ========================================== */
 /* MODAL DE SELEÇÃO — VISUAL COMPACTO E MODERNO */
 /* ========================================== */
-
-/* Container do modal — fundo mais sutil */
 #size-modal {
   background: rgba(15, 47, 34, 0.55) !important;
   backdrop-filter: blur(6px);
@@ -2663,5 +2704,41 @@ header.glass #search-input-desktop::placeholder {
     flex: 1 1 calc(25% - 5px);
     min-width: 44px;
     font-size: 12px !important;
+  }
+}
+
+/* ========================================== */
+/* PDF PREVIEW - VISUALIZAÇÃO NA TELA         */
+/* ========================================== */
+#pdf-preview-content {
+  background: #e8ebe9;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+#pdf-preview-content .pdf-preview-content {
+  box-shadow: 0 10px 40px rgba(15, 47, 34, 0.2);
+  border-radius: 4px;
+  transform-origin: top center;
+}
+
+@media (max-width: 640px) {
+  #pdf-preview-content {
+    padding: 10px;
+    overflow-x: auto;
+  }
+  #pdf-preview-content .pdf-preview-content {
+    transform: scale(0.75);
+    transform-origin: top left;
+    margin-left: -25px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  #pdf-preview-content .pdf-preview-content {
+    transform: scale(0.85);
+    transform-origin: top center;
   }
 }
