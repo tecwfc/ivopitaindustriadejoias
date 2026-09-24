@@ -6,6 +6,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
   <title>Ivo Pita | Indústria de Joias</title>
 
+   <!-- 🚧 VERIFICAÇÃO DE MANUTENÇÃO -->
+  <script>
+    (function() {
+      // Se for você (admin) com ?admin=, ignora
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('admin') === 'ivopita2026') {
+        sessionStorage.setItem('admin_bypass', 'true');
+        return;
+      }
+      if (sessionStorage.getItem('admin_bypass') === 'true') return;
+
+      // Verifica no Apps Script
+      var callback = 'manut_check_' + Date.now();
+      window[callback] = function(data) {
+        delete window[callback];
+        if (data && data.success && data.emManutencao) {
+          window.location.replace('manutencao.html');
+        }
+      };
+      var s = document.createElement('script');
+      s.src = 'https://script.google.com/macros/s/AKfycbwRaA3rQLawY32JJssrGfCDx08iSnapR6f_K3LgK9T3TwNcXX56Rvmy4DBO1chfkT-M/exec?modo=publico&tipo=verificar_manutencao&callback=' + callback;
+      document.head.appendChild(s);
+    })();
+  </script>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
