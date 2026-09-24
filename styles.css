@@ -2716,29 +2716,23 @@ header.glass #search-input-desktop::placeholder {
   display: flex;
   justify-content: center;
   border-radius: 12px;
+  overflow-x: auto; /* Permite rolar horizontalmente no mobile */
 }
 
 #pdf-preview-content .pdf-preview-content {
   box-shadow: 0 10px 40px rgba(15, 47, 34, 0.2);
   border-radius: 4px;
-  transform-origin: top center;
+  /* REMOVIDO: transform e margin-left que quebravam o mobile */
 }
 
+/* No mobile, permite rolagem horizontal em vez de cortar */
 @media (max-width: 640px) {
   #pdf-preview-content {
     padding: 10px;
-    overflow-x: auto;
+    justify-content: flex-start; /* Alinha à esquerda para rolar */
   }
   #pdf-preview-content .pdf-preview-content {
-    transform: scale(0.75);
-    transform-origin: top left;
-    margin-left: -25px;
-  }
-}
-
-@media (min-width: 641px) and (max-width: 900px) {
-  #pdf-preview-content .pdf-preview-content {
-    transform: scale(0.85);
-    transform-origin: top center;
+    /* Mantém o tamanho A4 real para o html2canvas capturar corretamente */
+    min-width: 210mm;
   }
 }
