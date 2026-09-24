@@ -27,6 +27,25 @@ let FRETE_GRATIS_VALOR = 3500;
 let TAXA_FRETE = 75;
 
 // ============================================
+// PLACEHOLDER SVG EMBUTIDO (não depende de internet)
+// ============================================
+const PLACEHOLDER_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#f0f7f2"/>
+  <rect x="20" y="20" width="360" height="360" fill="none" stroke="#c9a86a" stroke-width="2" stroke-dasharray="8,6" rx="20"/>
+  <g transform="translate(200, 170)">
+    <circle cx="0" cy="0" r="40" fill="none" stroke="#2f6b4f" stroke-width="3"/>
+    <circle cx="0" cy="0" r="20" fill="none" stroke="#c9a86a" stroke-width="2"/>
+    <path d="M-15 -15 L15 15 M15 -15 L-15 15" stroke="#2f6b4f" stroke-width="2" opacity="0.4"/>
+  </g>
+  <text x="200" y="280" font-family="Montserrat, Arial, sans-serif" font-size="16" font-weight="600" fill="#2f6b4f" text-anchor="middle" letter-spacing="1">SEM IMAGEM</text>
+  <text x="200" y="305" font-family="Montserrat, Arial, sans-serif" font-size="11" font-weight="400" fill="#5c6b63" text-anchor="middle" letter-spacing="0.5">Ivo Pita Joias</text>
+</svg>
+`)}`;
+
+window.PLACEHOLDER_SVG = PLACEHOLDER_SVG;
+
+// ============================================
 // VARIÁVEIS GLOBAIS
 // ============================================
 let allProducts = [];
@@ -43,10 +62,10 @@ let coresSelecionadas = {};
 let coresDisponiveis = [];
 
 // ============================================
-// CACHE DE ESTOQUE (evita consultas repetidas)
+// CACHE DE ESTOQUE
 // ============================================
 const ESTOQUE_CACHE = new Map();
-const ESTOQUE_CACHE_TTL = 30 * 1000; // 30 segundos
+const ESTOQUE_CACHE_TTL = 30 * 1000;
 
 function getEstoqueCache(produtoId) {
   const entry = ESTOQUE_CACHE.get(String(produtoId));
@@ -67,7 +86,7 @@ function invalidarEstoqueCache() {
 }
 
 // ============================================
-// TOAST PADRONIZADO (sempre topo-direita)
+// TOAST PADRONIZADO
 // ============================================
 function showToast(texto, tipo = 'success', duracao = 2500) {
   const cores = {
@@ -122,12 +141,12 @@ function normalizarPalavraBusca(palavra) {
 }
 
 function driveImg(url) {
-  if (!url) return "https://via.placeholder.com/400?text=Sem+Imagem";
+  if (!url || url === 'placeholder.png') return PLACEHOLDER_SVG;
   if (url.includes("googleusercontent.com")) return url;
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (match) return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=w800`;
   if (url.startsWith("http")) return url;
-  return "https://via.placeholder.com/400?text=Sem+Imagem";
+  return PLACEHOLDER_SVG;
 }
 
 // ============================================
@@ -573,6 +592,7 @@ async function verificarEstoqueServidor(produtoId) {
   return new Promise((resolve) => {
     const callbackName = "verificar_estoque_" + Date.now();
     let resolvido = false;
+    let script = null;
 
     const finalizar = (resultado) => {
       if (resolvido) return;
@@ -589,7 +609,7 @@ async function verificarEstoqueServidor(produtoId) {
       finalizar(response);
     };
 
-    const script = document.createElement("script");
+    script = document.createElement("script");
     script.src = `${ESTOQUE_API_URL}?modo=publico&tipo=verificar_estoque&id=${encodeURIComponent(produtoId)}&callback=${callbackName}`;
 
     script.onerror = function () {
@@ -887,7 +907,7 @@ function renderProducts(products) {
             <div class="product-card-image">
                 <img src="${driveImg(p["Imagem"])}" 
                      alt="${p["Nome do Produto"]}" 
-                     onerror="this.src='https://via.placeholder.com/400?text=Sem+Imagem'"
+                     onerror="this.onerror=null; this.src=window.PLACEHOLDER_SVG;"
                      onclick="abrirZoomDireto('${p["Imagem"]}')">
                 ${estoque <= 0 ? '<div class="product-card-sold-out"><span>ESGOTADO</span></div>' : ""}
             </div>
@@ -1000,7 +1020,8 @@ function abrirZoomDireto(imagem) {
 
   img.src = imagensZoom[zoomIndex];
   img.onerror = function () {
-    this.src = "https://via.placeholder.com/800x800?text=Sem+Imagem";
+    this.onerror = null;
+    this.src = PLACEHOLDER_SVG;
   };
 
   thumbnails.innerHTML = "";
@@ -1057,7 +1078,7 @@ window.abrirZoomDireto = abrirZoomDireto;
 window.abrirZoomModal = abrirZoomModal;
 
 // ============================================
-// OPEN SIZE SELECTOR (com cache + background)
+// OPEN SIZE SELECTOR
 // ============================================
 window.openSizeSelector = function (id, name, ref, price, img) {
   console.log("🎯 openSizeSelector:", { id, name, ref, price });
@@ -1116,7 +1137,7 @@ window.openSizeSelector = function (id, name, ref, price, img) {
     imgContainer.innerHTML = `
       <img src="${driveImg(p["Imagem"])}" 
            alt="${name}"
-           onerror="this.src='https://via.placeholder.com/100?text=Sem+Imagem'">
+           onerror="this.onerror=null; this.src=window.PLACEHOLDER_SVG;">
     `;
     imgContainer.onclick = function () {
       abrirZoomModal(p["Imagem"]);
@@ -1282,7 +1303,7 @@ async function carregarBannerHero() {
           <img src="${driveImg(b.imagem)}" 
                class="banner-slide-img" 
                alt="${b.titulo}"
-               onerror="this.src='https://via.placeholder.com/1600x600?text=Ivo+Pita'">
+               onerror="this.onerror=null; this.src=window.PLACEHOLDER_SVG;">
           <div class="banner-slide-bar">
             <div class="banner-slide-content">
               <h2 class="banner-slide-title">${b.titulo}</h2>
@@ -1493,7 +1514,7 @@ async function visualizarPDF() {
 }
 
 // ============================================
-// FUNÇÃO: Finalizar Pedido via ROTA PÚBLICA
+// FUNÇÃO: Finalizar Pedido via JSONP (compatível)
 // ============================================
 async function processarPedidoPublico(nomeCliente, endereco) {
   const itensParaBaixar = {};
@@ -1503,10 +1524,10 @@ async function processarPedidoPublico(nomeCliente, endereco) {
     itensParaBaixar[baseId] += item.quantity;
   });
 
-  const itemsArray = Object.keys(itensParaBaixar).map((id) => ({
-    id: id,
-    quantity: itensParaBaixar[id]
-  }));
+  // ✅ Formato compacto: "1:2,5:1" (id:qtd)
+  const itemsCompactos = Object.keys(itensParaBaixar)
+    .map((id) => `${id}:${itensParaBaixar[id]}`)
+    .join(',');
 
   const itensTexto = cart
     .map((i) => `${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} (R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada)`)
@@ -1515,13 +1536,27 @@ async function processarPedidoPublico(nomeCliente, endereco) {
   const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
   const freteAplicado = subtotal >= FRETE_GRATIS_VALOR ? 0 : TAXA_FRETE;
 
+  console.log("📡 Enviando pedido via JSONP...");
+  console.log("   Cliente:", nomeCliente);
+  console.log("   Itens compactos:", itemsCompactos);
+  console.log("   Total:", totalFinal);
+
+  // ✅ JSONP sempre funciona
   return new Promise((resolve, reject) => {
     const callbackName = "fazer_pedido_" + Date.now();
+    let resolvido = false;
 
-    window[callbackName] = function (response) {
+    const finalizar = (dados) => {
+      if (resolvido) return;
+      resolvido = true;
       delete window[callbackName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-      resolve(response);
+      if (script && script.parentNode) script.parentNode.removeChild(script);
+      resolve(dados);
+    };
+
+    window[callbackName] = function (data) {
+      console.log("📥 Resposta do servidor:", data);
+      finalizar(data);
     };
 
     const script = document.createElement("script");
@@ -1534,24 +1569,20 @@ async function processarPedidoPublico(nomeCliente, endereco) {
       `&frete=${freteAplicado}` +
       `&total=${totalFinal}` +
       `&data=${encodeURIComponent(new Date().toISOString())}` +
-      `&items=${encodeURIComponent(JSON.stringify(itemsArray))}` +
+      `&itemsCompactos=${encodeURIComponent(itemsCompactos)}` +
       `&callback=${callbackName}`;
 
     script.src = `${ESTOQUE_API_URL}?${params}`;
 
     script.onerror = function () {
-      delete window[callbackName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-      reject(new Error("Erro ao processar pedido"));
+      console.error("❌ Erro de rede ao enviar pedido");
+      finalizar({ success: false, error: "Erro de rede ao enviar pedido" });
     };
 
     setTimeout(() => {
-      if (window[callbackName]) {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        reject(new Error("Timeout ao processar pedido"));
-      }
-    }, 30000);
+      console.error("❌ Timeout ao enviar pedido");
+      finalizar({ success: false, error: "Timeout ao processar pedido" });
+    }, 20000);
 
     document.body.appendChild(script);
   });
@@ -1643,15 +1674,16 @@ async function downloadPDF() {
     const dataArquivo = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
     pdf.save(`Pedido_IvoPita_${dataArquivo}.pdf`);
 
-    console.log("📦 Enviando pedido...");
+    console.log("📦 PDF baixado. Enviando pedido ao servidor...");
     const resultado = await processarPedidoPublico(nomeCliente, endereco);
 
-    console.log("📥 Resultado:", resultado);
+    console.log("📥 Resultado final:", resultado);
 
     if (!resultado || !resultado.success) {
       throw new Error((resultado && resultado.error) || "Erro ao salvar pedido");
     }
 
+    // ✅ Só limpa o carrinho se o pedido foi salvo com sucesso
     cart = [];
     updateCart();
     document.getElementById("customer-name").value = "";
@@ -1670,7 +1702,8 @@ async function downloadPDF() {
 
   } catch (error) {
     console.error("❌ Erro:", error);
-    showToast("❌ Erro: " + error.message, "error", 4000);
+    showToast("❌ Erro: " + error.message + " — O PDF foi baixado, mas o pedido NÃO foi salvo. Tente novamente.", "error", 6000);
+    // ⚠️ NÃO limpa o carrinho aqui — o usuário pode tentar de novo
   } finally {
     if (btn) {
       btn.disabled = false;
