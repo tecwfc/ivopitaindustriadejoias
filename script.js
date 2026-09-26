@@ -1,5 +1,5 @@
 // ============================================
-// IVO PITA JOIAS - SCRIPT COMPLETO (CORRIGIDO)
+// IVO PITA JOIAS - SCRIPT COMPLETO
 // ============================================
 
 // ============================================
@@ -27,7 +27,7 @@ let FRETE_GRATIS_VALOR = 3500;
 let TAXA_FRETE = 75;
 
 // ============================================
-// PLACEHOLDER SVG EMBUTIDO (não depende de internet)
+// PLACEHOLDER SVG EMBUTIDO
 // ============================================
 const PLACEHOLDER_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
@@ -60,6 +60,10 @@ let zoomIndex = 0;
 let quantidadeSelecionada = 0;
 let coresSelecionadas = {};
 let coresDisponiveis = [];
+
+// 🆕 Estrutura dinâmica de categorias
+let estruturaCategorias = [];
+let sidebarDinamicaAtiva = false;
 
 // ============================================
 // CACHE DE ESTOQUE
@@ -147,6 +151,204 @@ function driveImg(url) {
   if (match) return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=w800`;
   if (url.startsWith("http")) return url;
   return PLACEHOLDER_SVG;
+}
+
+// ============================================
+// 🆕 SIDEBAR DINÂMICA
+// ============================================
+function renderizarSidebarDinamica() {
+  const scroll = document.getElementById('sidebar-scroll');
+  if (!scroll) return;
+
+  // Guarda o botão "Todas as Joias"
+  const btnTodas = scroll.querySelector('.sidebar-item[data-categoria="todos"]');
+
+  // Limpa tudo
+  scroll.innerHTML = '';
+
+  // Re-adiciona o botão Todas
+  if (btnTodas) {
+    scroll.appendChild(btnTodas);
+  } else {
+    const novaTodas = document.createElement('button');
+    novaTodas.className = 'sidebar-item sidebar-item-active';
+    novaTodas.setAttribute('data-categoria', 'todos');
+    novaTodas.innerHTML = `
+      <span class="sidebar-icon"><i class="fas fa-gem"></i></span>
+      <span class="sidebar-label">Todas as Joias</span>
+      <span class="sidebar-count" id="count-todos">0</span>
+    `;
+    scroll.appendChild(novaTodas);
+  }
+
+  if (!estruturaCategorias || estruturaCategorias.length === 0) {
+    console.log('ℹ️ Sem estrutura dinâmica — mantendo HTML estático');
+    return;
+  }
+
+  // Agrupa: grupo → categoria → [subcategorias]
+  const grupos = {};
+  estruturaCategorias.forEach(item => {
+    const g = item.grupo || 'Outros';
+    if (!grupos[g]) grupos[g] = {};
+    const c = item.categoria || 'Sem categoria';
+    if (!grupos[g][c]) grupos[g][c] = [];
+    if (item.subcategoria && item.subcategoria.trim() !== '') {
+      grupos[g][c].push(item.subcategoria);
+    }
+  });
+
+  const iconesGrupo = {
+    'Folheado Dourado': 'fa-solid fa-crown',
+    'Folheado Prata': 'fa-regular fa-gem'
+  };
+  const coresGrupo = {
+    'Folheado Dourado': 'linear-gradient(135deg, #fef3c7, #fcd34d)',
+    'Folheado Prata': 'linear-gradient(135deg, #f1f5f9, #cbd5e1)'
+  };
+  const coresIconeGrupo = {
+    'Folheado Dourado': '#92400e',
+    'Folheado Prata': '#475569'
+  };
+
+  Object.keys(grupos).forEach(nomeGrupo => {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'sidebar-group';
+
+    const titulo = document.createElement('button');
+    titulo.className = 'sidebar-group-title';
+    titulo.setAttribute('type', 'button');
+    titulo.onclick = function () { toggleSidebarGroup(this); };
+    titulo.innerHTML = `
+      <span class="sidebar-group-icon" style="background: ${coresGrupo[nomeGrupo] || 'linear-gradient(135deg, #eef4ef, #d9e7de)'};">
+        <i class="${iconesGrupo[nomeGrupo] || 'fa-solid fa-gem'}" style="color: ${coresIconeGrupo[nomeGrupo] || '#1f4d38'};"></i>
+      </span>
+      <span>${nomeGrupo}</span>
+      <i class="fas fa-chevron-down sidebar-group-arrow"></i>
+    `;
+    groupDiv.appendChild(titulo);
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'sidebar-group-content';
+
+    // Ordena categorias
+    const categoriasOrdenadas = Object.keys(grupos[nomeGrupo]).sort((a, b) => {
+      return a.localeCompare(b, 'pt-BR');
+    });
+
+    categoriasOrdenadas.forEach(nomeCategoria => {
+      const subs = grupos[nomeGrupo][nomeCategoria];
+
+      // Se não tem subcategoria OU tem 1 sub idêntica à categoria → botão direto
+      if (subs.length === 0) {
+        const btn = document.createElement('button');
+        btn.className = 'sidebar-item-sub';
+        btn.setAttribute('type', 'button');
+        btn.setAttribute('data-categoria', nomeCategoria.toLowerCase());
+        btn.innerHTML = `<span>${nomeCategoria}</span>`;
+        contentDiv.appendChild(btn);
+        return;
+      }
+
+      // Nome "curto" da categoria: remove sufixo Dourado/Prata/Dourada/Prateada
+      const nomeCurto = nomeCategoria
+    .replace(/\s+(dourado|dourada|dourados|douradas)\s*$/i, '')
+    .replace(/\s+(prata|prateado|prateada|prateados|prateadas)\s*$/i, '')
+    .trim();
+
+      // Se só tem 1 sub e ela é igual ao nome curto → botão direto
+      if (subs.length === 1 && subs[0].toLowerCase() === nomeCurto.toLowerCase()) {
+        const btn = document.createElement('button');
+        btn.className = 'sidebar-item-sub';
+        btn.setAttribute('type', 'button');
+        btn.setAttribute('data-categoria', nomeCategoria.toLowerCase());
+        btn.innerHTML = `<span>${nomeCategoria}</span>`;
+        contentDiv.appendChild(btn);
+        return;
+      }
+
+      // Caso contrário → subgrupo expansível
+      const subDiv = document.createElement('div');
+      subDiv.className = 'sidebar-subgroup';
+
+      const subTitle = document.createElement('button');
+      subTitle.className = 'sidebar-subgroup-title';
+      subTitle.setAttribute('type', 'button');
+      subTitle.onclick = function () { toggleSidebarSubgroup(this); };
+      subTitle.innerHTML = `<span>${nomeCurto}</span><i class="fas fa-chevron-down"></i>`;
+      subDiv.appendChild(subTitle);
+
+      const subContent = document.createElement('div');
+      subContent.className = 'sidebar-subgroup-content';
+
+      subs.forEach(sub => {
+        const btn = document.createElement('button');
+        btn.className = 'sidebar-item-sub';
+        btn.setAttribute('type', 'button');
+        // data-categoria = "categoria subcategoria" para o filtro bater
+        btn.setAttribute('data-categoria', (nomeCategoria + ' ' + sub).toLowerCase());
+        btn.innerHTML = `<span>${sub}</span>`;
+        subContent.appendChild(btn);
+      });
+
+      subDiv.appendChild(subContent);
+      contentDiv.appendChild(subDiv);
+    });
+
+    groupDiv.appendChild(contentDiv);
+    scroll.appendChild(groupDiv);
+  });
+
+  sidebarDinamicaAtiva = true;
+
+  // Re-bindar eventos
+  rebindSidebarEvents();
+
+  // Aplicar busca da sidebar se estiver preenchida
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput && searchInput.value.trim()) {
+    aplicarBuscaSidebar(searchInput.value);
+  }
+}
+
+function rebindSidebarEvents() {
+  document.querySelectorAll('.sidebar-item').forEach(btn => {
+    // evita duplicar listeners removendo antes
+    btn.onclick = function (e) {
+      e.preventDefault();
+      const categoria = this.getAttribute('data-categoria');
+      if (!categoria) return;
+      marcarItemSidebarAtivo(categoria);
+      filtrarPorCategoria(categoria);
+      if (window.innerWidth <= 900) fecharSidebarMobile();
+    };
+  });
+
+  document.querySelectorAll('.sidebar-item-sub').forEach(btn => {
+    btn.onclick = function (e) {
+      e.preventDefault();
+      const categoria = this.getAttribute('data-categoria');
+      if (!categoria) return;
+      marcarItemSidebarAtivo(categoria);
+      filtrarPorCategoria(categoria);
+      if (window.innerWidth <= 900) fecharSidebarMobile();
+    };
+  });
+
+  // Reconstrói contadores
+  atualizarContadoresSidebar();
+}
+
+function aplicarBuscaSidebar(termo) {
+  const termoNorm = normalizar(termo);
+  const elementos = document.querySelectorAll(
+    '.sidebar-item, .sidebar-item-sub, .sidebar-group-title, .sidebar-subgroup-title'
+  );
+  elementos.forEach(el => {
+    const texto = normalizar(el.textContent);
+    const match = !termoNorm || texto.includes(termoNorm);
+    el.style.display = match ? '' : 'none';
+  });
 }
 
 // ============================================
@@ -804,6 +1006,15 @@ async function loadProducts() {
     allProducts = data.produtos || [];
     aplicarConfig(data.config || {});
     renderizarMarquee(data.marquee || []);
+
+    // 🆕 Aplica estrutura dinâmica se vier do backend
+    if (data.estrutura && Array.isArray(data.estrutura) && data.estrutura.length > 0) {
+      estruturaCategorias = data.estrutura;
+      console.log(`📂 Estrutura dinâmica: ${estruturaCategorias.length} itens`);
+      renderizarSidebarDinamica();
+    } else {
+      console.log("ℹ️ Estrutura dinâmica não disponível — usando sidebar estática");
+    }
 
     allProducts = allProducts.map((p) => {
       if (!p["Saldo Estoque"]) {
@@ -1514,7 +1725,7 @@ async function visualizarPDF() {
 }
 
 // ============================================
-// FUNÇÃO: Finalizar Pedido via JSONP (compatível)
+// PROCESSAR PEDIDO VIA JSONP
 // ============================================
 async function processarPedidoPublico(nomeCliente, endereco) {
   const itensParaBaixar = {};
@@ -1524,7 +1735,6 @@ async function processarPedidoPublico(nomeCliente, endereco) {
     itensParaBaixar[baseId] += item.quantity;
   });
 
-  // ✅ Formato compacto: "1:2,5:1" (id:qtd)
   const itemsCompactos = Object.keys(itensParaBaixar)
     .map((id) => `${id}:${itensParaBaixar[id]}`)
     .join(',');
@@ -1541,7 +1751,6 @@ async function processarPedidoPublico(nomeCliente, endereco) {
   console.log("   Itens compactos:", itemsCompactos);
   console.log("   Total:", totalFinal);
 
-  // ✅ JSONP sempre funciona
   return new Promise((resolve, reject) => {
     const callbackName = "fazer_pedido_" + Date.now();
     let resolvido = false;
@@ -1683,7 +1892,6 @@ async function downloadPDF() {
       throw new Error((resultado && resultado.error) || "Erro ao salvar pedido");
     }
 
-    // ✅ Só limpa o carrinho se o pedido foi salvo com sucesso
     cart = [];
     updateCart();
     document.getElementById("customer-name").value = "";
@@ -1703,7 +1911,6 @@ async function downloadPDF() {
   } catch (error) {
     console.error("❌ Erro:", error);
     showToast("❌ Erro: " + error.message + " — O PDF foi baixado, mas o pedido NÃO foi salvo. Tente novamente.", "error", 6000);
-    // ⚠️ NÃO limpa o carrinho aqui — o usuário pode tentar de novo
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -1865,6 +2072,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById('sidebar-close-mobile')?.addEventListener('click', fecharSidebarMobile);
   document.getElementById('sidebar-overlay')?.addEventListener('click', fecharSidebarMobile);
 
+  // Event listeners nos itens estáticos (fallback) — sempre ativos
   document.querySelectorAll('.sidebar-item').forEach(btn => {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
@@ -1888,12 +2096,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.getElementById('sidebar-search')?.addEventListener('input', function (e) {
-    const termo = normalizar(e.target.value);
-    document.querySelectorAll('.sidebar-item, .sidebar-item-sub, .sidebar-group-title, .sidebar-subgroup-title').forEach(el => {
-      const texto = normalizar(el.textContent);
-      const match = !termo || texto.includes(termo);
-      el.style.display = match ? '' : 'none';
-    });
+    aplicarBuscaSidebar(e.target.value);
   });
 
   document.getElementById('sort-select')?.addEventListener('change', function () {
