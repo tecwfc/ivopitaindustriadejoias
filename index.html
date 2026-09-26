@@ -9,7 +9,6 @@
    <!-- 🚧 VERIFICAÇÃO DE MANUTENÇÃO -->
   <script>
     (function() {
-      // Se for você (admin) com ?admin=, ignora
       var params = new URLSearchParams(window.location.search);
       if (params.get('admin') === 'ivopita2026') {
         sessionStorage.setItem('admin_bypass', 'true');
@@ -17,7 +16,6 @@
       }
       if (sessionStorage.getItem('admin_bypass') === 'true') return;
 
-      // Verifica no Apps Script
       var callback = 'manut_check_' + Date.now();
       window[callback] = function(data) {
         delete window[callback];
@@ -77,16 +75,10 @@
 </head>
 
 <body class="bg-bgSoft text-textDark">
-  <!-- ========================================== -->
   <!-- HEADER FIXO -->
-  <!-- ========================================== -->
-    <!-- ========================================== -->
-  <!-- HEADER FIXO -->
-  <!-- ========================================== -->
   <header
     class="glass fixed top-0 w-full z-[100] px-4 md:px-6 border-b border-primary/10 flex items-center justify-between gap-4 md:gap-6">
 
-    <!-- LOGO + NOME -->
     <div class="flex items-center gap-3 group cursor-pointer shrink-0"
       onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
       <div class="relative">
@@ -105,12 +97,7 @@
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- VERSÃO DESKTOP (título + busca) -->
-    <!-- ========================================== -->
     <div class="flex-1 items-center justify-center gap-6 lg:gap-8 catalogo-desktop-group">
-
-      <!-- Título Catálogo -->
       <div class="catalogo-inline">
         <span class="catalogo-heading">
           <i class="fas fa-book-open"></i> Catálogo
@@ -119,18 +106,13 @@
         <span class="catalogo-subheading">faça seu pedido online</span>
       </div>
 
-      <!-- Barra de busca ÚNICA -->
       <div class="relative shrink-0 search-compact">
         <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-textMuted text-xs"></i>
         <input type="text" id="search-input-desktop" placeholder="Buscar..."
           class="w-full pl-8 pr-3 py-2 rounded-full border border-primary/20 bg-bgSoft text-xs outline-none transition-all focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/15" />
       </div>
-
     </div>
 
-      <!-- ========================================== -->
-    <!-- VERSÃO MOBILE (só título compacto) -->
-    <!-- ========================================== -->
     <div class="flex-1 items-center justify-center catalogo-mobile">
       <span class="catalogo-heading-mobile">
         <i class="fas fa-book-open"></i> Catálogo
@@ -139,18 +121,12 @@
       <span class="catalogo-subheading-mobile">faça seu pedido</span>
     </div>
 
-    <!-- ========================================== -->
-    <!-- BOTÕES DIREITA -->
-    <!-- ========================================== -->
     <div class="flex items-center gap-1 md:gap-3 shrink-0">
-
-      <!-- Busca mobile (lupa) -->
       <button id="mobile-search-btn"
         class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
         <i class="fas fa-search text-xl"></i>
       </button>
 
-      <!-- Carrinho -->
       <button id="cart-btn"
         class="relative bg-primary text-white p-3 md:p-2.5 rounded-xl md:rounded-full hover:bg-primaryDark transition shadow-card active:scale-95">
         <i class="fas fa-shopping-bag text-lg md:text-base"></i>
@@ -158,23 +134,19 @@
           class="absolute -top-1 -right-1 bg-white text-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">0</span>
       </button>
 
-      <!-- Menu mobile -->
       <button id="mobile-menu-btn"
         class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
         <i class="fa-solid fa-bars-staggered text-xl"></i>
       </button>
     </div>
   </header>
-  <!-- ========================================== -->
+
   <!-- MARQUEE PROMOCIONAL -->
-  <!-- ========================================== -->
   <div class="marquee-bar">
     <div class="marquee-track" id="marquee-track"></div>
   </div>
 
-  <!-- ========================================== -->
   <!-- BUSCA MOBILE -->
-  <!-- ========================================== -->
   <div id="search-overlay"
     class="fixed inset-x-0 top-0 h-20 bg-white z-[100] transform -translate-y-full transition-transform duration-300 ease-in-out shadow-xl flex items-center px-4 gap-3 md:hidden">
     <div class="flex-1 flex items-center bg-primary/5 rounded-2xl px-4 py-3 border border-primary/20">
@@ -185,9 +157,7 @@
     <button id="mobile-search-close" class="p-2 text-slate-400 font-bold text-sm uppercase">Fechar</button>
   </div>
 
-  <!-- ========================================== -->
   <!-- MENU MOBILE -->
-  <!-- ========================================== -->
   <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-[60] hidden backdrop-blur-sm"></div>
   <div id="mobile-menu"
     class="fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
@@ -208,24 +178,23 @@
     </div>
     <div class="flex-1 overflow-y-auto p-6">
       <nav class="space-y-2">
-  <p class="text-[10px] font-bold text-textMuted uppercase tracking-widest mb-4">Navegação</p>
+        <p class="text-[10px] font-bold text-textMuted uppercase tracking-widest mb-4">Navegação</p>
 
-  <!-- ✅ BOTÃO ÚNICO: Abre a sidebar de categorias -->
-  <button type="button" onclick="abrirSidebarMobile()"
-    class="w-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-amber-50/80 to-transparent hover:from-amber-100 text-amber-800 font-bold transition-all duration-300 border border-amber-200/30">
-    <span class="flex items-center gap-3">
-      <i class="fa-solid fa-crown text-amber-600"></i> Categorias & Joias
-    </span>
-    <i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i>
-  </button>
+        <button type="button" onclick="abrirSidebarMobile()"
+          class="w-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-amber-50/80 to-transparent hover:from-amber-100 text-amber-800 font-bold transition-all duration-300 border border-amber-200/30">
+          <span class="flex items-center gap-3">
+            <i class="fa-solid fa-crown text-amber-600"></i> Categorias & Joias
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i>
+        </button>
 
-  <hr class="my-6 border-primary/10" />
+        <hr class="my-6 border-primary/10" />
 
-  <a href="#sobre-empresa"
-    class="w-full flex items-center gap-3 p-4 text-textMuted font-medium hover:text-primary transition-all duration-300">
-    <i class="fa-solid fa-circle-info"></i> Sobre Ivo Pita
-  </a>
-</nav>
+        <a href="#sobre-empresa"
+          class="w-full flex items-center gap-3 p-4 text-textMuted font-medium hover:text-primary transition-all duration-300">
+          <i class="fa-solid fa-circle-info"></i> Sobre Ivo Pita
+        </a>
+      </nav>
     </div>
     <div class="p-6 border-t border-primary/10">
       <a href="https://wa.me/5588999049636" target="_blank"
@@ -235,14 +204,10 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- LAYOUT PRINCIPAL COM SIDEBAR -->
-  <!-- ========================================== -->
   <div class="main-layout">
 
-    <!-- ========================================== -->
     <!-- SIDEBAR DE CATEGORIAS -->
-    <!-- ========================================== -->
     <aside id="sidebar-categorias" class="sidebar-categorias">
 
       <div class="sidebar-header">
@@ -260,7 +225,7 @@
         <input type="text" id="sidebar-search" placeholder="Buscar categoria..." />
       </div>
 
-      <div class="sidebar-scroll">
+      <div class="sidebar-scroll" id="sidebar-scroll">
 
         <!-- TODAS -->
         <button class="sidebar-item sidebar-item-active" data-categoria="todos">
@@ -295,16 +260,17 @@
               </div>
             </div>
 
-            <div class="sidebar-subgroup">
-              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
-                <span>Brincos</span>
-                <i class="fas fa-chevron-down"></i>
-              </button>
-              <div class="sidebar-subgroup-content">
-                <button class="sidebar-item-sub" data-categoria="brinco de pressão dourado"><span>Brinco de Pressão</span></button>
-                <button class="sidebar-item-sub" data-categoria="brincos de moda dourado"><span>Brincos de Moda</span></button>
-              </div>
-            </div>
+           <div class="sidebar-subgroup">
+  <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+    <span>Brincos</span>
+    <i class="fas fa-chevron-down"></i>
+  </button>
+  <div class="sidebar-subgroup-content">
+    <button class="sidebar-item-sub" data-categoria="brinco de pressão dourado normal"><span>Brinco de Pressão</span></button>
+    <button class="sidebar-item-sub" data-categoria="brinco de pressão dourado zircônia"><span>Brinco Pressão Zircônia</span></button>
+    <button class="sidebar-item-sub" data-categoria="brincos de moda dourado"><span>Brincos de Moda</span></button>
+  </div>
+</div>
 
             <div class="sidebar-subgroup">
               <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
@@ -427,16 +393,16 @@
             </div>
 
             <div class="sidebar-subgroup">
-              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
-                <span>Brincos</span>
-                <i class="fas fa-chevron-down"></i>
-              </button>
-              <div class="sidebar-subgroup-content">
-                <button class="sidebar-item-sub" data-categoria="brinco de pressão prata"><span>Brinco de Pressão</span></button>
-                <button class="sidebar-item-sub" data-categoria="brincos de moda prata"><span>Brincos de Moda</span></button>
-              </div>
-            </div>
-
+  <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+    <span>Brincos</span>
+    <i class="fas fa-chevron-down"></i>
+  </button>
+  <div class="sidebar-subgroup-content">
+    <button class="sidebar-item-sub" data-categoria="brinco de pressão prateado normal"><span>Brinco de Pressão</span></button>
+    <button class="sidebar-item-sub" data-categoria="brinco de pressão prateado zircônia"><span>Brinco Pressão Zircônia</span></button>
+    <button class="sidebar-item-sub" data-categoria="brincos de moda prateado"><span>Brincos de Moda</span></button>
+  </div>
+</div>
             <div class="sidebar-subgroup">
               <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
                 <span>Correntes</span>
@@ -533,26 +499,15 @@
 
       </div>
 
-      <!-- <div class="sidebar-footer">
-        <a href="https://wa.me/5588999049636" target="_blank" class="sidebar-whatsapp">
-          <i class="fa-brands fa-whatsapp"></i>
-          Fale Conosco
-        </a>
-      </div> -->
-
     </aside>
 
     <!-- OVERLAY MOBILE -->
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-    <!-- ========================================== -->
     <!-- CONTEÚDO PRINCIPAL -->
-    <!-- ========================================== -->
     <main class="main-content">
 
-       <!-- ========================================== -->
-      <!-- BANNER HERO - LIMPO E BAIXO -->
-      <!-- ========================================== -->
+      <!-- BANNER HERO -->
       <section id="hero" class="hero-clean">
         <div class="swiper heroSwiper">
           <div class="swiper-wrapper"></div>
@@ -588,9 +543,7 @@
 
   </div>
 
-  <!-- ========================================== -->
   <!-- MODAL DO CARRINHO -->
-  <!-- ========================================== -->
   <div id="cart-modal" class="fixed inset-0 bg-accent/60 backdrop-blur-sm hidden items-center justify-center p-2 sm:p-4"
     style="z-index: 99999">
     <div
@@ -650,9 +603,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- MODAL PDF -->
-  <!-- ========================================== -->
   <div id="pdf-preview-modal" class="fixed inset-0 bg-accent/70 backdrop-blur-sm hidden items-center justify-center p-4"
     style="z-index: 99999">
     <div
@@ -675,9 +626,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- MODAL CONFIRM LIMPAR -->
-  <!-- ========================================== -->
   <div id="confirm-clear-modal" class="fixed inset-0 hidden items-center justify-center bg-accent/50"
     style="z-index: 99999">
     <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
@@ -692,18 +641,13 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- MODAL DE SELEÇÃO (NOVO VISUAL COMPACTO) -->
-  <!-- ========================================== -->
+  <!-- MODAL DE SELEÇÃO -->
   <div id="size-modal" class="fixed inset-0 bg-accent/60 backdrop-blur-sm hidden items-center justify-center p-4"
     style="z-index: 99999">
     <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl animate-scale overflow-hidden flex flex-col">
 
-      <!-- ============ HEADER: IMAGEM + PRODUTO ============ -->
       <div class="size-modal-header">
-        <div class="size-modal-thumb" id="size-product-image-container">
-          <!-- Imagem inserida via JS -->
-        </div>
+        <div class="size-modal-thumb" id="size-product-image-container"></div>
         <div class="size-modal-info">
           <p class="size-modal-ref" id="size-product-ref">Ref: —</p>
           <h3 class="size-modal-name" id="size-product-name">Produto</h3>
@@ -714,10 +658,7 @@
         </div>
       </div>
 
-      <!-- ============ CORPO ============ -->
       <div class="size-modal-body">
-
-        <!-- QUANTIDADE -->
         <div id="size-step">
           <p class="size-section-label">Quantidade</p>
           <div id="options-container"></div>
@@ -728,17 +669,14 @@
           </div>
         </div>
 
-        <!-- CORES -->
         <div id="color-step" style="margin-top: 16px;">
           <p class="size-section-label" id="color-instruction">Escolha a quantidade primeiro</p>
           <div id="colors-container"></div>
         </div>
 
-        <!-- RESUMO -->
         <div id="selection-summary" class="selection-summary hidden"></div>
       </div>
 
-      <!-- ============ RODAPÉ FIXO ============ -->
       <div class="size-modal-footer">
         <button onclick="closeSizeModal()" class="btn-cancel">
           Cancelar
@@ -750,9 +688,8 @@
 
     </div>
   </div>
-  <!-- ========================================== -->
+
   <!-- MODAL ZOOM -->
-  <!-- ========================================== -->
   <div id="image-zoom-modal" class="image-zoom-modal">
     <button class="close-zoom" onclick="fecharZoom()"><i class="fas fa-times"></i></button>
     <div class="nav-arrows">
@@ -770,9 +707,7 @@
     <i class="fa-brands fa-whatsapp"></i>
   </a>
 
-  <!-- ========================================== -->
   <!-- FOOTER -->
-  <!-- ========================================== -->
   <footer id="sobre-empresa" class="bg-accent text-white pt-20 pb-10 px-6 mt-20 border-t border-white/5">
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
       <div>
