@@ -1003,9 +1003,17 @@ async function loadProducts() {
 
     if (data.error) throw new Error(data.error);
 
-    allProducts = data.produtos || [];
+        // 🆕 FILTRO: só mostra produtos disponíveis (Disponível === 'sim')
+    allProducts = (data.produtos || []).filter(p => {
+        const disp = String(p["Disponível"] || p.disponivel || '').toLowerCase().trim();
+        return disp === 'sim';
+    });
+    
+    console.log(`✅ ${allProducts.length} produtos disponíveis (filtrados de ${(data.produtos || []).length})`);
+    
     aplicarConfig(data.config || {});
     renderizarMarquee(data.marquee || []);
+
 
     // 🆕 Aplica estrutura dinâmica se vier do backend
     if (data.estrutura && Array.isArray(data.estrutura) && data.estrutura.length > 0) {
@@ -1470,7 +1478,7 @@ async function carregarBannerHero() {
       };
 
       const script = document.createElement("script");
-      script.src = `${ESTOQUE_API_URL}?callback=${callbackName}`;
+      script.src = `${ESTOQUE_API_URL}?_t=${Date.now()}&callback=${callbackName}`;
 
       script.onerror = function () {
         delete window[callbackName];
