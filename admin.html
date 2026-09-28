@@ -6,22 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ivo Pita - Admin</title>
 
-    <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Proteção de acesso -->
     <script>
         (function () {
             var auth = sessionStorage.getItem("ivo_auth");
@@ -373,7 +365,7 @@
             }
         }
 
-        /* MODAL PRODUTO - VISUAL MELHORADO */
+        /* MODAL PRODUTO */
         #modalProduto .modal-content {
             max-width: 900px;
             border-radius: 20px;
@@ -676,7 +668,6 @@
             box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4);
         }
 
-        /* Estilos para itens da estrutura */
         .estrutura-item-card {
             background: #f9fafb;
             border: 1px solid #e5e7eb;
@@ -713,12 +704,578 @@
             padding: 2px;
             font-size: 10px;
         }
+
+        /* AÇÕES RÁPIDAS */
+        .acoes-rapidas {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+            flex-wrap: nowrap;
+        }
+
+        .btn-acao {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: 1.5px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.15s ease;
+            padding: 0;
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .btn-acao:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+        }
+
+        .btn-acao:active { transform: translateY(0); }
+        .btn-acao:disabled { opacity: 0.5; cursor: wait; }
+
+        .btn-acao.btn-repor { background: #dcfce7; color: #166534; border-color: #86efac; }
+        .btn-acao.btn-repor:hover { background: #bbf7d0; }
+
+        .btn-acao.btn-editar { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+        .btn-acao.btn-editar:hover { background: #bfdbfe; }
+
+        .btn-acao.btn-ocultar { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+        .btn-acao.btn-ocultar:hover { background: #fde68a; }
+
+        .btn-acao.btn-ocultar.esta-oculto { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+
+        .btn-acao.btn-destaque { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+        .btn-acao.btn-destaque.esta-destaque { background: #fef9c3; color: #ca8a04; border-color: #facc15; }
+
+        .btn-acao.btn-esgotar { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+        .btn-acao.btn-esgotar:hover { background: #fecaca; }
+
+        .btn-acao.btn-excluir { background: #f3f4f6; color: #dc2626; border-color: #e5e7eb; }
+        .btn-acao.btn-excluir:hover { background: #fee2e2; border-color: #f87171; }
+
+        /* MODAL REPOR */
+        #modalRepor .modal-content {
+            max-width: 440px;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(15, 47, 34, 0.35);
+        }
+
+        #modalRepor .modal-header-repor {
+            background: linear-gradient(135deg, #2f6b4f 0%, #1f4d38 100%);
+            padding: 18px 22px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #c9a86a;
+        }
+
+        #modalRepor .modal-header-repor h3 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #modalRepor .modal-body-repor { padding: 22px; background: #f8faf8; }
+
+        #modalRepor .produto-info {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(47, 107, 79, 0.12);
+        }
+
+        #modalRepor .produto-info .nome {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1f4d38;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        #modalRepor .produto-info .ref {
+            font-size: 11px;
+            color: #6b7280;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+        }
+
+        #modalRepor .estoque-atual {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #eef4ef;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+
+        #modalRepor .estoque-atual .label {
+            font-size: 11px;
+            color: #4b5563;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        #modalRepor .estoque-atual .valor { font-size: 20px; font-weight: 800; color: #2f6b4f; }
+
+        #modalRepor .atalhos-qtd {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        #modalRepor .atalhos-qtd button {
+            background: #ffffff;
+            border: 1.5px solid #d1d5db;
+            border-radius: 9px;
+            padding: 10px 4px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        #modalRepor .atalhos-qtd button:hover {
+            background: #2f6b4f;
+            color: #fff;
+            border-color: #2f6b4f;
+            transform: translateY(-1px);
+        }
+
+        #modalRepor .campo-qtd-custom { display: flex; gap: 8px; align-items: center; }
+
+        #modalRepor .campo-qtd-custom label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        #modalRepor .campo-qtd-custom input {
+            flex: 1;
+            padding: 11px 14px;
+            border: 1.5px solid #e5ebe7;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f4d38;
+            outline: none;
+            text-align: center;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        #modalRepor .campo-qtd-custom input:focus {
+            border-color: #2f6b4f;
+            box-shadow: 0 0 0 4px rgba(47, 107, 79, 0.12);
+        }
+
+        #modalRepor .preview-novo {
+            background: #dbeafe;
+            border: 1.5px dashed #60a5fa;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-top: 14px;
+            font-size: 12px;
+            color: #1e40af;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        #modalRepor .preview-novo strong { font-size: 15px; color: #1e40af; }
+
+        #modalRepor .modal-footer-repor {
+            background: #ffffff;
+            border-top: 2px solid rgba(47, 107, 79, 0.08);
+            padding: 14px 22px;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        #modalRepor .modal-footer-repor button {
+            padding: 11px 20px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        #modalRepor .btn-cancelar-repor {
+            background: #ffffff;
+            color: #5c6b63;
+            border: 1.5px solid #e5ebe7 !important;
+        }
+        #modalRepor .btn-cancelar-repor:hover {
+            background: #f0f7f2;
+            color: #2f6b4f;
+            border-color: #2f6b4f !important;
+        }
+
+        #modalRepor .btn-confirmar-repor {
+            background: linear-gradient(135deg, #2f6b4f, #1f4d38);
+            color: #ffffff;
+            box-shadow: 0 6px 18px rgba(47, 107, 79, 0.3);
+            min-width: 140px;
+        }
+        #modalRepor .btn-confirmar-repor:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(47, 107, 79, 0.4);
+        }
+        #modalRepor .btn-confirmar-repor:disabled {
+            opacity: 0.6;
+            cursor: wait;
+            transform: none;
+        }
+
+        @media (max-width: 640px) {
+            .acoes-rapidas { gap: 2px; }
+            .btn-acao { width: 24px; height: 24px; font-size: 10px; }
+            #modalRepor .atalhos-qtd { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* CARDS DE PRODUTOS */
+        .cards-filtros-topo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 14px 16px;
+            background: #f8faf8;
+            border-bottom: 1px solid #e8ede9;
+            align-items: center;
+        }
+
+        .cards-filtros-topo .filtro-input {
+            flex: 1;
+            min-width: 180px;
+            padding: 8px 14px;
+            border: 1.5px solid #e5ebe7;
+            border-radius: 10px;
+            font-size: 13px;
+            outline: none;
+            background: #fff;
+            transition: all 0.2s;
+        }
+
+        .cards-filtros-topo .filtro-input:focus {
+            border-color: #2f6b4f;
+            box-shadow: 0 0 0 3px rgba(47, 107, 79, 0.12);
+        }
+
+        .cards-filtros-topo select.filtro-input {
+            cursor: pointer;
+            min-width: 160px;
+            flex: 0 0 auto;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 34px;
+        }
+
+        .cards-filtros-topo .filtro-limpar {
+            background: #e5e7eb;
+            color: #4b5563;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .cards-filtros-topo .filtro-limpar:hover { background: #d1d5db; }
+
+        #produtos-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+            padding: 16px;
+            background: #f6f8f5;
+        }
+
+        @media (max-width: 900px) {
+            #produtos-cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 12px;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            #produtos-cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 8px;
+                padding: 8px;
+            }
+            .cards-filtros-topo { padding: 10px; gap: 6px; }
+            .cards-filtros-topo .filtro-input,
+            .cards-filtros-topo select.filtro-input {
+                font-size: 12px;
+                padding: 6px 10px;
+                min-width: 100px;
+            }
+        }
+
+        .produto-card {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1.5px solid #e8ede9;
+            overflow: hidden;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 8px rgba(15, 47, 34, 0.04);
+        }
+
+        .produto-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 28px rgba(15, 47, 34, 0.14);
+            border-color: #c9a86a;
+        }
+
+        .card-imagem-wrapper {
+            position: relative;
+            background: #ffffff;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            border-bottom: 1px solid #eef4ef;
+            overflow: hidden;
+        }
+
+        .card-imagem {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.4s ease;
+        }
+
+        .produto-card:hover .card-imagem { transform: scale(1.06); }
+
+        .card-ref-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px;
+            pointer-events: none;
+        }
+
+        .card-ref-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #1f4d38;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2px 6px;
+            border-radius: 3px;
+            line-height: 1;
+        }
+
+        .card-ref-valor {
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+            background: #16a34a;
+            padding: 3px 10px;
+            border-radius: 4px;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.35);
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
+        .card-badges-status {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 5px;
+            z-index: 2;
+        }
+
+        .card-badge-status {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(4px);
+        }
+
+        .card-badge-status.destaque {
+            background: linear-gradient(135deg, #fef9c3, #fde047);
+            color: #ca8a04;
+            border: 1px solid #facc15;
+        }
+
+        .card-badge-status.oculto {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+            border: 1px solid #f87171;
+        }
+
+        .card-body {
+            padding: 12px 14px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card-categoria-titulo { font-size: 12px; color: #6b7280; font-weight: 500; line-height: 1.3; }
+
+        .card-nome {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 34px;
+        }
+
+        .card-ref-badge {
+            display: inline-block;
+            background: #f3f4f6;
+            color: #4b5563;
+            padding: 3px 9px;
+            border-radius: 5px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            border: 1px solid #e5e7eb;
+            width: fit-content;
+            line-height: 1.2;
+        }
+
+        .card-subtitulo {
+            font-size: 11px;
+            color: #9ca3af;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-preco {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1f4d38;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-top: 4px;
+        }
+
+        .card-estoque-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #dcfce7;
+            color: #166534;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            width: fit-content;
+            border: 1px solid #86efac;
+            line-height: 1.2;
+        }
+
+        .card-estoque-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #16a34a;
+            flex-shrink: 0;
+        }
+
+        .card-estoque-badge.baixo {
+            background: #fef9c3;
+            color: #92400e;
+            border-color: #fbbf24;
+            animation: pulse-stock 1.5s ease-in-out infinite;
+        }
+        .card-estoque-badge.baixo .dot { background: #ca8a04; }
+
+        .card-estoque-badge.esgotado {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #f87171;
+        }
+        .card-estoque-badge.esgotado .dot { background: #dc2626; }
+
+        .card-acoes {
+            padding: 10px 14px;
+            background: #fafcfb;
+            border-top: 1px solid #eef4ef;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+        }
+
+        .card-acoes .btn-acao {
+            width: 100%;
+            height: 30px;
+            border-radius: 6px;
+            font-size: 11px;
+        }
+
+        @media (max-width: 640px) {
+            .card-body { padding: 9px 10px; gap: 5px; }
+            .card-nome { font-size: 11px; min-height: 28px; }
+            .card-categoria-titulo { font-size: 10px; }
+            .card-subtitulo { font-size: 9px; }
+            .card-preco { font-size: 16px; }
+            .card-estoque-badge { font-size: 9px; padding: 3px 8px; }
+            .card-ref-valor { font-size: 10px; padding: 2px 7px; }
+            .card-ref-label { font-size: 7px; padding: 1px 4px; }
+            .card-badge-status { width: 22px; height: 22px; font-size: 9px; }
+            .card-acoes { grid-template-columns: repeat(3, 1fr); padding: 8px; gap: 3px; }
+            .card-acoes .btn-acao { height: 28px; font-size: 10px; }
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- LOADING -->
     <div id="loading-overlay" class="loading-overlay">
         <div class="text-center">
             <i class="fas fa-spinner fa-spin text-4xl text-primary mb-3"></i>
@@ -726,7 +1283,6 @@
         </div>
     </div>
 
-    <!-- NAVBAR -->
     <nav class="bg-white shadow-md px-4 py-3 flex justify-between items-center sticky top-0 z-50 border-b">
         <div class="flex items-center gap-2 min-w-0">
             <div class="bg-primary text-white p-2 rounded-lg shadow-lg flex-shrink-0">
@@ -748,7 +1304,6 @@
                 class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg transition text-xs font-medium">
                 <i class="fas fa-sync-alt mr-1"></i> <span class="hidden sm:inline">Atualizar</span>
             </button>
-
             <button onclick="logout()"
                 class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition text-xs font-medium flex items-center gap-1">
                 <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Sair</span>
@@ -756,10 +1311,9 @@
         </div>
     </nav>
 
-    <!-- MAIN -->
     <main class="max-w-[1600px] mx-auto p-4 space-y-4">
 
-        <!-- DASHBOARD CARDS -->
+        <!-- DASHBOARD -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             <div class="card-dashboard">
                 <div class="flex items-center justify-between">
@@ -815,7 +1369,6 @@
                 <span class="hidden xs:inline">Gerenciar</span>
             </div>
             <div class="btn-group">
-                <!-- NOVO PRODUTO -->
                 <button onclick="abrirModal('modalProduto')" style="background-color: #2f6b4f; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#1f4d38'" onmouseout="this.style.backgroundColor='#2f6b4f'"
                     class="px-4 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
@@ -823,7 +1376,6 @@
                     <i class="fas fa-plus-circle" style="font-size: 14px;"></i>
                 </button>
 
-                <!-- USUÁRIOS -->
                 <button onclick="abrirModal('modalUsuarios')" style="background-color: #4f46e5; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#4338ca'" onmouseout="this.style.backgroundColor='#4f46e5'"
                     class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
@@ -831,7 +1383,6 @@
                     <i class="fas fa-users" style="font-size: 14px;"></i>
                 </button>
 
-                <!-- CONFIG -->
                 <button onclick="abrirModal('modalConfig')" style="background-color: #374151; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#1f2937'" onmouseout="this.style.backgroundColor='#374151'"
                     class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
@@ -839,7 +1390,6 @@
                     <i class="fas fa-sliders-h" style="font-size: 14px;"></i>
                 </button>
 
-                <!-- MARQUEE -->
                 <button onclick="abrirModal('modalMarquee')" style="background-color: #eab308; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#ca8a04'" onmouseout="this.style.backgroundColor='#eab308'"
                     class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
@@ -847,7 +1397,6 @@
                     <i class="fas fa-bullhorn" style="font-size: 14px;"></i>
                 </button>
 
-                <!-- BANNERS -->
                 <button onclick="abrirModal('modalBanner')" style="background-color: #9333ea; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#7e22ce'" onmouseout="this.style.backgroundColor='#9333ea'"
                     class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
@@ -855,7 +1404,6 @@
                     <i class="fas fa-image" style="font-size: 14px;"></i>
                 </button>
 
-                <!-- VENDAS -->
                 <button onclick="abrirModal('modalVendas')" style="background-color: #2563eb; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#1d4ed8'" onmouseout="this.style.backgroundColor='#2563eb'"
                     class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
@@ -863,7 +1411,6 @@
                     <i class="fas fa-chart-line" style="font-size: 14px;"></i>
                 </button>
 
-                <!-- MANUTENÇÃO -->
                 <button onclick="abrirModal('modalManutencao')" style="background-color: #ea580c; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#c2410c'" onmouseout="this.style.backgroundColor='#ea580c'"
                     class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
@@ -871,7 +1418,6 @@
                     <i class="fas fa-tools" style="font-size: 14px;"></i>
                 </button>
 
-                <!-- ESTRUTURA -->
                 <button onclick="abrirModal('modalEstrutura')" style="background-color: #059669; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#047857'" onmouseout="this.style.backgroundColor='#059669'"
                     class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
@@ -884,18 +1430,12 @@
         <!-- GRÁFICOS -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div class="bg-white rounded-2xl shadow-sm border p-4">
-                <h3 class="font-bold text-gray-700 text-sm mb-3"><i
-                        class="fas fa-chart-pie text-primary mr-2"></i>Produtos por Categoria</h3>
-                <div style="height: 200px;">
-                    <canvas id="chartCategorias"></canvas>
-                </div>
+                <h3 class="font-bold text-gray-700 text-sm mb-3"><i class="fas fa-chart-pie text-primary mr-2"></i>Produtos por Categoria</h3>
+                <div style="height: 200px;"><canvas id="chartCategorias"></canvas></div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border p-4">
-                <h3 class="font-bold text-gray-700 text-sm mb-3"><i class="fas fa-chart-bar text-primary mr-2"></i>Top 5
-                    Estoque</h3>
-                <div style="height: 200px;">
-                    <canvas id="chartEstoque"></canvas>
-                </div>
+                <h3 class="font-bold text-gray-700 text-sm mb-3"><i class="fas fa-chart-bar text-primary mr-2"></i>Top 5 Estoque</h3>
+                <div style="height: 200px;"><canvas id="chartEstoque"></canvas></div>
             </div>
         </div>
 
@@ -905,6 +1445,16 @@
                 <h2 class="text-base font-bold text-gray-800"><i class="fas fa-table text-primary mr-2"></i>Produtos
                 </h2>
                 <div class="flex items-center gap-2 flex-wrap">
+                    <button onclick="alternarVisualizacao()" id="btn-toggle-view"
+                        style="background-color: #f59e0b; color: #ffffff;"
+                        onmouseover="this.style.backgroundColor='#d97706'"
+                        onmouseout="this.style.backgroundColor='#f59e0b'"
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1"
+                        title="Alternar entre tabela e cards">
+                        <i class="fas fa-th-large" id="icone-toggle-view"></i>
+                        <span id="texto-toggle-view">Cards</span>
+                    </button>
+
                     <input type="text" id="filtro-subcategoria" placeholder="Filtrar por subcategoria..."
                         class="border rounded-lg px-3 py-1 text-xs outline-none focus:ring-2 focus:ring-primary"
                         style="max-width: 200px;">
@@ -939,7 +1489,32 @@
                 <div id="checkboxes-colunas" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2"></div>
             </div>
 
-            <div class="p-1 md:p-2 overflow-x-auto">
+            <!-- 🎴 VISUALIZAÇÃO EM CARDS -->
+            <div id="produtos-cards-view" class="hidden">
+                <div class="cards-filtros-topo">
+                    <input type="text" id="cards-filtro-busca" class="filtro-input" 
+                        placeholder="🔍 Buscar por nome ou referência...">
+                    <select id="cards-filtro-categoria" class="filtro-input">
+                        <option value="">Todas as categorias</option>
+                    </select>
+                    <select id="cards-filtro-ordem" class="filtro-input">
+                        <option value="relevancia">Relevância</option>
+                        <option value="menor-preco">Menor preço</option>
+                        <option value="maior-preco">Maior preço</option>
+                        <option value="nome-az">Nome (A-Z)</option>
+                        <option value="nome-za">Nome (Z-A)</option>
+                        <option value="maior-estoque">Maior estoque</option>
+                        <option value="menor-estoque">Menor estoque</option>
+                    </select>
+                    <button onclick="limparFiltrosCards()" class="filtro-limpar">
+                        <i class="fas fa-undo"></i> Limpar
+                    </button>
+                </div>
+                <div id="produtos-cards-container"></div>
+            </div>
+
+            <!-- 📊 VISUALIZAÇÃO EM TABELA -->
+            <div id="produtos-tabela-view" class="p-1 md:p-2 overflow-x-auto">
                 <table id="produtosTable" class="display nowrap w-full" style="width:100%">
                     <thead>
                         <tr>
@@ -968,12 +1543,11 @@
 
     </main>
 
-    <!-- ========================================== -->
+        <!-- ========================================== -->
     <!-- MODAL PRODUTO -->
     <!-- ========================================== -->
     <div id="modalProduto" class="modal-overlay">
         <div class="modal-content" onclick="event.stopPropagation()">
-
             <div class="flex justify-between items-center text-white sticky top-0 z-10">
                 <h3 class="font-bold flex items-center gap-2">
                     <i class="fas fa-box"></i>
@@ -986,7 +1560,6 @@
 
             <div class="overflow-y-auto" style="max-height: calc(95vh - 60px);">
                 <form id="formProduto">
-
                     <input type="hidden" id="editID">
 
                     <div class="form-section">
@@ -1005,13 +1578,11 @@
                             <div>
                                 <label>Referência *</label>
                                 <input type="text" id="referencia" required placeholder="Ex: AG 001">
-                                <small class="field-hint">🔑 <strong>Único</strong> — usado para identificar o
-                                    produto</small>
+                                <small class="field-hint">🔑 <strong>Único</strong> — usado para identificar o produto</small>
                             </div>
                             <div class="col-span-2">
                                 <label>Nome do Produto *</label>
-                                <input type="text" id="Nome do Produto" required
-                                    placeholder="Ex: Argola Dourada Lisa Pequena">
+                                <input type="text" id="Nome do Produto" required placeholder="Ex: Argola Dourada Lisa Pequena">
                             </div>
                         </div>
                     </div>
@@ -1027,8 +1598,7 @@
                                 <select id="Categoria" required class="form-select">
                                     <option value="">Selecione uma categoria</option>
                                 </select>
-                                <small class="field-hint">Copie <strong>exatamente</strong> como aparece no menu do
-                                    site</small>
+                                <small class="field-hint">Copie <strong>exatamente</strong> como aparece no menu do site</small>
                                 <div class="campo-categoria">
                                     <input type="text" id="novaCategoria" placeholder="Nova categoria...">
                                     <button type="button" id="btnNovaCategoria">
@@ -1082,8 +1652,7 @@
                             <div class="col-span-2">
                                 <label>Quantidades Sugeridas</label>
                                 <input type="text" id="Quantidade" placeholder="Ex: 5,10,20,30,40">
-                                <small class="field-hint">Aparecem como <strong>botões de atalho</strong> ao adicionar
-                                    ao carrinho</small>
+                                <small class="field-hint">Aparecem como <strong>botões de atalho</strong> ao adicionar ao carrinho</small>
                             </div>
                         </div>
                     </div>
@@ -1107,8 +1676,7 @@
                             <div>
                                 <label>Saldo Estoque *</label>
                                 <input type="number" id="Saldo Estoque" required placeholder="0" value="0">
-                                <small class="field-hint">Deixe <strong>igual ao Estoque</strong> para novo
-                                    produto</small>
+                                <small class="field-hint">Deixe <strong>igual ao Estoque</strong> para novo produto</small>
                             </div>
                         </div>
                     </div>
@@ -1122,8 +1690,7 @@
                             <div class="col-span-2">
                                 <label>URL do Google Drive</label>
                                 <input type="text" id="Imagem" placeholder="https://drive.google.com/file/d/...">
-                                <small class="field-hint">Certifique-se de que a imagem está <strong>pública</strong> no
-                                    Drive</small>
+                                <small class="field-hint">Certifique-se de que a imagem está <strong>pública</strong> no Drive</small>
                                 <div class="image-preview-box" id="imagePreviewBox">
                                     <img id="imagePreviewImg" src="" alt="Preview" style="display:none;">
                                     <div class="preview-info">
@@ -1151,7 +1718,6 @@
                             </label>
                         </div>
                     </div>
-
                 </form>
             </div>
 
@@ -1164,7 +1730,6 @@
                     <i class="fas fa-save mr-1"></i> Salvar Produto
                 </button>
             </div>
-
         </div>
     </div>
 
@@ -1177,13 +1742,11 @@
                 <h3 class="text-lg font-bold flex items-center gap-2">
                     <i class="fas fa-users"></i> Gerenciar Usuários
                 </h3>
-                <button onclick="fecharModal('modalUsuarios')"
-                    class="text-white/80 hover:text-white text-xl transition">
+                <button onclick="fecharModal('modalUsuarios')" class="text-white/80 hover:text-white text-xl transition">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="p-4 overflow-y-auto" style="max-height: calc(95vh - 60px);">
-
                 <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 mb-4">
                     <p class="text-xs text-indigo-800">
                         <i class="fas fa-info-circle mr-1"></i>
@@ -1246,7 +1809,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- MODAL CONFIGURAÇÕES DO SITE -->
+    <!-- MODAL CONFIGURAÇÕES -->
     <!-- ========================================== -->
     <div id="modalConfig" class="modal-overlay">
         <div class="modal-content modal-content-config" onclick="event.stopPropagation()">
@@ -1259,33 +1822,26 @@
                 </button>
             </div>
             <div class="p-4 overflow-y-auto" style="max-height: calc(95vh - 60px);">
-
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                     <p class="text-xs text-blue-800">
                         <i class="fas fa-info-circle mr-1"></i>
-                        Essas configurações aparecem automaticamente no site público (botão WhatsApp, footer, frete,
-                        etc).
+                        Essas configurações aparecem automaticamente no site público (botão WhatsApp, footer, frete, etc).
                     </p>
                 </div>
 
                 <form id="formConfig" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                     <div class="col-span-full">
                         <h4 class="font-bold text-gray-700 text-sm mb-2 pb-1 border-b flex items-center gap-2">
                             <i class="fab fa-whatsapp text-green-600"></i> WhatsApp
                         </h4>
                     </div>
-
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Número (só dígitos)
-                            *</label>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Número (só dígitos) *</label>
                         <input type="text" id="cfgWhatsapp" required
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm font-mono"
                             placeholder="5588999049636">
-                        <small class="field-hint">Formato: <strong>55</strong> + DDD + número. Ex:
-                            <code>5588999049636</code></small>
+                        <small class="field-hint">Formato: <strong>55</strong> + DDD + número. Ex: <code>5588999049636</code></small>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Exibição *</label>
                         <input type="text" id="cfgWhatsappDisplay" required
@@ -1299,14 +1855,12 @@
                             <i class="fab fa-instagram text-pink-600"></i> Instagram
                         </h4>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Usuário (sem @) *</label>
                         <input type="text" id="cfgInstagram" required
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
                             placeholder="ivo_pita">
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Exibição *</label>
                         <input type="text" id="cfgInstagramDisplay" required
@@ -1319,31 +1873,26 @@
                             <i class="fas fa-address-card text-primary"></i> Contato
                         </h4>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Telefone (exibição)</label>
                         <input type="text" id="cfgTelefone"
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
                             placeholder="(88) 99909-9999">
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">E-mail</label>
                         <input type="email" id="cfgEmail"
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
                             placeholder="contato@ivopita.com.br">
                     </div>
-
                     <div class="col-span-full">
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Endereço</label>
                         <input type="text" id="cfgEndereco"
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
                             placeholder="Juazeiro do Norte, CE">
                     </div>
-
                     <div class="col-span-full">
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Texto "Sobre"
-                            (footer)</label>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Texto "Sobre" (footer)</label>
                         <textarea id="cfgSobreTexto" rows="3"
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
                             placeholder="A IVO PITA nasceu para celebrar..."></textarea>
@@ -1355,16 +1904,13 @@
                             <i class="fas fa-truck text-primary"></i> Frete
                         </h4>
                     </div>
-
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Frete Grátis acima de (R$)
-                            *</label>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Frete Grátis acima de (R$) *</label>
                         <input type="number" step="0.01" id="cfgFreteGratis" required
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
                             placeholder="3500">
                         <small class="field-hint">Ex: <code>3500</code> = R$ 3.500,00</small>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Taxa de Frete (R$) *</label>
                         <input type="number" step="0.01" id="cfgTaxaFrete" required
@@ -1378,7 +1924,6 @@
                             <i class="fab fa-pix text-teal-600"></i> Pagamento
                         </h4>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Desconto PIX (%)</label>
                         <input type="number" step="0.1" id="cfgPixDesconto"
@@ -1416,11 +1961,8 @@
                 </button>
             </div>
             <div class="p-4 overflow-y-auto" style="max-height: calc(95vh - 60px);">
-
                 <div id="marquee-list" class="space-y-2 mb-6"></div>
-
                 <hr class="my-4">
-
                 <h4 class="font-bold text-gray-700 mb-3 text-sm" id="marqueeFormTitle">➕ Adicionar Frase</h4>
                 <input type="hidden" id="marqueeEditIndex" value="-1">
 
@@ -1431,7 +1973,6 @@
                             class="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-yellow-500"
                             placeholder="Ex: Frete Grátis acima de R$ 3.500">
                     </div>
-
                     <div class="col-span-2">
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Ícone</label>
                         <div id="icones-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 mb-2"></div>
@@ -1442,7 +1983,6 @@
                             Clique em um ícone acima ou digite a classe do FontAwesome
                         </small>
                     </div>
-
                     <div class="col-span-2">
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Cor do Texto</label>
                         <select id="marqueeCor"
@@ -1451,7 +1991,6 @@
                             <option value="dourado">🟡 Dourado (destaque)</option>
                         </select>
                     </div>
-
                     <div class="col-span-full flex justify-end gap-2 border-t pt-3">
                         <button type="button" onclick="cancelarEdicaoMarquee()"
                             class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium">
@@ -1480,7 +2019,6 @@
             </div>
             <div class="p-4 overflow-y-auto" style="max-height: calc(95vh - 60px);">
                 <div id="banners-list" class="space-y-3 mb-6"></div>
-
                 <hr class="my-4">
                 <h4 class="font-bold text-gray-700 mb-3 text-sm">Adicionar Banner</h4>
                 <form id="formBanner" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1508,7 +2046,6 @@
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-600 outline-none text-sm"
                             placeholder="Ex: #produtos ou https://...">
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Posição do Texto</label>
                         <select id="bannerPosicao"
@@ -1519,7 +2056,6 @@
                         </select>
                         <small class="field-hint">Onde o texto aparece sobre a imagem</small>
                     </div>
-
                     <div class="flex items-center gap-2">
                         <input type="checkbox" id="bannerAtivo" checked
                             class="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-600">
@@ -1546,32 +2082,19 @@
     <div id="modalVendas" class="modal-overlay">
         <div class="modal-content modal-content-vendas" onclick="event.stopPropagation()">
             <div class="bg-blue-600 px-4 py-3 flex justify-between items-center text-white sticky top-0 z-10">
-                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-chart-line"></i>Relatório de
-                    Vendas</h3>
+                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-chart-line"></i>Relatório de Vendas</h3>
                 <button onclick="fecharModal('modalVendas')" class="text-white/80 hover:text-white text-xl transition">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="p-4 overflow-y-auto" style="max-height: calc(95vh - 60px);">
-
                 <div class="filtros-container">
-                    <div>
-                        <label>Data Início</label>
-                        <input type="date" id="filtro-data-inicio">
-                    </div>
-                    <div>
-                        <label>Data Fim</label>
-                        <input type="date" id="filtro-data-fim">
-                    </div>
-                    <div>
-                        <label>Mês / Ano</label>
-                        <input type="month" id="filtro-mes">
-                    </div>
+                    <div><label>Data Início</label><input type="date" id="filtro-data-inicio"></div>
+                    <div><label>Data Fim</label><input type="date" id="filtro-data-fim"></div>
+                    <div><label>Mês / Ano</label><input type="month" id="filtro-mes"></div>
                     <div>
                         <label>Cliente</label>
-                        <select id="filtro-cliente">
-                            <option value="">Todos os clientes</option>
-                        </select>
+                        <select id="filtro-cliente"><option value="">Todos os clientes</option></select>
                     </div>
                     <div>
                         <label>Status</label>
@@ -1666,9 +2189,7 @@
     <!-- ========================================== -->
     <div id="modalManutencao" class="modal-overlay">
         <div class="modal-content modal-content-config" onclick="event.stopPropagation()">
-
             <div class="p-5 overflow-y-auto" style="max-height: 85vh;">
-
                 <div class="flex items-center justify-between mb-5 pb-4 border-b border-gray-200">
                     <h3 class="text-lg font-bold flex items-center gap-2 text-orange-600">
                         <i class="fas fa-tools"></i> Modo Manutenção
@@ -1694,8 +2215,7 @@
                 <div class="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-5">
                     <p class="text-xs text-orange-800">
                         <i class="fas fa-info-circle mr-1"></i>
-                        Quando <strong>ativada</strong>, os visitantes veem uma tela elegante de manutenção.
-                        Você (admin) continua com acesso normal.
+                        Quando <strong>ativada</strong>, os visitantes veem uma tela elegante de manutenção. Você (admin) continua com acesso normal.
                     </p>
                 </div>
 
@@ -1708,7 +2228,6 @@
                             class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none text-sm resize-none"
                             placeholder="Nosso site está passando por uma atualização especial...">Nosso site está passando por uma atualização especial para trazer ainda mais elegância e qualidade para você. Voltamos em breve!</textarea>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-2">
                             <i class="fab fa-whatsapp mr-1 text-green-600"></i> WhatsApp para contato
@@ -1734,84 +2253,35 @@
                 <p class="text-center text-[10px] text-gray-400 mt-4">
                     Você pode ativar e desativar a qualquer momento
                 </p>
-
             </div>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- MODAL ESTRUTURA DE CATEGORIAS (CSS INLINE) -->
+    <!-- MODAL ESTRUTURA -->
     <!-- ========================================== -->
     <div id="modalEstrutura" class="modal-overlay">
-        <div style="
-            background: #ffffff;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 1000px;
-            max-height: 92vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin: auto;
-        " onclick="event.stopPropagation()">
-
-            <!-- HEADER -->
-            <div style="
-                background: linear-gradient(135deg, #059669, #047857);
-                color: #ffffff;
-                padding: 16px 20px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                flex-shrink: 0;
-            ">
+        <div style="background: #ffffff; border-radius: 16px; width: 100%; max-width: 1000px; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); margin: auto;"
+            onclick="event.stopPropagation()">
+            <div style="background: linear-gradient(135deg, #059669, #047857); color: #ffffff; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
                 <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-sitemap"></i>
                     Estrutura de Categorias
                 </h3>
-                <button type="button" onclick="fecharModal('modalEstrutura')" style="
-                    background: rgba(255,255,255,0.15);
-                    border: none;
-                    color: #ffffff;
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    font-size: 18px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                " onmouseover="this.style.background='rgba(255,255,255,0.3)'"
-                   onmouseout="this.style.background='rgba(255,255,255,0.15)'"
-                   title="Fechar">
+                <button type="button" onclick="fecharModal('modalEstrutura')" style="background: rgba(255,255,255,0.15); border: none; color: #ffffff; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.3)'"
+                    onmouseout="this.style.background='rgba(255,255,255,0.15)'"
+                    title="Fechar">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
-            <!-- BODY SCROLLÁVEL -->
-            <div style="
-                flex: 1;
-                overflow-y: auto;
-                padding: 20px;
-                background: #ffffff;
-            ">
-
-                <div style="
-                    background: #ecfdf5;
-                    border: 1px solid #a7f3d0;
-                    border-radius: 10px;
-                    padding: 12px 14px;
-                    margin-bottom: 16px;
-                    font-size: 12px;
-                    color: #065f46;
-                ">
+            <div style="flex: 1; overflow-y: auto; padding: 20px; background: #ffffff;">
+                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; font-size: 12px; color: #065f46;">
                     <i class="fas fa-info-circle" style="margin-right: 4px;"></i>
-                    Adicione, edite ou remova categorias e subcategorias. As alterações aparecem
-                    <strong>instantaneamente</strong> no menu do site.
+                    Adicione, edite ou remova categorias e subcategorias. As alterações aparecem <strong>instantaneamente</strong> no menu do site.
                 </div>
 
-                <!-- FILTROS -->
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
                     <button type="button" onclick="filtrarEstrutura('todos')" id="btn-filtro-todos"
                         style="padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; background: #059669; color: #fff;">
@@ -1827,12 +2297,10 @@
                     </button>
                 </div>
 
-                <!-- LISTA -->
                 <div id="estrutura-list" style="margin-bottom: 20px;"></div>
 
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 16px 0;">
 
-                <!-- FORM -->
                 <h4 id="estruturaFormTitle" style="margin: 0 0 12px 0; font-weight: 700; font-size: 14px; color: #374151;">
                     ➕ Adicionar Item
                 </h4>
@@ -1840,78 +2308,29 @@
 
                 <form id="formEstrutura" style="display: grid; grid-template-columns: 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">
-                            Grupo *
-                        </label>
-                        <select id="estruturaGrupo" required style="
-                            width: 100%;
-                            padding: 10px 12px;
-                            border: 1px solid #d1d5db;
-                            border-radius: 8px;
-                            font-size: 13px;
-                            outline: none;
-                            background: #fff;
-                        ">
+                        <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">Grupo *</label>
+                        <select id="estruturaGrupo" required style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; background: #fff;">
                             <option value="Folheado Dourado">Folheado Dourado</option>
                             <option value="Folheado Prata">Folheado Prata</option>
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">
-                            Categoria *
-                        </label>
-                        <input type="text" id="estruturaCategoria" required placeholder="Ex: Brinco de Moda Dourado" style="
-                            width: 100%;
-                            padding: 10px 12px;
-                            border: 1px solid #d1d5db;
-                            border-radius: 8px;
-                            font-size: 13px;
-                            outline: none;
-                            background: #fff;
-                        ">
+                        <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">Categoria *</label>
+                        <input type="text" id="estruturaCategoria" required placeholder="Ex: Brinco de Moda Dourado"
+                            style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; background: #fff;">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">
-                            Subcategoria
-                        </label>
-                        <input type="text" id="estruturaSubcategoria" placeholder="Ex: Zircônia" style="
-                            width: 100%;
-                            padding: 10px 12px;
-                            border: 1px solid #d1d5db;
-                            border-radius: 8px;
-                            font-size: 13px;
-                            outline: none;
-                            background: #fff;
-                        ">
+                        <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">Subcategoria</label>
+                        <input type="text" id="estruturaSubcategoria" placeholder="Ex: Zircônia"
+                            style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; background: #fff;">
                     </div>
-
-                    <!-- BOTÕES -->
                     <div style="display: flex; justify-content: flex-end; gap: 10px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
-                        <button type="button" onclick="cancelarEdicaoEstrutura()" style="
-                            padding: 10px 20px;
-                            background: #ffffff;
-                            color: #4b5563;
-                            border: 1px solid #d1d5db;
-                            border-radius: 8px;
-                            font-size: 13px;
-                            font-weight: 600;
-                            cursor: pointer;
-                        ">
+                        <button type="button" onclick="cancelarEdicaoEstrutura()"
+                            style="padding: 10px 20px; background: #ffffff; color: #4b5563; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
                             Cancelar
                         </button>
-                        <button type="submit" id="btnSalvarEstrutura" style="
-                            padding: 10px 24px;
-                            background: linear-gradient(135deg, #059669, #047857);
-                            color: #ffffff;
-                            border: none;
-                            border-radius: 8px;
-                            font-size: 13px;
-                            font-weight: 700;
-                            cursor: pointer;
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 8px;
-                        ">
+                        <button type="submit" id="btnSalvarEstrutura"
+                            style="padding: 10px 24px; background: linear-gradient(135deg, #059669, #047857); color: #ffffff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
                             <i class="fas fa-plus"></i>
                             <span id="btnSalvarEstruturaText">Adicionar</span>
                         </button>
@@ -1922,6 +2341,62 @@
     </div>
 
     <!-- ========================================== -->
+    <!-- MODAL REPOR ESTOQUE -->
+    <!-- ========================================== -->
+    <div id="modalRepor" class="modal-overlay">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header-repor">
+                <h3><i class="fas fa-plus-circle"></i> Repor Estoque</h3>
+                <button onclick="fecharModal('modalRepor')"
+                    style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body-repor">
+                <div class="produto-info">
+                    <div class="nome" id="reporProdutoNome">—</div>
+                    <div class="ref" id="reporProdutoRef">—</div>
+                </div>
+
+                <div class="estoque-atual">
+                    <span class="label">Estoque atual</span>
+                    <span class="valor" id="reporEstoqueAtual">0</span>
+                </div>
+
+                <div style="margin-bottom:14px;">
+                    <label style="display:block;font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">
+                        Adicionar quantidade
+                    </label>
+                    <div class="atalhos-qtd">
+                        <button type="button" onclick="setReporQtd(5)">+5</button>
+                        <button type="button" onclick="setReporQtd(10)">+10</button>
+                        <button type="button" onclick="setReporQtd(25)">+25</button>
+                        <button type="button" onclick="setReporQtd(50)">+50</button>
+                    </div>
+                    <div class="campo-qtd-custom">
+                        <label>Ou outro:</label>
+                        <input type="number" id="reporQtdInput" min="1" value="10" oninput="atualizarPreviewRepor()">
+                    </div>
+                </div>
+
+                <div class="preview-novo" id="reporPreview">
+                    Novo estoque: <strong>0</strong>
+                </div>
+            </div>
+
+            <div class="modal-footer-repor">
+                <button type="button" onclick="fecharModal('modalRepor')" class="btn-cancelar-repor">
+                    Cancelar
+                </button>
+                <button type="button" id="btnConfirmarRepor" onclick="confirmarRepor()" class="btn-confirmar-repor">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ========================================== -->
     <!-- SCRIPT PRINCIPAL -->
     <!-- ========================================== -->
     <script>
@@ -1931,7 +2406,6 @@
         const SVG_PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f3f4f6"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="10" text-anchor="middle" dy=".3em" fill="%239ca3af"%3ESem Imagem%3C/text%3E%3C/svg%3E`;
 
         const CATEGORIAS_OFICIAIS = [
-            // DOURADOS
             "Brinco de Pressão Dourado", "Brinco de Moda Dourado",
             "Argolas Dourada", "Correntes Feminina Dourado", "Correntes Masculina Dourado",
             "Pulseiras Feminina Dourado", "Pulseiras Masculina Dourado",
@@ -1939,7 +2413,6 @@
             "Braceletes Dourado", "Conjuntos Dourado", "Anéis Dourado",
             "Colar Feminino Dourado", "Colar Masculino Dourado", "Colar Infantil Dourado",
             "Tornozeleiras Feminina Dourado", "Tornozeleiras Infantil Dourado", "Escapulário Dourado",
-            // PRATEADOS
             "Brinco de Pressão Prateado", "Brinco de Moda Prateado",
             "Argolas Prateada", "Correntes Feminina Prateado", "Correntes Masculina Prateado",
             "Pulseiras Feminina Prateado", "Pulseiras Masculina Prateado",
@@ -1987,6 +2460,7 @@
         let categoriasCache = [];
         let chartCategorias = null;
         let chartEstoque = null;
+        let visualizacaoAtual = 'tabela';
 
         // Estrutura dinâmica
         let estruturaCache = [];
@@ -2269,6 +2743,15 @@
                         params += `&index=${dados.index}`;
                     } else if (tipo === 'salvar_estrutura') {
                         params += `&estrutura=${encodeURIComponent(dados.estrutura || '[]')}`;
+                    } else if (tipo === 'repor_estoque') {
+                        params += `&id=${encodeURIComponent(dados.id || '')}`;
+                        params += `&qtd=${encodeURIComponent(dados.qtd || 0)}`;
+                    } else if (tipo === 'zerar_estoque') {
+                        params += `&id=${encodeURIComponent(dados.id || '')}`;
+                    } else if (tipo === 'toggle_disponivel') {
+                        params += `&id=${encodeURIComponent(dados.id || '')}`;
+                    } else if (tipo === 'toggle_destaque') {
+                        params += `&id=${encodeURIComponent(dados.id || '')}`;
                     }
 
                     const script = document.createElement('script');
@@ -2479,6 +2962,10 @@
                 if (trEl) trEl.innerText = `${produtos.length} registros`;
 
                 renderizarTabelaProdutos();
+                popularFiltroCategorias();
+                if (visualizacaoAtual === 'cards') {
+                    renderizarCardsProdutos();
+                }
                 renderizarBanners();
                 renderizarMarqueeAdmin();
                 carregarCategoriasFixas();
@@ -2567,9 +3054,25 @@
                     <td class="text-center text-xs font-bold text-blue-600">${vendidos}</td>
                     <td class="text-center text-xs font-bold ${saldoEstoque <= 3 ? 'text-red-600' : 'text-green-600'}">${saldoEstoque}</td>
                     <td class="text-center">
-                        <div class="flex gap-1 justify-center">
-                            <button onclick="editarProduto('${p.ID}')" class="text-blue-600 hover:text-blue-800 p-1 rounded text-xs" title="Editar"><i class="fas fa-pen"></i></button>
-                            <button onclick="excluirProduto('${p.ID}')" class="text-red-500 hover:text-red-700 p-1 rounded text-xs" title="Excluir"><i class="fas fa-trash-alt"></i></button>
+                        <div class="acoes-rapidas">
+                            <button onclick="abrirModalRepor('${p.ID}')" class="btn-acao btn-repor" title="Repor Estoque">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button onclick="editarProduto('${p.ID}')" class="btn-acao btn-editar" title="Editar">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button onclick="toggleDisponivelRapido('${p.ID}')" class="btn-acao btn-ocultar ${String(p.Disponível || '').toLowerCase().trim() !== 'sim' ? 'esta-oculto' : ''}" title="${String(p.Disponível || '').toLowerCase().trim() === 'sim' ? 'Ocultar do site' : 'Mostrar no site'}">
+                                <i class="fas fa-eye${String(p.Disponível || '').toLowerCase().trim() === 'sim' ? '' : '-slash'}"></i>
+                            </button>
+                            <button onclick="toggleDestaqueRapido('${p.ID}')" class="btn-acao btn-destaque ${String(p.Destaque || '').toLowerCase().trim() === 'sim' ? 'esta-destaque' : ''}" title="${String(p.Destaque || '').toLowerCase().trim() === 'sim' ? 'Remover destaque' : 'Marcar como destaque'}">
+                                <i class="fas fa-star"></i>
+                            </button>
+                            <button onclick="esgotarProduto('${p.ID}')" class="btn-acao btn-esgotar" title="Marcar como Esgotado">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                            <button onclick="excluirProduto('${p.ID}')" class="btn-acao btn-excluir" title="Excluir Produto">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
                     </td>
                 `;
@@ -2584,7 +3087,7 @@
             });
             setTimeout(() => aplicarColunasVisiveis(), 50);
         }
-
+    
         // ============================================
         // BANNERS
         // ============================================
@@ -3389,6 +3892,12 @@
                 document.body.style.overflow = 'auto';
             }
         });
+        
+        document.getElementById('modalRepor')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modalRepor')) {
+                fecharModal('modalRepor');
+            }
+        });
 
         // ============================================
         // USUÁRIOS
@@ -3780,6 +4289,11 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('btnSalvarManutencaoMsg')?.addEventListener('click', salvarMensagemManutencao);
+
+            // Event listeners dos filtros de cards
+            document.getElementById('cards-filtro-busca')?.addEventListener('input', renderizarCardsProdutos);
+            document.getElementById('cards-filtro-categoria')?.addEventListener('change', renderizarCardsProdutos);
+            document.getElementById('cards-filtro-ordem')?.addEventListener('change', renderizarCardsProdutos);
         });
 
         window.carregarStatusManutencao = carregarStatusManutencao;
@@ -3790,6 +4304,366 @@
                 fecharModal('modalManutencao');
             }
         });
+
+        // ============================================
+        // 🆕 AÇÕES RÁPIDAS
+        // ============================================
+        let reporProdutoAtual = null;
+
+        function abrirModalRepor(id) {
+            const p = produtos.find(prod => String(prod.ID) === String(id));
+            if (!p) { alert('Produto não encontrado!'); return; }
+
+            reporProdutoAtual = p;
+
+            document.getElementById('reporProdutoNome').textContent = p["Nome do Produto"] || '—';
+            document.getElementById('reporProdutoRef').textContent = 'Ref: ' + (p.referencia || '—');
+            document.getElementById('reporEstoqueAtual').textContent = parseInt(p.Estoque) || 0;
+            document.getElementById('reporQtdInput').value = 10;
+            atualizarPreviewRepor();
+
+            document.getElementById('modalRepor').classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(() => document.getElementById('reporQtdInput').select(), 200);
+        }
+
+        function setReporQtd(qtd) {
+            document.getElementById('reporQtdInput').value = qtd;
+            atualizarPreviewRepor();
+        }
+
+        function atualizarPreviewRepor() {
+            if (!reporProdutoAtual) return;
+            const estoqueAtual = parseInt(reporProdutoAtual.Estoque) || 0;
+            const qtd = parseInt(document.getElementById('reporQtdInput').value) || 0;
+            const novo = estoqueAtual + qtd;
+            document.getElementById('reporPreview').innerHTML =
+                `Novo estoque: <strong>${novo}</strong>`;
+        }
+
+        async function confirmarRepor() {
+            if (!reporProdutoAtual) return;
+            const qtd = parseInt(document.getElementById('reporQtdInput').value) || 0;
+            if (qtd <= 0) { alert('Informe uma quantidade válida'); return; }
+
+            const btn = document.getElementById('btnConfirmarRepor');
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+            try {
+                const result = await chamarAPI('repor_estoque', {
+                    id: reporProdutoAtual.ID,
+                    qtd: qtd
+                });
+
+                if (result.success) {
+                    showToast(`✅ ${result.message}`, 'success');
+                    fecharModal('modalRepor');
+                    carregarProdutos();
+                } else {
+                    alert('❌ Erro: ' + (result.error || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                alert('❌ Erro: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        }
+
+        async function toggleDisponivelRapido(id) {
+            const p = produtos.find(prod => String(prod.ID) === String(id));
+            if (!p) return;
+
+            const estaDisponivel = String(p.Disponível || '').toLowerCase().trim() === 'sim';
+            const acao = estaDisponivel ? 'ocultar' : 'mostrar';
+            if (!confirm(`Deseja ${acao} este produto no site?`)) return;
+
+            try {
+                const result = await chamarAPI('toggle_disponivel', { id: id });
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    carregarProdutos();
+                } else {
+                    alert('❌ Erro: ' + (result.error || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                alert('❌ Erro: ' + error.message);
+            }
+        }
+
+        async function toggleDestaqueRapido(id) {
+            try {
+                const result = await chamarAPI('toggle_destaque', { id: id });
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    carregarProdutos();
+                } else {
+                    alert('❌ Erro: ' + (result.error || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                alert('❌ Erro: ' + error.message);
+            }
+        }
+
+        async function esgotarProduto(id) {
+            const p = produtos.find(prod => String(prod.ID) === String(id));
+            if (!p) return;
+
+            const estoqueAtual = parseInt(p.Estoque) || 0;
+            if (estoqueAtual === 0) {
+                alert('ℹ️ Este produto já está com estoque zero.');
+                return;
+            }
+
+            const confirmMsg = `⚠️ ATENÇÃO!\n\nVocê está prestes a ESGOTAR o produto:\n\n` +
+                               `"${p["Nome do Produto"]}"\n\n` +
+                               `Estoque atual: ${estoqueAtual} unidades\n\n` +
+                               `Isso vai marcar TODAS as ${estoqueAtual} unidades como VENDIDAS,\n` +
+                               `zerando o saldo disponível.\n\n` +
+                               `Deseja continuar?`;
+
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const result = await chamarAPI('zerar_estoque', { id: id });
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    carregarProdutos();
+                } else {
+                    alert('❌ Erro: ' + (result.error || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                alert('❌ Erro: ' + error.message);
+            }
+        }
+
+        window.abrirModalRepor = abrirModalRepor;
+        window.setReporQtd = setReporQtd;
+        window.atualizarPreviewRepor = atualizarPreviewRepor;
+        window.confirmarRepor = confirmarRepor;
+        window.toggleDisponivelRapido = toggleDisponivelRapido;
+        window.toggleDestaqueRapido = toggleDestaqueRapido;
+        window.esgotarProduto = esgotarProduto;
+
+        // ============================================
+        // 🎴 VISUALIZAÇÃO EM CARDS
+        // ============================================
+        function alternarVisualizacao() {
+            visualizacaoAtual = visualizacaoAtual === 'tabela' ? 'cards' : 'tabela';
+            aplicarVisualizacao();
+        }
+
+        function aplicarVisualizacao() {
+            const cardsView = document.getElementById('produtos-cards-view');
+            const tabelaView = document.getElementById('produtos-tabela-view');
+            const btnIcone = document.getElementById('icone-toggle-view');
+            const btnTexto = document.getElementById('texto-toggle-view');
+
+            if (!cardsView || !tabelaView) return;
+
+            if (visualizacaoAtual === 'cards') {
+                cardsView.classList.remove('hidden');
+                tabelaView.classList.add('hidden');
+                if (btnIcone) btnIcone.className = 'fas fa-table';
+                if (btnTexto) btnTexto.textContent = 'Tabela';
+                
+                popularFiltroCategorias();
+                renderizarCardsProdutos();
+            } else {
+                cardsView.classList.add('hidden');
+                tabelaView.classList.remove('hidden');
+                if (btnIcone) btnIcone.className = 'fas fa-th-large';
+                if (btnTexto) btnTexto.textContent = 'Cards';
+            }
+        }
+
+        function popularFiltroCategorias() {
+            const select = document.getElementById('cards-filtro-categoria');
+            if (!select) return;
+
+            // Guarda contra produtos ainda não carregados
+            if (!produtos || produtos.length === 0) return;
+
+            const valorAtual = select.value;
+            const categorias = [...new Set(produtos.map(p => p.Categoria).filter(c => c))].sort();
+
+            select.innerHTML = '<option value="">Todas as categorias</option>';
+            categorias.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                select.appendChild(opt);
+            });
+
+            if (categorias.includes(valorAtual)) select.value = valorAtual;
+        }
+
+        function renderizarCardsProdutos() {
+            const container = document.getElementById('produtos-cards-container');
+            if (!container) return;
+
+            const busca = (document.getElementById('cards-filtro-busca')?.value || '').toLowerCase().trim();
+            const categoria = document.getElementById('cards-filtro-categoria')?.value || '';
+            const ordem = document.getElementById('cards-filtro-ordem')?.value || 'relevancia';
+
+            let filtrados = produtos.slice();
+
+            if (busca) {
+                filtrados = filtrados.filter(p => {
+                    const nome = (p["Nome do Produto"] || '').toLowerCase();
+                    const ref = (p.referencia || '').toLowerCase();
+                    const sub = (p.Subcategoria || '').toLowerCase();
+                    return nome.includes(busca) || ref.includes(busca) || sub.includes(busca);
+                });
+            }
+
+            if (categoria) {
+                filtrados = filtrados.filter(p => p.Categoria === categoria);
+            }
+
+            switch (ordem) {
+                case 'menor-preco':
+                    filtrados.sort((a, b) => (parseFloat(a.Preço) || 0) - (parseFloat(b.Preço) || 0));
+                    break;
+                case 'maior-preco':
+                    filtrados.sort((a, b) => (parseFloat(b.Preço) || 0) - (parseFloat(a.Preço) || 0));
+                    break;
+                case 'nome-az':
+                    filtrados.sort((a, b) => (a["Nome do Produto"] || '').localeCompare(b["Nome do Produto"] || ''));
+                    break;
+                case 'nome-za':
+                    filtrados.sort((a, b) => (b["Nome do Produto"] || '').localeCompare(a["Nome do Produto"] || ''));
+                    break;
+                case 'maior-estoque':
+                    filtrados.sort((a, b) => (parseInt(b.Estoque) || 0) - (parseInt(a.Estoque) || 0));
+                    break;
+                case 'menor-estoque':
+                    filtrados.sort((a, b) => (parseInt(a.Estoque) || 0) - (parseInt(b.Estoque) || 0));
+                    break;
+                default:
+                    break;
+            }
+
+            if (filtrados.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #9ca3af;">
+                        <i class="fas fa-box-open" style="font-size: 32px; display: block; margin-bottom: 12px; opacity: 0.5;"></i>
+                        <p style="font-size: 14px;">Nenhum produto encontrado com esses filtros.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+
+            filtrados.forEach(p => {
+                const estoque = parseInt(p.Estoque) || 0;
+                const saldoEstoque = parseInt(p["Saldo Estoque"]) || 0;
+                const imgSrc = getPlaceholderImage(p.Imagem, 400);
+                const estaDisponivel = String(p.Disponível || '').toLowerCase().trim() === 'sim';
+                const estaDestaque = String(p.Destaque || '').toLowerCase().trim() === 'sim';
+
+                let classeEstoque = '';
+                let textoEstoque = `${saldoEstoque} disponíveis`;
+                if (saldoEstoque <= 0) {
+                    classeEstoque = 'esgotado';
+                    textoEstoque = 'Esgotado';
+                } else if (saldoEstoque <= 3) {
+                    classeEstoque = 'baixo';
+                    textoEstoque = `${saldoEstoque} restantes`;
+                } else if (saldoEstoque === 1) {
+                    classeEstoque = 'baixo';
+                    textoEstoque = `1 disponível`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'produto-card';
+                card.innerHTML = `
+                    <div class="card-imagem-wrapper">
+                        <img src="${imgSrc}" class="card-imagem" alt="${p["Nome do Produto"] || ''}" 
+                            onerror="this.src='${SVG_PLACEHOLDER}'">
+                        
+                        ${(estaDestaque || !estaDisponivel) ? `
+                            <div class="card-badges-status">
+                                ${estaDestaque ? '<div class="card-badge-status destaque" title="Destaque"><i class="fas fa-star"></i></div>' : ''}
+                                ${!estaDisponivel ? '<div class="card-badge-status oculto" title="Oculto no site"><i class="fas fa-eye-slash"></i></div>' : ''}
+                            </div>
+                        ` : ''}
+
+                        <div class="card-ref-overlay">
+                            <div class="card-ref-label">Referência</div>
+                            <div class="card-ref-valor">${p.referencia || '—'}</div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="card-categoria-titulo">${p.Categoria || 'Sem categoria'}</div>
+                        
+                        <div class="card-nome" title="${p["Nome do Produto"] || ''}">${p["Nome do Produto"] || '—'}</div>
+                        
+                        <div class="card-ref-badge">REF: ${p.referencia || '—'}</div>
+                        
+                        <div class="card-subtitulo">
+                            ${p.Categoria || ''}${p.Subcategoria ? ' · ' + p.Subcategoria : ''}
+                        </div>
+                        
+                        <div class="card-preco">R$ ${parseFloat(p.Preço || 0).toFixed(2).replace('.', ',')}</div>
+                        
+                        <div class="card-estoque-badge ${classeEstoque}">
+                            <span class="dot"></span>
+                            ${textoEstoque}
+                        </div>
+                    </div>
+
+                    <div class="card-acoes">
+                        <button onclick="abrirModalRepor('${p.ID}')" class="btn-acao btn-repor" title="Repor Estoque">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button onclick="editarProduto('${p.ID}')" class="btn-acao btn-editar" title="Editar">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button onclick="toggleDisponivelRapido('${p.ID}')" 
+                            class="btn-acao btn-ocultar ${!estaDisponivel ? 'esta-oculto' : ''}" 
+                            title="${estaDisponivel ? 'Ocultar do site' : 'Mostrar no site'}">
+                            <i class="fas fa-eye${estaDisponivel ? '' : '-slash'}"></i>
+                        </button>
+                        <button onclick="toggleDestaqueRapido('${p.ID}')" 
+                            class="btn-acao btn-destaque ${estaDestaque ? 'esta-destaque' : ''}" 
+                            title="${estaDestaque ? 'Remover destaque' : 'Marcar como destaque'}">
+                            <i class="fas fa-star"></i>
+                        </button>
+                        <button onclick="esgotarProduto('${p.ID}')" class="btn-acao btn-esgotar" title="Marcar como Esgotado">
+                            <i class="fas fa-ban"></i>
+                        </button>
+                        <button onclick="excluirProduto('${p.ID}')" class="btn-acao btn-excluir" title="Excluir">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function limparFiltrosCards() {
+            const busca = document.getElementById('cards-filtro-busca');
+            const categoria = document.getElementById('cards-filtro-categoria');
+            const ordem = document.getElementById('cards-filtro-ordem');
+            
+            if (busca) busca.value = '';
+            if (categoria) categoria.value = '';
+            if (ordem) ordem.value = 'relevancia';
+            
+            renderizarCardsProdutos();
+        }
+
+        window.alternarVisualizacao = alternarVisualizacao;
+        window.aplicarVisualizacao = aplicarVisualizacao;
+        window.renderizarCardsProdutos = renderizarCardsProdutos;
+        window.limparFiltrosCards = limparFiltrosCards;
+        window.popularFiltroCategorias = popularFiltroCategorias;
 
         // ============================================
         // 🛡️ ESCUDO CONTRA NULL
@@ -3827,7 +4701,7 @@
         })();
 
         // ============================================
-        // 🆕 ESTRUTURA DE CATEGORIAS
+        // ESTRUTURA DE CATEGORIAS
         // ============================================
         async function carregarEstruturaAdmin() {
             try {
