@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
   <title>Ivo Pita | Indústria de Joias</title>
 
-   <!-- 🚧 VERIFICAÇÃO DE MANUTENÇÃO -->
+  <!-- 🚧 VERIFICAÇÃO DE MANUTENÇÃO -->
   <script>
     (function() {
       var params = new URLSearchParams(window.location.search);
@@ -19,7 +19,9 @@
       var callback = 'manut_check_' + Date.now();
       window[callback] = function(data) {
         delete window[callback];
-        if (data && data.success && data.emManutencao) {
+        if (data && data.success && data.data?.emManutencao) {
+          window.location.replace('manutencao.html');
+        } else if (data && data.success && data.emManutencao) {
           window.location.replace('manutencao.html');
         }
       };
@@ -29,49 +31,35 @@
     })();
   </script>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: "#2f6b4f",
-            primaryDark: "#1f4d38",
-            accent: "#0f2f22",
-            gold: "#c9a86a",
-            bgSoft: "#f6f8f5",
-            textDark: "#182420",
-            textMuted: "#5c6b63",
-          },
-          fontFamily: {
-            serif: ["Cormorant Garamond", "serif"],
-            sans: ["Montserrat", "sans-serif"],
-          },
-          boxShadow: {
-            soft: "0 10px 30px -12px rgba(15, 47, 34, 0.25)",
-            card: "0 4px 20px -6px rgba(15, 47, 34, 0.12)",
-          },
-        },
-      },
-    };
-  </script>
+  <!-- ⚡ PRECONNECT (ganha 100-300ms) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://lh3.googleusercontent.com">
 
+  <!-- ⚡ PRELOAD da logo (LCP) -->
+  <link rel="preload" as="image" href="assets/papel_ivo_preto.png">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;600;800&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- Bibliotecas pesadas (carregam depois, sem travar) -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#2f6b4f" />
 
   <link rel="icon" type="image/png" href="assets/papel_ivo_preto.png" />
   <link rel="apple-touch-icon" href="assets/papel_ivo_preto.png" />
+
 </head>
 
 <body class="bg-bgSoft text-textDark">
@@ -260,17 +248,17 @@
               </div>
             </div>
 
-           <div class="sidebar-subgroup">
-  <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
-    <span>Brincos</span>
-    <i class="fas fa-chevron-down"></i>
-  </button>
-  <div class="sidebar-subgroup-content">
-    <button class="sidebar-item-sub" data-categoria="brinco de pressão dourado normal"><span>Brinco de Pressão</span></button>
-    <button class="sidebar-item-sub" data-categoria="brinco de pressão dourado zircônia"><span>Brinco Pressão Zircônia</span></button>
-    <button class="sidebar-item-sub" data-categoria="brincos de moda dourado"><span>Brincos de Moda</span></button>
-  </div>
-</div>
+            <div class="sidebar-subgroup">
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Brincos</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="brinco de pressão dourado normal"><span>Brinco de Pressão</span></button>
+                <button class="sidebar-item-sub" data-categoria="brinco de pressão dourado zircônia"><span>Brinco Pressão Zircônia</span></button>
+                <button class="sidebar-item-sub" data-categoria="brincos de moda dourado"><span>Brincos de Moda</span></button>
+              </div>
+            </div>
 
             <div class="sidebar-subgroup">
               <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
@@ -393,16 +381,17 @@
             </div>
 
             <div class="sidebar-subgroup">
-  <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
-    <span>Brincos</span>
-    <i class="fas fa-chevron-down"></i>
-  </button>
-  <div class="sidebar-subgroup-content">
-    <button class="sidebar-item-sub" data-categoria="brinco de pressão prateado normal"><span>Brinco de Pressão</span></button>
-    <button class="sidebar-item-sub" data-categoria="brinco de pressão prateado zircônia"><span>Brinco Pressão Zircônia</span></button>
-    <button class="sidebar-item-sub" data-categoria="brincos de moda prateado"><span>Brincos de Moda</span></button>
-  </div>
-</div>
+              <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
+                <span>Brincos</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="sidebar-subgroup-content">
+                <button class="sidebar-item-sub" data-categoria="brinco de pressão prateado normal"><span>Brinco de Pressão</span></button>
+                <button class="sidebar-item-sub" data-categoria="brinco de pressão prateado zircônia"><span>Brinco Pressão Zircônia</span></button>
+                <button class="sidebar-item-sub" data-categoria="brincos de moda prateado"><span>Brincos de Moda</span></button>
+              </div>
+            </div>
+
             <div class="sidebar-subgroup">
               <button class="sidebar-subgroup-title" onclick="toggleSidebarSubgroup(this)">
                 <span>Correntes</span>
@@ -507,14 +496,6 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="main-content">
 
-      <!-- BANNER HERO -->
-      <section id="hero" class="hero-clean">
-        <div class="swiper heroSwiper">
-          <div class="swiper-wrapper"></div>
-          <div class="swiper-pagination"></div>
-        </div>
-      </section>
-
       <!-- PRODUTOS -->
       <section id="produtos" class="px-4 max-w-full mx-auto pb-20">
 
@@ -535,7 +516,18 @@
           </div>
         </div>
 
-        <div id="produtos-container" class="produtos-grid-5"></div>
+        <div id="produtos-container" class="produtos-grid-5">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
 
       </section>
 
@@ -751,9 +743,9 @@
   </footer>
 
   <!-- SCRIPTS -->
-  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="script.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script defer src="script.js"></script>
+
 
   <script>
     if ('serviceWorker' in navigator) {
@@ -765,4 +757,5 @@
     }
   </script>
 </body>
+
 </html>
