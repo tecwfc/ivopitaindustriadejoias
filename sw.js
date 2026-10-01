@@ -1,5 +1,4 @@
-// sw.js - Service Worker para PWA (VERSAO 3 - Sem cache de HTML)
-const CACHE_NAME = 'ivo-pita-v3';
+const CACHE_NAME = 'ivo-pita-v8';
 const urlsToCache = [
   '/styles.css',
   '/script.js',
