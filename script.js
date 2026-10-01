@@ -1,14 +1,19 @@
 // ============================================
-// IVO PITA JOIAS - SCRIPT COMPLETO
+// IVO PITA JOIAS - SCRIPT OTIMIZADO v2 (sem banner)
 // ============================================
 
-// ============================================
-// CONFIGURAÇÕES
-// ============================================
-const PLANILHA_ID = "1CwBlISE9wAFKkyYxfGXDDBKJ9LTIx_wVL6mR8ei5tCM";
+const PLANILHA_ID = "142Ir0-8yfUuu2sSbbRo8x6SwjeQL74MLMUpNElVn1rc";
 
 const ESTOQUE_API_URL =
-  "https://script.google.com/macros/s/AKfycbwRaA3rQLawY32JJssrGfCDx08iSnapR6f_K3LgK9T3TwNcXX56Rvmy4DBO1chfkT-M/exec";
+  "https://script.google.com/macros/s/AKfycbwtdqgkfRH8mXRFRCfSTYSkmvXWtp0xAmdW6Qd_j8hCCrPl5ynOMeyolSCzvtoON1yyWQ/exec";
+
+const CACHE_KEY_DADOS = 'ivo_dados_v2';
+const CACHE_KEY_TIME = 'ivo_dados_time_v2';
+const CACHE_TTL_MS = 5 * 60 * 1000;
+
+const IMG_SIZE_CARD = 400;
+const IMG_SIZE_MODAL = 600;
+const IMG_SIZE_ZOOM = 1200;
 
 let siteConfig = {
   whatsapp: "5588999049636",
@@ -26,48 +31,31 @@ let siteConfig = {
 let FRETE_GRATIS_VALOR = 3500;
 let TAXA_FRETE = 75;
 
-// ============================================
-// PLACEHOLDER SVG EMBUTIDO
-// ============================================
 const PLACEHOLDER_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
   <rect width="400" height="400" fill="#f0f7f2"/>
   <rect x="20" y="20" width="360" height="360" fill="none" stroke="#c9a86a" stroke-width="2" stroke-dasharray="8,6" rx="20"/>
-  <g transform="translate(200, 170)">
-    <circle cx="0" cy="0" r="40" fill="none" stroke="#2f6b4f" stroke-width="3"/>
-    <circle cx="0" cy="0" r="20" fill="none" stroke="#c9a86a" stroke-width="2"/>
-    <path d="M-15 -15 L15 15 M15 -15 L-15 15" stroke="#2f6b4f" stroke-width="2" opacity="0.4"/>
-  </g>
-  <text x="200" y="280" font-family="Montserrat, Arial, sans-serif" font-size="16" font-weight="600" fill="#2f6b4f" text-anchor="middle" letter-spacing="1">SEM IMAGEM</text>
-  <text x="200" y="305" font-family="Montserrat, Arial, sans-serif" font-size="11" font-weight="400" fill="#5c6b63" text-anchor="middle" letter-spacing="0.5">Ivo Pita Joias</text>
+  <text x="200" y="210" font-family="Montserrat, Arial, sans-serif" font-size="16" font-weight="600" fill="#2f6b4f" text-anchor="middle">SEM IMAGEM</text>
+  <text x="200" y="235" font-family="Montserrat, Arial, sans-serif" font-size="11" fill="#5c6b63" text-anchor="middle">Ivo Pita Joias</text>
 </svg>
 `)}`;
 
 window.PLACEHOLDER_SVG = PLACEHOLDER_SVG;
 
-// ============================================
-// VARIÁVEIS GLOBAIS
-// ============================================
 let allProducts = [];
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let selectedColor = "";
 let tempProduct = null;
-let heroSwiper = null;
 let subtotal = 0;
 let imagensZoom = [];
 let zoomIndex = 0;
-
 let quantidadeSelecionada = 0;
 let coresSelecionadas = {};
 let coresDisponiveis = [];
-
-// 🆕 Estrutura dinâmica de categorias
 let estruturaCategorias = [];
 let sidebarDinamicaAtiva = false;
+let __dadosCarregados = null;
 
-// ============================================
-// CACHE DE ESTOQUE
-// ============================================
 const ESTOQUE_CACHE = new Map();
 const ESTOQUE_CACHE_TTL = 30 * 1000;
 
@@ -89,68 +77,161 @@ function invalidarEstoqueCache() {
   ESTOQUE_CACHE.clear();
 }
 
-// ============================================
-// TOAST PADRONIZADO
-// ============================================
 function showToast(texto, tipo = 'success', duracao = 2500) {
+  if (typeof Toastify === 'undefined') { console.log('[Toast]', texto); return; }
   const cores = {
     success: 'linear-gradient(135deg, #2f6b4f, #1f4d38)',
-    error: '#ef4444',
-    warning: '#f59e0b',
-    info: '#3b82f6'
+    error: '#ef4444', warning: '#f59e0b', info: '#3b82f6'
   };
-
   Toastify({
-    text: texto,
-    duration: duracao,
-    gravity: 'top',
-    position: 'right',
-    stopOnFocus: true,
+    text: texto, duration: duracao, gravity: 'top', position: 'right', stopOnFocus: true,
     style: {
-      background: cores[tipo] || cores.success,
-      borderRadius: '14px',
-      fontWeight: '700',
-      fontSize: '13px',
-      padding: '14px 20px',
-      boxShadow: '0 10px 30px rgba(15, 47, 34, 0.25)',
-      maxWidth: '340px'
+      background: cores[tipo] || cores.success, borderRadius: '14px', fontWeight: '700',
+      fontSize: '13px', padding: '14px 20px',
+      boxShadow: '0 10px 30px rgba(15, 47, 34, 0.25)', maxWidth: '340px'
     },
-    offset: {
-      x: 16,
-      y: 90
-    }
+    offset: { x: 16, y: 90 }
   }).showToast();
 }
 window.showToast = showToast;
 
-// ============================================
-// FUNÇÕES AUXILIARES
-// ============================================
 function normalizar(texto) {
   if (!texto) return "";
-  return texto
-    .toString()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+  return texto.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 function normalizarPalavraBusca(palavra) {
-  return palavra
-    .replace(/s$/, "")
-    .replace(/a$/, "")
-    .replace(/o$/, "")
-    .replace(/es$/, "")
-    .replace(/ns$/, "m");
+  return palavra.replace(/s$/, "").replace(/a$/, "").replace(/o$/, "").replace(/es$/, "").replace(/ns$/, "m");
 }
 
-function driveImg(url) {
+function driveImg(url, size = IMG_SIZE_CARD) {
   if (!url || url === 'placeholder.png') return PLACEHOLDER_SVG;
   if (url.includes("googleusercontent.com")) return url;
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (match) return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=w800`;
+  if (match) return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=w${size}`;
   if (url.startsWith("http")) return url;
   return PLACEHOLDER_SVG;
+}
+
+async function carregarTudo() {
+  const cache = localStorage.getItem(CACHE_KEY_DADOS);
+  const cacheTime = parseInt(localStorage.getItem(CACHE_KEY_TIME) || '0');
+
+  if (cache && Date.now() - cacheTime < CACHE_TTL_MS) {
+    try {
+      const dados = JSON.parse(cache);
+      console.log('⚡ Renderizando do cache local');
+      aplicarDados(dados);
+      __dadosCarregados = dados;
+      setTimeout(() => atualizarEmBackground(false), 200);
+      return;
+    } catch (e) {
+      localStorage.removeItem(CACHE_KEY_DADOS);
+    }
+  }
+
+  await atualizarEmBackground(true);
+}
+
+async function atualizarEmBackground(mostrarLoading = false) {
+  try {
+    if (mostrarLoading) {
+      const c = document.getElementById('produtos-container');
+      if (c && c.querySelectorAll('.product-card').length === 0) {
+        c.innerHTML = Array(10).fill('<div class="skeleton-card"></div>').join('');
+      }
+    }
+
+    const t0 = performance.now();
+    const dados = await new Promise((resolve, reject) => {
+      const cb = 'ivo_load_' + Date.now();
+      let script = null;
+      const timeout = setTimeout(() => {
+        delete window[cb];
+        if (script && script.parentNode) script.parentNode.removeChild(script);
+        reject(new Error('Timeout'));
+      }, 12000);
+      window[cb] = function (response) {
+        clearTimeout(timeout);
+        delete window[cb];
+        if (script && script.parentNode) script.parentNode.removeChild(script);
+        resolve(response);
+      };
+      script = document.createElement('script');
+      script.src = `${ESTOQUE_API_URL}?callback=${cb}&_t=${Date.now()}`;
+      script.onerror = () => {
+        clearTimeout(timeout);
+        delete window[cb];
+        if (script && script.parentNode) script.parentNode.removeChild(script);
+        reject(new Error('Erro de rede'));
+      };
+      document.body.appendChild(script);
+    });
+
+    console.log(`✅ Dados em ${Math.round(performance.now() - t0)}ms`);
+
+    if (!dados || dados.error) throw new Error(dados?.error || 'Erro desconhecido');
+
+    try {
+      localStorage.setItem(CACHE_KEY_DADOS, JSON.stringify(dados));
+      localStorage.setItem(CACHE_KEY_TIME, String(Date.now()));
+    } catch (e) {}
+
+    __dadosCarregados = dados;
+    aplicarDados(dados);
+  } catch (err) {
+    console.error('❌ Erro:', err);
+    const c = document.getElementById('produtos-container');
+    if (c) {
+      c.innerHTML = `
+        <div class="col-span-full text-center py-12">
+          <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+          <p class="text-textMuted font-bold">Erro ao carregar produtos</p>
+          <p class="text-textMuted text-xs mt-2">${err.message}</p>
+          <button onclick="localStorage.removeItem('${CACHE_KEY_DADOS}');location.reload()"
+            class="mt-4 bg-primary text-white px-6 py-2 rounded-full text-sm font-bold">
+            <i class="fas fa-sync-alt mr-2"></i>Tentar novamente
+          </button>
+        </div>`;
+    }
+  }
+}
+
+function aplicarDados(dados) {
+  allProducts = (dados.produtos || []).filter(p => {
+    const disp = String(p["Disponível"] || p.disponivel || '').toLowerCase().trim();
+    return disp === 'sim';
+  }).map(p => {
+    if (!p["Saldo Estoque"] && p["Saldo Estoque"] !== 0) {
+      p["Saldo Estoque"] = (parseInt(p.Estoque) || 0) - (parseInt(p.Vendidos) || 0);
+    }
+    return p;
+  });
+
+  console.log(`📦 ${allProducts.length} produtos disponíveis`);
+  aplicarConfig(dados.config || {});
+  renderizarMarquee(dados.marquee || []);
+
+  if (dados.estrutura && Array.isArray(dados.estrutura) && dados.estrutura.length > 0) {
+    estruturaCategorias = dados.estrutura;
+    renderizarSidebarDinamica();
+  }
+
+  if (allProducts.length === 0) {
+    const container = document.getElementById("produtos-container");
+    if (container) {
+      container.innerHTML = `
+        <div class="col-span-full text-center py-12">
+          <i class="fas fa-gem text-4xl text-primary/30 mb-4"></i>
+          <p class="text-textMuted">Nenhum produto disponível.</p>
+        </div>`;
+    }
+  } else {
+    renderProducts(allProducts);
+  }
+
+  setTimeout(atualizarContadoresSidebar, 50);
+  setTimeout(atualizarContadorProdutos, 50);
 }
 
 // ============================================
@@ -160,13 +241,9 @@ function renderizarSidebarDinamica() {
   const scroll = document.getElementById('sidebar-scroll');
   if (!scroll) return;
 
-  // Guarda o botão "Todas as Joias"
   const btnTodas = scroll.querySelector('.sidebar-item[data-categoria="todos"]');
-
-  // Limpa tudo
   scroll.innerHTML = '';
 
-  // Re-adiciona o botão Todas
   if (btnTodas) {
     scroll.appendChild(btnTodas);
   } else {
@@ -186,7 +263,6 @@ function renderizarSidebarDinamica() {
     return;
   }
 
-  // Agrupa: grupo → categoria → [subcategorias]
   const grupos = {};
   estruturaCategorias.forEach(item => {
     const g = item.grupo || 'Outros';
@@ -231,15 +307,11 @@ function renderizarSidebarDinamica() {
     const contentDiv = document.createElement('div');
     contentDiv.className = 'sidebar-group-content';
 
-    // Ordena categorias
-    const categoriasOrdenadas = Object.keys(grupos[nomeGrupo]).sort((a, b) => {
-      return a.localeCompare(b, 'pt-BR');
-    });
+    const categoriasOrdenadas = Object.keys(grupos[nomeGrupo]).sort((a, b) => a.localeCompare(b, 'pt-BR'));
 
     categoriasOrdenadas.forEach(nomeCategoria => {
       const subs = grupos[nomeGrupo][nomeCategoria];
 
-      // Se não tem subcategoria OU tem 1 sub idêntica à categoria → botão direto
       if (subs.length === 0) {
         const btn = document.createElement('button');
         btn.className = 'sidebar-item-sub';
@@ -250,13 +322,11 @@ function renderizarSidebarDinamica() {
         return;
       }
 
-      // Nome "curto" da categoria: remove sufixo Dourado/Prata/Dourada/Prateada
       const nomeCurto = nomeCategoria
-    .replace(/\s+(dourado|dourada|dourados|douradas)\s*$/i, '')
-    .replace(/\s+(prata|prateado|prateada|prateados|prateadas)\s*$/i, '')
-    .trim();
+        .replace(/\s+(dourado|dourada|dourados|douradas)\s*$/i, '')
+        .replace(/\s+(prata|prateado|prateada|prateados|prateadas)\s*$/i, '')
+        .trim();
 
-      // Se só tem 1 sub e ela é igual ao nome curto → botão direto
       if (subs.length === 1 && subs[0].toLowerCase() === nomeCurto.toLowerCase()) {
         const btn = document.createElement('button');
         btn.className = 'sidebar-item-sub';
@@ -267,7 +337,6 @@ function renderizarSidebarDinamica() {
         return;
       }
 
-      // Caso contrário → subgrupo expansível
       const subDiv = document.createElement('div');
       subDiv.className = 'sidebar-subgroup';
 
@@ -285,7 +354,6 @@ function renderizarSidebarDinamica() {
         const btn = document.createElement('button');
         btn.className = 'sidebar-item-sub';
         btn.setAttribute('type', 'button');
-        // data-categoria = "categoria subcategoria" para o filtro bater
         btn.setAttribute('data-categoria', (nomeCategoria + ' ' + sub).toLowerCase());
         btn.innerHTML = `<span>${sub}</span>`;
         subContent.appendChild(btn);
@@ -300,11 +368,8 @@ function renderizarSidebarDinamica() {
   });
 
   sidebarDinamicaAtiva = true;
-
-  // Re-bindar eventos
   rebindSidebarEvents();
 
-  // Aplicar busca da sidebar se estiver preenchida
   const searchInput = document.getElementById('sidebar-search');
   if (searchInput && searchInput.value.trim()) {
     aplicarBuscaSidebar(searchInput.value);
@@ -313,7 +378,6 @@ function renderizarSidebarDinamica() {
 
 function rebindSidebarEvents() {
   document.querySelectorAll('.sidebar-item').forEach(btn => {
-    // evita duplicar listeners removendo antes
     btn.onclick = function (e) {
       e.preventDefault();
       const categoria = this.getAttribute('data-categoria');
@@ -335,7 +399,6 @@ function rebindSidebarEvents() {
     };
   });
 
-  // Reconstrói contadores
   atualizarContadoresSidebar();
 }
 
@@ -452,12 +515,7 @@ function atualizarContadoresSidebar() {
       btn.appendChild(countSpan);
     }
     countSpan.textContent = quantidade;
-
-    if (quantidade === 0) {
-      btn.style.opacity = '0.5';
-    } else {
-      btn.style.opacity = '1';
-    }
+    btn.style.opacity = quantidade === 0 ? '0.5' : '1';
   });
 
   document.querySelectorAll('.sidebar-group-title').forEach(groupTitle => {
@@ -495,11 +553,8 @@ function atualizarContadoresSidebar() {
       countSpan = document.createElement('span');
       countSpan.className = 'sidebar-count';
       const icon = subgroupTitle.querySelector('i');
-      if (icon) {
-        subgroupTitle.insertBefore(countSpan, icon);
-      } else {
-        subgroupTitle.appendChild(countSpan);
-      }
+      if (icon) subgroupTitle.insertBefore(countSpan, icon);
+      else subgroupTitle.appendChild(countSpan);
     }
     countSpan.textContent = total;
   });
@@ -540,9 +595,7 @@ function ordenarProdutos(tipo) {
     return titleEl ? titleEl.textContent.trim() : '';
   });
 
-  const produtosFiltrados = allProducts.filter(p =>
-    nomesVisiveis.includes(p["Nome do Produto"])
-  );
+  const produtosFiltrados = allProducts.filter(p => nomesVisiveis.includes(p["Nome do Produto"]));
 
   let ordenados = [...produtosFiltrados];
 
@@ -586,9 +639,7 @@ function renderizarCores() {
       "px-4 py-3 rounded-xl border border-primary/20 " +
       "bg-white hover:bg-primary hover:text-white " +
       "transition-all duration-200 font-semibold text-sm";
-    btn.onclick = function () {
-      window.selectColor(nomeCor);
-    };
+    btn.onclick = function () { window.selectColor(nomeCor); };
     container.appendChild(btn);
   });
 }
@@ -616,9 +667,7 @@ function selectColor(cor) {
 
   showToast(`🎨 ${qtd}x ${cor} adicionado`, "success", 2000);
 
-  document
-    .querySelectorAll(".qty-option-btn")
-    .forEach((btn) => btn.classList.remove("selected"));
+  document.querySelectorAll(".qty-option-btn").forEach((btn) => btn.classList.remove("selected"));
 
   const instruction = document.getElementById("color-instruction");
   if (instruction) {
@@ -749,8 +798,7 @@ function confirmarSelecao() {
   if (totalSelecionado > estoqueDisponivel) {
     showToast(
       `Total selecionado (${totalSelecionado}) ultrapassa o estoque disponível (${estoqueDisponivel}).`,
-      "error",
-      3000
+      "error", 3000
     );
     return;
   }
@@ -847,12 +895,11 @@ function updateCart() {
 
   if (cart.length === 0) {
     container.innerHTML = `
-            <div class="cart-empty-state">
-                <div class="cart-empty-icon"><i class="fas fa-shopping-bag"></i></div>
-                <p class="cart-empty-title">Sua sacola está vazia</p>
-                <p class="cart-empty-subtitle">Adicione produtos para começar</p>
-            </div>
-        `;
+      <div class="cart-empty-state">
+        <div class="cart-empty-icon"><i class="fas fa-shopping-bag"></i></div>
+        <p class="cart-empty-title">Sua sacola está vazia</p>
+        <p class="cart-empty-subtitle">Adicione produtos para começar</p>
+      </div>`;
   } else {
     cart.forEach((item) => {
       subtotal += item.price;
@@ -860,26 +907,25 @@ function updateCart() {
       const div = document.createElement("div");
       div.className = "cart-item";
       div.innerHTML = `
-                <div class="cart-item-image">
-                    <img src="${driveImg(item.img)}" alt="${item.name}">
-                </div>
-                <div class="cart-item-details">
-                    <h4 class="cart-item-name">${item.name}</h4>
-                    ${item.ref ? `<p class="cart-item-ref">Ref: ${item.ref}</p>` : ""}
-                    <div class="cart-item-price-row">
-                        <span class="cart-item-unit-price">R$ ${precoUnitario.toFixed(2).replace(".", ",")} <small>/un</small></span>
-                        <span class="cart-item-total-price">R$ ${item.price.toFixed(2).replace(".", ",")}</span>
-                    </div>
-                    <div class="cart-item-controls">
-                        <div class="cart-qty-control">
-                            <button onclick="changeQty('${item.id}', -1)" class="cart-qty-btn"><i class="fas fa-minus"></i></button>
-                            <span class="cart-qty-value">${item.quantity}</span>
-                            <button onclick="changeQty('${item.id}', 1)" class="cart-qty-btn"><i class="fas fa-plus"></i></button>
-                        </div>
-                        <button onclick="removeCartItem('${item.id}')" class="cart-item-remove"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                </div>
-            `;
+        <div class="cart-item-image">
+          <img src="${driveImg(item.img, 200)}" alt="${item.name}" loading="lazy" decoding="async">
+        </div>
+        <div class="cart-item-details">
+          <h4 class="cart-item-name">${item.name}</h4>
+          ${item.ref ? `<p class="cart-item-ref">Ref: ${item.ref}</p>` : ""}
+          <div class="cart-item-price-row">
+            <span class="cart-item-unit-price">R$ ${precoUnitario.toFixed(2).replace(".", ",")} <small>/un</small></span>
+            <span class="cart-item-total-price">R$ ${item.price.toFixed(2).replace(".", ",")}</span>
+          </div>
+          <div class="cart-item-controls">
+            <div class="cart-qty-control">
+              <button onclick="changeQty('${item.id}', -1)" class="cart-qty-btn"><i class="fas fa-minus"></i></button>
+              <span class="cart-qty-value">${item.quantity}</span>
+              <button onclick="changeQty('${item.id}', 1)" class="cart-qty-btn"><i class="fas fa-plus"></i></button>
+            </div>
+            <button onclick="removeCartItem('${item.id}')" class="cart-item-remove"><i class="fas fa-trash-alt"></i></button>
+          </div>
+        </div>`;
       container.appendChild(div);
     });
   }
@@ -958,119 +1004,6 @@ function addToCart(id, name, price, img, baseId, ref, quantity) {
 }
 
 // ============================================
-// CARREGAR PRODUTOS (via JSONP)
-// ============================================
-async function loadProducts() {
-  try {
-    console.log("🔄 Carregando produtos via JSONP...");
-
-    const data = await new Promise((resolve, reject) => {
-      const callbackName = "listar_produtos_" + Date.now();
-
-      window[callbackName] = function (response) {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        resolve(response);
-      };
-
-      const script = document.createElement("script");
-      script.src = `${ESTOQUE_API_URL}?callback=${callbackName}`;
-
-      script.onerror = function () {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        reject(new Error("Erro ao carregar produtos"));
-      };
-
-      const timeoutId = setTimeout(() => {
-        if (window[callbackName]) {
-          delete window[callbackName];
-          if (script.parentNode) script.parentNode.removeChild(script);
-          reject(new Error("Timeout ao carregar produtos"));
-        }
-      }, 30000);
-
-      const originalCallback = window[callbackName];
-      window[callbackName] = function (resp) {
-        clearTimeout(timeoutId);
-        originalCallback(resp);
-      };
-
-      document.body.appendChild(script);
-    });
-
-    console.log("📥 Dados recebidos:", data);
-
-    if (data.error) throw new Error(data.error);
-
-        // 🆕 FILTRO: só mostra produtos disponíveis (Disponível === 'sim')
-    allProducts = (data.produtos || []).filter(p => {
-        const disp = String(p["Disponível"] || p.disponivel || '').toLowerCase().trim();
-        return disp === 'sim';
-    });
-    
-    console.log(`✅ ${allProducts.length} produtos disponíveis (filtrados de ${(data.produtos || []).length})`);
-    
-    aplicarConfig(data.config || {});
-    renderizarMarquee(data.marquee || []);
-
-
-    // 🆕 Aplica estrutura dinâmica se vier do backend
-    if (data.estrutura && Array.isArray(data.estrutura) && data.estrutura.length > 0) {
-      estruturaCategorias = data.estrutura;
-      console.log(`📂 Estrutura dinâmica: ${estruturaCategorias.length} itens`);
-      renderizarSidebarDinamica();
-    } else {
-      console.log("ℹ️ Estrutura dinâmica não disponível — usando sidebar estática");
-    }
-
-    allProducts = allProducts.map((p) => {
-      if (!p["Saldo Estoque"]) {
-        const inicial = parseInt(p.Estoque) || 0;
-        const vendidos = parseInt(p.Vendidos) || 0;
-        p["Saldo Estoque"] = inicial - vendidos;
-      }
-      return p;
-    });
-
-    if (allProducts.length === 0) {
-      const container = document.getElementById("produtos-container");
-      if (container) {
-        container.innerHTML = `
-                    <div class="col-span-full text-center py-12">
-                        <i class="fas fa-gem text-4xl text-primary/30 mb-4"></i>
-                        <p class="text-textMuted">Nenhum produto disponível.</p>
-                    </div>
-                `;
-      }
-      return;
-    }
-
-    console.log(`✅ ${allProducts.length} produtos carregados`);
-
-    renderProducts(allProducts);
-
-    setTimeout(atualizarContadoresSidebar, 500);
-    setTimeout(atualizarContadorProdutos, 500);
-
-  } catch (err) {
-    console.error("Erro ao carregar produtos:", err);
-    const container = document.getElementById("produtos-container");
-    if (container) {
-      container.innerHTML = `
-                <div class="col-span-full text-center py-12">
-                    <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
-                    <p class="text-textMuted font-bold">Erro ao carregar produtos</p>
-                    <button onclick="loadProducts()" class="mt-4 bg-primary text-white px-6 py-2 rounded-full text-sm font-bold">
-                        <i class="fas fa-sync-alt mr-2"></i>Tentar novamente
-                    </button>
-                </div>
-            `;
-    }
-  }
-}
-
-// ============================================
 // RENDERIZAR PRODUTOS
 // ============================================
 function renderProducts(products) {
@@ -1080,14 +1013,16 @@ function renderProducts(products) {
 
   if (products.length === 0) {
     container.innerHTML = `
-            <div class="col-span-full text-center py-12">
-                <i class="fas fa-search text-4xl text-primary/30 mb-4"></i>
-                <p class="text-textMuted">Nenhum produto encontrado.</p>
-            </div>
-        `;
+      <div class="col-span-full text-center py-12">
+        <i class="fas fa-search text-4xl text-primary/30 mb-4"></i>
+        <p class="text-textMuted">Nenhum produto encontrado.</p>
+      </div>`;
     setTimeout(atualizarContadorProdutos, 50);
     return;
   }
+
+  // ⚡ Usa DocumentFragment para reduzir reflows
+  const fragment = document.createDocumentFragment();
 
   products.forEach((p) => {
     const estoque = parseInt(p["Saldo Estoque"]) || 0;
@@ -1112,35 +1047,38 @@ function renderProducts(products) {
       botaoHTML = `<button disabled class="product-card-btn-disabled">Indisponível</button>`;
     } else if (temCores) {
       botaoHTML = `<button onclick='openSizeSelector("${p["ID"]}", "${nomeEscapado}", "${refEscapada}", ${preco}, "${imgEscapada}")' class="product-card-btn">
-                <i class="fas fa-palette"></i> Escolher Opções
-            </button>`;
+        <i class="fas fa-palette"></i> Escolher Opções
+      </button>`;
     } else {
       botaoHTML = `<button onclick='openSizeSelector("${p["ID"]}", "${nomeEscapado}", "${refEscapada}", ${preco}, "${imgEscapada}")' class="product-card-btn product-card-btn-direct">
-                <i class="fas fa-cart-plus"></i> Adicionar
-            </button>`;
+        <i class="fas fa-cart-plus"></i> Adicionar
+      </button>`;
     }
 
     const card = document.createElement("div");
     card.className = "product-card";
     card.innerHTML = `
-            <div class="product-card-image">
-                <img src="${driveImg(p["Imagem"])}" 
-                     alt="${p["Nome do Produto"]}" 
-                     onerror="this.onerror=null; this.src=window.PLACEHOLDER_SVG;"
-                     onclick="abrirZoomDireto('${p["Imagem"]}')">
-                ${estoque <= 0 ? '<div class="product-card-sold-out"><span>ESGOTADO</span></div>' : ""}
-            </div>
-            <div class="product-card-content">
-                <h3 class="product-card-title">${p["Nome do Produto"]}</h3>
-                ${p["referencia"] ? `<p class="product-card-ref">Ref: ${p["referencia"]}</p>` : ""}
-                ${p["Categoria"] ? `<p class="text-[10px] text-slate-500">${p["Categoria"]}${p["Subcategoria"] ? " • " + p["Subcategoria"] : ""}</p>` : ""}
-                <p class="product-card-price">R$ ${preco.toFixed(2).replace(".", ",")}</p>
-                <div class="product-card-stock">${stockBadge}</div>
-                ${botaoHTML}
-            </div>
-        `;
-    container.appendChild(card);
+      <div class="product-card-image">
+        <img src="${driveImg(p["Imagem"], IMG_SIZE_CARD)}"
+             alt="${p["Nome do Produto"]}"
+             loading="lazy"
+             decoding="async"
+             onerror="this.onerror=null; this.src=window.PLACEHOLDER_SVG;"
+             onclick="abrirZoomDireto('${p["Imagem"]}')">
+        ${estoque <= 0 ? '<div class="product-card-sold-out"><span>ESGOTADO</span></div>' : ""}
+      </div>
+      <div class="product-card-content">
+        <h3 class="product-card-title">${p["Nome do Produto"]}</h3>
+        ${p["referencia"] ? `<p class="product-card-ref">Ref: ${p["referencia"]}</p>` : ""}
+        ${p["Categoria"] ? `<p class="text-[10px] text-slate-500">${p["Categoria"]}${p["Subcategoria"] ? " • " + p["Subcategoria"] : ""}</p>` : ""}
+        <p class="product-card-price">R$ ${preco.toFixed(2).replace(".", ",")}</p>
+        <div class="product-card-stock">${stockBadge}</div>
+        ${botaoHTML}
+      </div>`;
+    fragment.appendChild(card);
   });
+
+  container.appendChild(fragment);
 
   setTimeout(atualizarContadorProdutos, 100);
 }
@@ -1171,8 +1109,7 @@ function renderizarMarquee(items) {
       return `
       <span class="marquee-item ${classeCor}">
         <i class="${item.icone || "fa-solid fa-star"}"></i> ${item.texto}
-      </span>
-    `;
+      </span>`;
     })
     .join("");
 }
@@ -1220,7 +1157,6 @@ function aplicarConfig(cfg) {
   }
 
   window.__whatsappNumero = whatsNumero;
-  console.log("✅ Configurações aplicadas:", siteConfig);
 }
 window.aplicarConfig = aplicarConfig;
 
@@ -1233,7 +1169,7 @@ function abrirZoomDireto(imagem) {
   const thumbnails = document.getElementById("zoom-thumbnails");
   if (!modal || !img || !thumbnails) return;
 
-  const imagemExibir = driveImg(imagem);
+  const imagemExibir = driveImg(imagem, IMG_SIZE_ZOOM);
   imagensZoom = [imagemExibir];
   zoomIndex = 0;
 
@@ -1300,8 +1236,6 @@ window.abrirZoomModal = abrirZoomModal;
 // OPEN SIZE SELECTOR
 // ============================================
 window.openSizeSelector = function (id, name, ref, price, img) {
-  console.log("🎯 openSizeSelector:", { id, name, ref, price });
-
   const p = allProducts.find((prod) => String(prod["ID"]) === String(id));
   if (!p) {
     showToast("Produto não encontrado!", "error", 2000);
@@ -1322,8 +1256,7 @@ window.openSizeSelector = function (id, name, ref, price, img) {
       jaNoCarrinho > 0
         ? `Você já tem ${jaNoCarrinho} no carrinho. Estoque total: ${estoqueLocal}.`
         : "Produto esgotado!",
-      "error",
-      3000
+      "error", 3000
     );
     return;
   }
@@ -1346,18 +1279,19 @@ window.openSizeSelector = function (id, name, ref, price, img) {
   if (refEl) refEl.innerText = ref ? `Ref: ${ref}` : "Ref: —";
   if (priceEl) {
     priceEl.innerHTML = `
-        R$ ${priceNum.toFixed(2).replace(".", ",")} cada
-        <small id="estoque-display">${estoqueDisponivel} unidades disponíveis${jaNoCarrinho > 0 ? ` (${jaNoCarrinho} no carrinho)` : ""}</small>
+      R$ ${priceNum.toFixed(2).replace(".", ",")} cada
+      <small id="estoque-display">${estoqueDisponivel} unidades disponíveis${jaNoCarrinho > 0 ? ` (${jaNoCarrinho} no carrinho)` : ""}</small>
     `;
   }
 
   const imgContainer = document.getElementById("size-product-image-container");
   if (imgContainer) {
     imgContainer.innerHTML = `
-      <img src="${driveImg(p["Imagem"])}" 
+      <img src="${driveImg(p["Imagem"], IMG_SIZE_MODAL)}"
            alt="${name}"
-           onerror="this.onerror=null; this.src=window.PLACEHOLDER_SVG;">
-    `;
+           loading="lazy"
+           decoding="async"
+           onerror="this.onerror=null; this.src=window.PLACEHOLDER_SVG;">`;
     imgContainer.onclick = function () {
       abrirZoomModal(p["Imagem"]);
     };
@@ -1463,112 +1397,6 @@ window.openSizeSelector = function (id, name, ref, price, img) {
 };
 
 // ============================================
-// CARREGAR BANNER HERO
-// ============================================
-async function carregarBannerHero() {
-  try {
-    console.log("🔄 Carregando banners via JSONP...");
-
-    const data = await new Promise((resolve, reject) => {
-      const callbackName = "listar_banners_" + Date.now();
-      window[callbackName] = function (response) {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        resolve(response);
-      };
-
-      const script = document.createElement("script");
-      script.src = `${ESTOQUE_API_URL}?_t=${Date.now()}&callback=${callbackName}`;
-
-      script.onerror = function () {
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        reject(new Error("Erro ao carregar banners"));
-      };
-
-      const timeoutId = setTimeout(() => {
-        if (window[callbackName]) {
-          delete window[callbackName];
-          if (script.parentNode) script.parentNode.removeChild(script);
-          reject(new Error("Timeout"));
-        }
-      }, 30000);
-
-      document.body.appendChild(script);
-    });
-
-    const banners = data.banners || [];
-    const wrapper = document.querySelector(".heroSwiper .swiper-wrapper");
-    if (!wrapper) return;
-    wrapper.innerHTML = "";
-
-    let hasBanners = false;
-
-    banners.forEach((b) => {
-      if (b.ativo && b.ativo.toLowerCase() === "nao") return;
-      if (!b.titulo) return;
-      hasBanners = true;
-
-      const posicaoBruta = (b.posicao || "centro").toLowerCase().trim();
-      const posicao = ["centro", "esquerda", "direita"].includes(posicaoBruta) ? posicaoBruta : "centro";
-
-      const slide = document.createElement("div");
-      slide.className = `swiper-slide banner-pos-${posicao}`;
-      slide.style.position = "relative";
-      slide.style.width = "100%";
-      slide.style.height = "100%";
-      slide.innerHTML = `
-        <div class="banner-slide-wrapper">
-          <img src="${driveImg(b.imagem)}" 
-               class="banner-slide-img" 
-               alt="${b.titulo}"
-               onerror="this.onerror=null; this.src=window.PLACEHOLDER_SVG;">
-          <div class="banner-slide-bar">
-            <div class="banner-slide-content">
-              <h2 class="banner-slide-title">${b.titulo}</h2>
-              ${b.btnText && b.btnLink ? `<a href="${b.btnLink}" class="banner-slide-btn">${b.btnText}</a>` : ""}
-            </div>
-          </div>
-        </div>
-      `;
-      wrapper.appendChild(slide);
-    });
-
-    if (!hasBanners) {
-      const slide = document.createElement("div");
-      slide.className = "swiper-slide banner-pos-centro";
-      slide.style.position = "relative";
-      slide.style.width = "100%";
-      slide.style.height = "100%";
-      slide.innerHTML = `
-        <div class="banner-slide-wrapper" style="background: linear-gradient(135deg, #f0f7f2, #e8f3ec);">
-          <div class="banner-slide-bar" style="position: relative; height: 100%;">
-            <div class="banner-slide-content" style="align-items: center; text-align: center; margin: 0 auto;">
-              <h2 class="banner-slide-title" style="color: #1f4d38;">Ivo Pita Joias</h2>
-              <p class="banner-slide-subtitle" style="color: #5c6b63;">Qualidade e Elegância</p>
-            </div>
-          </div>
-        </div>
-      `;
-      wrapper.appendChild(slide);
-    }
-
-    if (heroSwiper) heroSwiper.destroy();
-    heroSwiper = new Swiper(".heroSwiper", {
-      loop: true,
-      effect: "fade",
-      fadeEffect: { crossFade: true },
-      speed: 900,
-      autoHeight: false,
-      autoplay: { delay: 5500, disableOnInteraction: false },
-      pagination: { el: ".swiper-pagination", clickable: true },
-    });
-  } catch (err) {
-    console.error("Erro banners:", err);
-  }
-}
-
-// ============================================
 // BUSCA
 // ============================================
 function performSearch(termo) {
@@ -1610,8 +1438,7 @@ function gerarConteudoPDF() {
         <td style="padding: 8px 6px; text-align: center; font-size: 10px; color: #182420; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">${item.quantity}</td>
         <td style="padding: 8px 6px; text-align: right; font-size: 10px; color: #6b7280; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">R$ ${precoUnitario.toFixed(2).replace(".", ",")}</td>
         <td style="padding: 8px 6px; text-align: right; font-size: 10px; font-weight: 700; color: #1f4d38; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">R$ ${item.price.toFixed(2).replace(".", ",")}</td>
-      </tr>
-    `;
+      </tr>`;
   });
 
   return `
@@ -1627,12 +1454,9 @@ function gerarConteudoPDF() {
     flex-direction: column;
     position: relative;
   ">
-
     <div style="height: 4px; background: linear-gradient(90deg, #2f6b4f 0%, #c9a86a 100%);"></div>
-
     <div style="flex: 1; padding: 6mm 2mm 6mm 2mm; display: flex; flex-direction: column;">
       <div style="flex: 1; padding: 0 6mm; display: flex; flex-direction: column;">
-
         <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb; margin-bottom: 18px;">
           <div>
             <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: #1f4d38; letter-spacing: 0.02em; line-height: 1;">IVO PITA</div>
@@ -1644,7 +1468,6 @@ function gerarConteudoPDF() {
             <div style="font-size: 9px; color: #9ca3af; margin-top: 3px;">${dataAtual} · ${horaAtual}</div>
           </div>
         </div>
-
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 18px;">
           <div>
             <div style="font-size: 8px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px;">Cliente</div>
@@ -1655,7 +1478,6 @@ function gerarConteudoPDF() {
             <div style="font-size: 10px; color: #4b5563; line-height: 1.45;">${endereco}</div>
           </div>
         </div>
-
         <div style="margin-bottom: 16px;">
           <table style="width: 100%; border-collapse: collapse;">
             <thead>
@@ -1667,12 +1489,9 @@ function gerarConteudoPDF() {
                 <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 95px;">Total</th>
               </tr>
             </thead>
-            <tbody>
-              ${itensHTML}
-            </tbody>
+            <tbody>${itensHTML}</tbody>
           </table>
         </div>
-
         <div style="display: flex; justify-content: flex-end; margin-bottom: 22px;">
           <div style="width: 260px; border-top: 1px solid #e5e7eb; padding-top: 10px;">
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 10px; color: #6b7280;">
@@ -1689,7 +1508,6 @@ function gerarConteudoPDF() {
             </div>
           </div>
         </div>
-
         <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 8px; color: #9ca3af;">
           <div>
             <div style="font-weight: 700; color: #1f4d38; letter-spacing: 0.05em; font-size: 9px; margin-bottom: 3px;">IVO PITA — INDÚSTRIA DE JOIAS</div>
@@ -1700,12 +1518,9 @@ function gerarConteudoPDF() {
             <div>${siteConfig.endereco || "Juazeiro do Norte, CE"}</div>
           </div>
         </div>
-
       </div>
     </div>
-
     <div style="height: 3px; background: linear-gradient(90deg, #c9a86a 0%, #2f6b4f 100%);"></div>
-
   </div>`;
 }
 
@@ -1754,14 +1569,10 @@ async function processarPedidoPublico(nomeCliente, endereco) {
   const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
   const freteAplicado = subtotal >= FRETE_GRATIS_VALOR ? 0 : TAXA_FRETE;
 
-  console.log("📡 Enviando pedido via JSONP...");
-  console.log("   Cliente:", nomeCliente);
-  console.log("   Itens compactos:", itemsCompactos);
-  console.log("   Total:", totalFinal);
-
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const callbackName = "fazer_pedido_" + Date.now();
     let resolvido = false;
+    let script = null;
 
     const finalizar = (dados) => {
       if (resolvido) return;
@@ -1772,11 +1583,10 @@ async function processarPedidoPublico(nomeCliente, endereco) {
     };
 
     window[callbackName] = function (data) {
-      console.log("📥 Resposta do servidor:", data);
       finalizar(data);
     };
 
-    const script = document.createElement("script");
+    script = document.createElement("script");
     const params =
       `modo=publico&tipo=fazer_pedido` +
       `&cliente=${encodeURIComponent(nomeCliente)}` +
@@ -1792,12 +1602,10 @@ async function processarPedidoPublico(nomeCliente, endereco) {
     script.src = `${ESTOQUE_API_URL}?${params}`;
 
     script.onerror = function () {
-      console.error("❌ Erro de rede ao enviar pedido");
       finalizar({ success: false, error: "Erro de rede ao enviar pedido" });
     };
 
     setTimeout(() => {
-      console.error("❌ Timeout ao enviar pedido");
       finalizar({ success: false, error: "Timeout ao processar pedido" });
     }, 20000);
 
@@ -1819,18 +1627,9 @@ async function downloadPDF() {
   const nomeCliente = document.getElementById("customer-name").value.trim();
   const endereco = document.getElementById("address").value.trim();
 
-  if (cart.length === 0) {
-    showToast("Sacola vazia!", "error", 2000);
-    return;
-  }
-  if (!nomeCliente) {
-    showToast("Informe seu nome!", "error", 2000);
-    return;
-  }
-  if (!endereco) {
-    showToast("Informe o endereço!", "error", 2000);
-    return;
-  }
+  if (cart.length === 0) { showToast("Sacola vazia!", "error", 2000); return; }
+  if (!nomeCliente) { showToast("Informe seu nome!", "error", 2000); return; }
+  if (!endereco) { showToast("Informe o endereço!", "error", 2000); return; }
 
   const btn = document.getElementById("download-pdf-btn");
   const original = btn ? btn.innerHTML : "";
@@ -1858,10 +1657,7 @@ async function downloadPDF() {
 
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-      compress: true
+      orientation: "portrait", unit: "mm", format: "a4", compress: true
     });
 
     const pageWidth = 210;
@@ -1891,10 +1687,7 @@ async function downloadPDF() {
     const dataArquivo = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
     pdf.save(`Pedido_IvoPita_${dataArquivo}.pdf`);
 
-    console.log("📦 PDF baixado. Enviando pedido ao servidor...");
     const resultado = await processarPedidoPublico(nomeCliente, endereco);
-
-    console.log("📥 Resultado final:", resultado);
 
     if (!resultado || !resultado.success) {
       throw new Error((resultado && resultado.error) || "Erro ao salvar pedido");
@@ -1913,12 +1706,12 @@ async function downloadPDF() {
     showToast("✅ Pedido finalizado! PDF baixado.", "success", 4000);
 
     invalidarEstoqueCache();
-    loadProducts();
-    setTimeout(() => loadProducts(), 3000);
+    localStorage.removeItem(CACHE_KEY_DADOS);
+    carregarTudo();
 
   } catch (error) {
     console.error("❌ Erro:", error);
-    showToast("❌ Erro: " + error.message + " — O PDF foi baixado, mas o pedido NÃO foi salvo. Tente novamente.", "error", 6000);
+    showToast("❌ Erro: " + error.message + " — O PDF foi baixado, mas o pedido NÃO foi salvo.", "error", 6000);
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -1934,10 +1727,7 @@ async function finalizarPedidoDireto() {
   const nomeCliente = document.getElementById("customer-name").value;
   const endereco = document.getElementById("address").value;
 
-  if (cart.length === 0) {
-    showToast("Sacola vazia!", "error", 2000);
-    return;
-  }
+  if (cart.length === 0) { showToast("Sacola vazia!", "error", 2000); return; }
   if (!nomeCliente.trim()) {
     showToast("Informe seu nome!", "error", 2000);
     document.getElementById("customer-name").focus();
@@ -1959,10 +1749,7 @@ async function finalizarPedidoDireto() {
     const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
     const freteExibicao = subtotal >= FRETE_GRATIS_VALOR ? "GRÁTIS" : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
 
-    console.log("📦 Enviando pedido...");
     const resultado = await processarPedidoPublico(nomeCliente, endereco);
-
-    console.log("📥 Resultado:", resultado);
 
     if (!resultado || !resultado.success) {
       throw new Error((resultado && resultado.error) || "Erro ao salvar pedido");
@@ -1984,8 +1771,8 @@ async function finalizarPedidoDireto() {
     showToast("✅ Pedido enviado e estoque atualizado!", "success", 4000);
 
     invalidarEstoqueCache();
-    loadProducts();
-    setTimeout(() => loadProducts(), 3000);
+    localStorage.removeItem(CACHE_KEY_DADOS);
+    carregarTudo();
 
   } catch (error) {
     console.error("❌ Erro:", error);
@@ -2004,8 +1791,6 @@ async function finalizarPedidoDireto() {
 function filtrarPorCategoria(categoria) {
   if (typeof allProducts === "undefined" || typeof renderProducts === "undefined") return;
 
-  console.log("🔍 Filtrando por:", categoria);
-
   const catFiltro = normalizar(categoria);
   const palavrasFiltro = catFiltro.split(/\s+/).filter((p) => p.length > 0);
   const palavrasFiltroNorm = palavrasFiltro.map(normalizarPalavraBusca);
@@ -2022,8 +1807,6 @@ function filtrarPorCategoria(categoria) {
           const combinadoNorm = combinado.split(/\s+/).map(normalizarPalavraBusca).join(" ");
           return palavrasFiltroNorm.every((palavra) => combinadoNorm.includes(palavra));
         });
-
-  console.log(`📦 ${filtrados.length} produtos encontrados para "${categoria}"`);
 
   renderProducts(filtrados);
 
@@ -2070,17 +1853,18 @@ window.toggleSubmenuMobile = toggleSubmenuMobile;
 // INICIALIZAÇÃO
 // ============================================
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("🚀 Ivo Pita - Inicializando...");
+  console.log("🚀 Ivo Pita - Inicializando (versão otimizada)...");
 
-  loadProducts();
-  carregarBannerHero();
+  // ⚡ UMA única chamada que traz TUDO
+  carregarTudo();
   updateCart();
 
+  // Event listeners
   document.getElementById('sidebar-open-btn')?.addEventListener('click', abrirSidebarMobile);
   document.getElementById('sidebar-close-mobile')?.addEventListener('click', fecharSidebarMobile);
   document.getElementById('sidebar-overlay')?.addEventListener('click', fecharSidebarMobile);
 
-  // Event listeners nos itens estáticos (fallback) — sempre ativos
+  // Sidebar estática (fallback — sempre ativa)
   document.querySelectorAll('.sidebar-item').forEach(btn => {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
@@ -2251,4 +2035,4 @@ document.addEventListener("DOMContentLoaded", function () {
   } catch (e) {}
 })();
 
-console.log("✅ Script Ivo Pita Industria de Joias carregado!");
+console.log("✅ Script Ivo Pita (sem banner) carregado!");
