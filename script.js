@@ -1077,14 +1077,25 @@ function renderProducts(products) {
       </button>`;
     }
 
-    // Categoria + Subcategoria
-    let categoriaHTML = "";
-    if (categoria || subcategoria) {
-      const partes = [];
-      if (categoria) partes.push(categoria);
-      if (subcategoria) partes.push(subcategoria);
-      categoriaHTML = `<p class="product-card-category">${partes.join(" • ")}</p>`;
-    }
+    // Categoria + Subcategoria mostra os dois
+    // let categoriaHTML = "";
+    // if (categoria || subcategoria) {
+    //   const partes = [];
+    //   if (categoria) partes.push(categoria);
+    //   if (subcategoria) partes.push(subcategoria);
+    //   categoriaHTML = `<p class="product-card-category">${partes.join(" • ")}</p>`;
+    // }
+    // ---------- CATEGORIA (oculta via CSS) ----------
+      let categoriaHTML = "";
+      if (categoria) {
+        categoriaHTML = `<p class="product-card-category">${categoria}</p>`;
+      }
+
+      // ---------- SUBCATEGORIA (visível) ----------
+      let subcategoriaHTML = "";
+      if (subcategoria) {
+        subcategoriaHTML = `<p class="product-card-subcategory">${subcategoria}</p>`;
+      }
 
     // Referência
     const refHTML = referencia
@@ -1118,6 +1129,7 @@ function renderProducts(products) {
         <h3 class="product-card-title">${nome}</h3>
         ${refHTML}
         ${categoriaHTML}
+        ${subcategoriaHTML}
         <p class="product-card-price">R$ ${preco.toFixed(2).replace(".", ",")}</p>
         <div class="product-card-stock">${stockBadge}</div>
         ${botaoHTML}
