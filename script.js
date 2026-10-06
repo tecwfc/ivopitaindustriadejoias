@@ -7,9 +7,13 @@ const PLANILHA_ID = "142Ir0-8yfUuu2sSbbRo8x6SwjeQL74MLMUpNElVn1rc";
 const ESTOQUE_API_URL =
   "https://script.google.com/macros/s/AKfycbwtdqgkfRH8mXRFRCfSTYSkmvXWtp0xAmdW6Qd_j8hCCrPl5ynOMeyolSCzvtoON1yyWQ/exec";
 
-const CACHE_KEY_DADOS = 'ivo_dados_v2';
-const CACHE_KEY_TIME = 'ivo_dados_time_v2';
-const CACHE_TTL_MS = 5 * 60 * 1000;
+// const CACHE_KEY_DADOS = 'ivo_dados_v2';
+// const CACHE_KEY_TIME = 'ivo_dados_time_v2';
+// const CACHE_TTL_MS = 5 * 60 * 1000;
+
+const CACHE_KEY_DADOS = 'ivo_dados_v3';
+const CACHE_KEY_TIME = 'ivo_dados_time_v3';
+const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutos (antes era 5)
 
 const IMG_SIZE_CARD = 400;
 const IMG_SIZE_MODAL = 600;
@@ -106,13 +110,23 @@ function normalizarPalavraBusca(palavra) {
 
 function driveImg(url, size = IMG_SIZE_CARD) {
   if (!url || url === 'placeholder.png') return PLACEHOLDER_SVG;
-  if (url.includes("googleusercontent.com")) return url;
+
+  // Já é do Google Drive cacheado → força tamanho correto
+  if (url.includes("googleusercontent.com")) {
+    // Remove qualquer parâmetro de tamanho antigo e aplica o novo
+    return url.replace(/=s\d+.*$/, `=s${size}`).replace(/=w\d+.*$/, `=s${size}`);
+  }
+
+  // Extrai ID do Google Drive
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (match) return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=w${size}`;
+  if (match) {
+    // ✅ "=s" força o Google a redimensionar de verdade (mais rápido que "=w")
+    return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=s${size}`;
+  }
+
   if (url.startsWith("http")) return url;
   return PLACEHOLDER_SVG;
 }
-
 async function carregarTudo() {
   const cache = localStorage.getItem(CACHE_KEY_DADOS);
   const cacheTime = parseInt(localStorage.getItem(CACHE_KEY_TIME) || '0');
@@ -1006,16 +1020,12 @@ function addToCart(id, name, price, img, baseId, ref, quantity) {
 // ============================================
 // RENDERIZAR PRODUTOS
 // ============================================
-// ============================================
-// RENDERIZAR PRODUTOS
-// ============================================
 function renderProducts(products) {
   const container = document.getElementById("produtos-container");
   if (!container) return;
 
   container.innerHTML = "";
 
-  // Nenhum produto encontrado
   if (!products || products.length === 0) {
     container.innerHTML = `
       <div class="col-span-full text-center py-12">
@@ -1026,10 +1036,9 @@ function renderProducts(products) {
     return;
   }
 
-  // ⚡ Usa DocumentFragment para reduzir reflows
   const fragment = document.createDocumentFragment();
 
-  products.forEach((p) => {
+  products.forEach((p, index) => {
     const estoque = parseInt(p["Saldo Estoque"]) || 0;
     const temCores = p["Cores"] && String(p["Cores"]).trim() !== "";
     const preco = parseFloat(p["Preço"]) || 0;
@@ -1040,7 +1049,7 @@ function renderProducts(products) {
     const subcategoria = p["Subcategoria"] || "";
     const imagem = p["Imagem"] || "";
 
-    // ---------- BADGE DE ESTOQUE ----------
+    // Badge de estoque
     let stockBadge = "";
     if (estoque <= 0) {
       stockBadge = `<span class="stock-out"><i class="fas fa-times-circle"></i> Indisponível</span>`;
@@ -1050,7 +1059,7 @@ function renderProducts(products) {
       stockBadge = `<span class="stock-available"><i class="fas fa-check-circle"></i> ${estoque} disponíveis</span>`;
     }
 
-    // ---------- BOTÃO ----------
+    // Botão
     const nomeEscapado = nome.replace(/'/g, "\\'").replace(/"/g, "&quot;");
     const refEscapada = referencia.replace(/'/g, "\\'").replace(/"/g, "&quot;");
     const imgEscapada = imagem.replace(/"/g, "&quot;");
@@ -1068,7 +1077,7 @@ function renderProducts(products) {
       </button>`;
     }
 
-    // ---------- CATEGORIA + SUBCATEGORIA ----------
+    // Categoria + Subcategoria
     let categoriaHTML = "";
     if (categoria || subcategoria) {
       const partes = [];
@@ -1077,22 +1086,32 @@ function renderProducts(products) {
       categoriaHTML = `<p class="product-card-category">${partes.join(" • ")}</p>`;
     }
 
-    // ---------- REFERÊNCIA ----------
+    // Referência
     const refHTML = referencia
       ? `<p class="product-card-ref">REF: ${referencia}</p>`
       : "";
 
-    // ---------- CARD ----------
+    // ⚡ PRIMEIRAS 5 IMAGENS: carregam imediatamente (LCP rápido)
+    // ⚡ RESTO: lazy load com IntersectionObserver
+    const isPriority = index < 5;
+    const imgSrc = driveImg(imagem, IMG_SIZE_CARD);
+
     const card = document.createElement("div");
     card.className = "product-card";
     card.innerHTML = `
       <div class="product-card-image">
-        <img src="${driveImg(imagem, IMG_SIZE_CARD)}"
-             alt="${nome}"
-             loading="lazy"
-             decoding="async"
-             onerror="this.onerror=null; this.src=window.PLACEHOLDER_SVG;"
-             onclick="abrirZoomDireto('${imgEscapada}')">
+        <img
+          ${isPriority ? `src="${imgSrc}"` : `data-src="${imgSrc}" src="${PLACEHOLDER_SVG}"`}
+          alt="${nome}"
+          loading="${isPriority ? 'eager' : 'lazy'}"
+          decoding="async"
+          fetchpriority="${isPriority ? 'high' : 'low'}"
+          width="400"
+          height="400"
+          class="product-card-img"
+          onerror="this.onerror=null; this.src='${PLACEHOLDER_SVG}'"
+          onclick="abrirZoomDireto('${imgEscapada}')"
+        >
         ${estoque <= 0 ? '<div class="product-card-sold-out"><span>ESGOTADO</span></div>' : ""}
       </div>
       <div class="product-card-content">
@@ -1102,14 +1121,59 @@ function renderProducts(products) {
         <p class="product-card-price">R$ ${preco.toFixed(2).replace(".", ",")}</p>
         <div class="product-card-stock">${stockBadge}</div>
         ${botaoHTML}
-      </div>`;
+      </div>
+    `;
 
     fragment.appendChild(card);
   });
 
   container.appendChild(fragment);
 
+  // ⚡ Ativa lazy loading para as imagens com data-src
+  ativarLazyLoading();
+
   setTimeout(atualizarContadorProdutos, 100);
+}
+
+// ============================================
+// LAZY LOADING COM INTERSECTION OBSERVER
+// ============================================
+let lazyObserver = null;
+
+function ativarLazyLoading() {
+  // Se o navegador não suporta, carrega tudo de uma vez
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('img[data-src]').forEach(img => {
+      img.src = img.dataset.src;
+      img.removeAttribute('data-src');
+    });
+    return;
+  }
+
+  // Cria o observer só uma vez
+  if (!lazyObserver) {
+    lazyObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const src = img.dataset.src;
+          if (src) {
+            img.src = src;
+            img.removeAttribute('data-src');
+          }
+          lazyObserver.unobserve(img);
+        }
+      });
+    }, {
+      rootMargin: '300px 0px', // começa a carregar 300px antes de aparecer
+      threshold: 0.01
+    });
+  }
+
+  // Observa todas as imagens com data-src
+  document.querySelectorAll('img[data-src]').forEach(img => {
+    lazyObserver.observe(img);
+  });
 }
 
 // ============================================
@@ -1567,6 +1631,13 @@ async function visualizarPDF() {
     return;
   }
 
+  // Carrega as libs só agora
+  const ok = await carregarLibsPDF();
+  if (!ok) {
+    showToast("Erro ao carregar gerador de PDF", "error");
+    return;
+  }
+
   if (document.fonts && document.fonts.ready) {
     await document.fonts.ready;
   }
@@ -1575,7 +1646,6 @@ async function visualizarPDF() {
   document.getElementById("pdf-preview-modal").classList.remove("hidden");
   document.getElementById("pdf-preview-modal").classList.add("flex");
 }
-
 // ============================================
 // PROCESSAR PEDIDO VIA JSONP
 // ============================================
@@ -1642,6 +1712,36 @@ async function processarPedidoPublico(nomeCliente, endereco) {
   });
 }
 
+
+let pdfLibsLoaded = false;
+
+async function carregarLibsPDF() {
+  if (pdfLibsLoaded) return true;
+  if (window.jspdf && window.html2canvas) {
+    pdfLibsLoaded = true;
+    return true;
+  }
+
+  return new Promise((resolve) => {
+    const loadScript = (src) => {
+      return new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = res;
+        s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    };
+
+    Promise.all([
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'),
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
+    ]).then(() => {
+      pdfLibsLoaded = true;
+      resolve(true);
+    }).catch(() => resolve(false));
+  });
+}
 // ============================================
 // DOWNLOAD PDF
 // ============================================
@@ -1670,19 +1770,22 @@ async function downloadPDF() {
   showToast("Gerando PDF...", "info", 2000);
 
   try {
+    // Garante que as libs estão carregadas
+    await carregarLibsPDF();
+
     if (document.fonts && document.fonts.ready) {
       await document.fonts.ready;
     }
 
     const canvas = await html2canvas(element, {
-      scale: 3,
+      scale: 2, // reduzido de 3 para 2 (mais rápido e menor arquivo)
       backgroundColor: "#ffffff",
       useCORS: true,
       logging: false,
       windowWidth: element.scrollWidth,
       windowHeight: element.scrollHeight
     });
-    const imgData = canvas.toDataURL("image/png");
+    const imgData = canvas.toDataURL("image/jpeg", 0.85); // JPEG em vez de PNG (muito mais leve)
 
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
@@ -1701,13 +1804,13 @@ async function downloadPDF() {
 
     if (imgHeight <= printableHeight) {
       const yOffset = margin + (printableHeight - imgHeight) / 2;
-      pdf.addImage(imgData, "PNG", margin, yOffset, imgWidth, imgHeight, undefined, "FAST");
+      pdf.addImage(imgData, "JPEG", margin, yOffset, imgWidth, imgHeight, undefined, "FAST");
     } else {
       let position = 0;
       let pageNum = 0;
       while (position < imgHeight) {
         if (pageNum > 0) pdf.addPage();
-        pdf.addImage(imgData, "PNG", margin, margin - position, imgWidth, imgHeight, undefined, "FAST");
+        pdf.addImage(imgData, "JPEG", margin, margin - position, imgWidth, imgHeight, undefined, "FAST");
         position += printableHeight;
         pageNum++;
       }
