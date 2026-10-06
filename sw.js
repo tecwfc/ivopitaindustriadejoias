@@ -1,9 +1,9 @@
-const CACHE_NAME = 'ivo-pita-v8';
+const CACHE_NAME = 'ivo-pita-v9';
 const urlsToCache = [
   '/styles.css',
   '/script.js',
-  '/manifest.json'
-  // ⚠️ NÃO cacheamos HTML — sempre vem da rede
+  '/manifest.json',
+  '/assets/papel_ivo_preto.png'
 ];
 
 // INSTALL
@@ -45,7 +45,7 @@ self.addEventListener('fetch', event => {
 
   if (event.request.method !== 'GET') return;
 
-  // 🚫 NUNCA cacheia HTML (index, login, admin, etc.)
+  // 🚫 NUNCA cacheia HTML
   if (
     event.request.mode === 'navigate' ||
     url.endsWith('.html') ||
@@ -54,11 +54,13 @@ self.addEventListener('fetch', event => {
     url.includes('login.html') ||
     url.includes('admin.html')
   ) {
-    return; // deixa o navegador buscar sempre da rede
+    return;
   }
 
-  // 🚫 Ignora CDNs e APIs externas
+  // 🚫 NUNCA cacheia imagens do Google Drive nem CDNs/APIs
   if (
+    url.includes('googleusercontent.com') ||  // ⚡ ESSA LINHA
+    url.includes('drive.google.com') ||       // ⚡ ESSA LINHA
     url.includes('cdn.tailwindcss.com') ||
     url.includes('cdn.jsdelivr.net') ||
     url.includes('cdnjs.cloudflare.com') ||
@@ -66,14 +68,13 @@ self.addEventListener('fetch', event => {
     url.includes('fonts.gstatic.com') ||
     url.includes('script.google.com') ||
     url.includes('docs.google.com') ||
-    url.includes('googleusercontent.com') ||
     url.includes('via.placeholder.com') ||
     url.includes('wa.me')
   ) {
     return;
   }
 
-  // ✅ CSS, JS, imagens → Network First com fallback cache
+  // ✅ CSS, JS locais → Network First com fallback cache
   event.respondWith(
     fetch(event.request)
       .then(networkResponse => {
@@ -89,9 +90,7 @@ self.addEventListener('fetch', event => {
         }
         return networkResponse;
       })
-      .catch(() => {
-        return caches.match(event.request);
-      })
+      .catch(() => caches.match(event.request))
   );
 });
 
