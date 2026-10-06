@@ -1006,12 +1006,17 @@ function addToCart(id, name, price, img, baseId, ref, quantity) {
 // ============================================
 // RENDERIZAR PRODUTOS
 // ============================================
+// ============================================
+// RENDERIZAR PRODUTOS
+// ============================================
 function renderProducts(products) {
   const container = document.getElementById("produtos-container");
   if (!container) return;
+
   container.innerHTML = "";
 
-  if (products.length === 0) {
+  // Nenhum produto encontrado
+  if (!products || products.length === 0) {
     container.innerHTML = `
       <div class="col-span-full text-center py-12">
         <i class="fas fa-search text-4xl text-primary/30 mb-4"></i>
@@ -1026,9 +1031,16 @@ function renderProducts(products) {
 
   products.forEach((p) => {
     const estoque = parseInt(p["Saldo Estoque"]) || 0;
-    const temCores = p["Cores"] && p["Cores"].trim() !== "";
+    const temCores = p["Cores"] && String(p["Cores"]).trim() !== "";
     const preco = parseFloat(p["Preço"]) || 0;
 
+    const nome = p["Nome do Produto"] || "Produto sem nome";
+    const referencia = p["referencia"] || "";
+    const categoria = p["Categoria"] || "";
+    const subcategoria = p["Subcategoria"] || "";
+    const imagem = p["Imagem"] || "";
+
+    // ---------- BADGE DE ESTOQUE ----------
     let stockBadge = "";
     if (estoque <= 0) {
       stockBadge = `<span class="stock-out"><i class="fas fa-times-circle"></i> Indisponível</span>`;
@@ -1038,11 +1050,12 @@ function renderProducts(products) {
       stockBadge = `<span class="stock-available"><i class="fas fa-check-circle"></i> ${estoque} disponíveis</span>`;
     }
 
-    let botaoHTML = "";
-    const nomeEscapado = (p["Nome do Produto"] || "").replace(/'/g, "\\'").replace(/"/g, '&quot;');
-    const refEscapada = (p["referencia"] || "").replace(/'/g, "\\'");
-    const imgEscapada = (p["Imagem"] || "").replace(/"/g, '&quot;');
+    // ---------- BOTÃO ----------
+    const nomeEscapado = nome.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+    const refEscapada = referencia.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+    const imgEscapada = imagem.replace(/"/g, "&quot;");
 
+    let botaoHTML = "";
     if (estoque <= 0) {
       botaoHTML = `<button disabled class="product-card-btn-disabled">Indisponível</button>`;
     } else if (temCores) {
@@ -1055,26 +1068,42 @@ function renderProducts(products) {
       </button>`;
     }
 
+    // ---------- CATEGORIA + SUBCATEGORIA ----------
+    let categoriaHTML = "";
+    if (categoria || subcategoria) {
+      const partes = [];
+      if (categoria) partes.push(categoria);
+      if (subcategoria) partes.push(subcategoria);
+      categoriaHTML = `<p class="product-card-category">${partes.join(" • ")}</p>`;
+    }
+
+    // ---------- REFERÊNCIA ----------
+    const refHTML = referencia
+      ? `<p class="product-card-ref">REF: ${referencia}</p>`
+      : "";
+
+    // ---------- CARD ----------
     const card = document.createElement("div");
     card.className = "product-card";
     card.innerHTML = `
       <div class="product-card-image">
-        <img src="${driveImg(p["Imagem"], IMG_SIZE_CARD)}"
-             alt="${p["Nome do Produto"]}"
+        <img src="${driveImg(imagem, IMG_SIZE_CARD)}"
+             alt="${nome}"
              loading="lazy"
              decoding="async"
              onerror="this.onerror=null; this.src=window.PLACEHOLDER_SVG;"
-             onclick="abrirZoomDireto('${p["Imagem"]}')">
+             onclick="abrirZoomDireto('${imgEscapada}')">
         ${estoque <= 0 ? '<div class="product-card-sold-out"><span>ESGOTADO</span></div>' : ""}
       </div>
       <div class="product-card-content">
-        <h3 class="product-card-title">${p["Nome do Produto"]}</h3>
-        ${p["referencia"] ? `<p class="product-card-ref">Ref: ${p["referencia"]}</p>` : ""}
-        ${p["Categoria"] ? `<p class="text-[10px] text-slate-500">${p["Categoria"]}${p["Subcategoria"] ? " • " + p["Subcategoria"] : ""}</p>` : ""}
+        <h3 class="product-card-title">${nome}</h3>
+        ${refHTML}
+        ${categoriaHTML}
         <p class="product-card-price">R$ ${preco.toFixed(2).replace(".", ",")}</p>
         <div class="product-card-stock">${stockBadge}</div>
         ${botaoHTML}
       </div>`;
+
     fragment.appendChild(card);
   });
 
