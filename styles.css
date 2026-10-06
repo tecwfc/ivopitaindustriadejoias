@@ -1805,3 +1805,16 @@ header.glass #search-input-desktop::placeholder {
   .catalogo-subheading-mobile, .catalogo-separator-mobile { display: none; }
   .catalogo-heading-mobile { font-size: 1.05rem; }
 }
+/* Fade-in suave quando a imagem carrega */
+.product-card-img {
+  background: #f0f7f2;
+  transition: opacity 0.3s ease;
+}
+
+.product-card-img[data-src] {
+  opacity: 0.3;
+}
+
+.product-card-img:not([data-src]) {
+  opacity: 1;
+}
