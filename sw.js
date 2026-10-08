@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ivo-pita-v9';
+const CACHE_NAME = 'ivo-pita-v10';
 const urlsToCache = [
   '/styles.css',
   '/script.js',
