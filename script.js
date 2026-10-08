@@ -787,8 +787,11 @@ function adicionarSemCor(quantidade) {
 }
 window.adicionarSemCor = adicionarSemCor;
 
+
 function confirmarSelecao() {
-  // Sem cores cadastradas → adiciona direto
+  // ⚠️ CORREÇÃO: pega a referência ANTES de usar
+  const instruction = document.getElementById("color-instruction");
+
   if (coresDisponiveis.length === 0) {
     const inputCustom = document.getElementById("custom-quantity");
     let qtd = parseInt(inputCustom?.value) || 0;
@@ -800,20 +803,19 @@ function confirmarSelecao() {
     return;
   }
 
-  // ⚠️ Se o usuário escolheu uma quantidade mas não vinculou a nenhuma cor
+  // ✅ AQUI ENTRA O NOVO BLOCO ⬇️
   if (quantidadeSelecionada > 0) {
     showToast(
       `Você escolheu ${quantidadeSelecionada} unidade(s). Clique em uma cor para confirmar!`,
       "warning", 3000
     );
-    // Opcional: dar destaque visual na instrução
-    const instruction = document.getElementById("color-instruction");
     if (instruction) {
       instruction.classList.add("highlight");
       instruction.scrollIntoView({ behavior: "smooth", block: "center" });
     }
     return;
   }
+  // ✅ FIM DO NOVO BLOCO ⬆️
 
   const entradas = Object.entries(coresSelecionadas).filter(([_, qtd]) => qtd > 0);
 
@@ -844,6 +846,7 @@ function confirmarSelecao() {
   window.closeSizeModal();
 }
 window.confirmarSelecao = confirmarSelecao;
+
 
 window.closeSizeModal = function () {
   const modal = document.getElementById("size-modal");
