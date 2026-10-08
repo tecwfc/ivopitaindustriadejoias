@@ -2689,3 +2689,123 @@ header.glass #search-input-desktop::placeholder {
   align-self: flex-start;
 }
 
+/* ========================================== */
+/* 🔍 ZOOM EXTRA NA IMAGEM (LUPA)             */
+/* ========================================== */
+
+.image-zoom-modal {
+  overflow: hidden;
+}
+
+.image-zoom-modal img {
+  transition: transform 0.3s ease;
+  cursor: zoom-in;
+  user-select: none;
+  -webkit-user-drag: none;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.image-zoom-modal img.zoomed {
+  cursor: grab;
+  transform-origin: center center;
+  transition: none;
+}
+
+.image-zoom-modal img.zoomed:active {
+  cursor: grabbing;
+}
+
+.zoom-indicator {
+  position: absolute;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(47, 107, 79, 0.9);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(47, 107, 79, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.image-zoom-modal.zoomed-active .zoom-indicator {
+  opacity: 1;
+}
+
+.zoom-controls {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.zoom-controls button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.zoom-controls button:hover {
+  background: rgba(47, 107, 79, 0.6);
+  border-color: rgba(47, 107, 79, 0.8);
+  transform: scale(1.1);
+}
+
+.zoom-controls button:active {
+  transform: scale(0.95);
+}
+/* ========================================== */
+/* BOTÃO WHATSAPP FLUTUANTE — COR GARANTIDA   */
+/* ========================================== */
+a[href*="wa.me"].animate-breathe,
+a.fixed.bottom-6.right-6[target="_blank"] {
+  background-color: #25d366 !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+a[href*="wa.me"].animate-breathe:hover {
+  background-color: #128c7e !important;
+  transform: scale(1.1);
+  transition: all 0.3s ease;
+}
+
+/* Garante que o ícone dentro seja branco */
+a[href*="wa.me"].animate-breathe i {
+  color: #ffffff !important;
+}
+.btn-whatsapp-flutuante {
+  background-color: #25d366;
+  color: #ffffff;
+  box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
+}
+
+.btn-whatsapp-flutuante:hover {
+  background-color: #128c7e;
+}
