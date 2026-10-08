@@ -1,9 +1,9 @@
 const CACHE_NAME = 'ivo-pita-v10';
 const urlsToCache = [
-  '/styles.css',
-  '/script.js',
-  '/manifest.json',
-  '/assets/papel_ivo_preto.png'
+  './styles.css',
+  './script.js',
+  './manifest.json',
+  './assets/papel_ivo_preto.png'
 ];
 
 // INSTALL
