@@ -680,23 +680,39 @@
     </div>
   </div>
 
-  <!-- MODAL ZOOM -->
-  <div id="image-zoom-modal" class="image-zoom-modal">
-    <button class="close-zoom" onclick="fecharZoom()"><i class="fas fa-times"></i></button>
-    <div class="nav-arrows">
-      <button onclick="zoomAnterior()"><i class="fas fa-chevron-left"></i></button>
-      <button onclick="zoomProximo()"><i class="fas fa-chevron-right"></i></button>
-    </div>
-    <img id="zoom-image" src="" alt="Ampliar imagem">
-    <div style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px;"
-      id="zoom-thumbnails"></div>
+  <!-- MODAL ZOOM COM LUPA -->
+<div id="image-zoom-modal" class="image-zoom-modal">
+  <button class="close-zoom" onclick="fecharZoom()"><i class="fas fa-times"></i></button>
+
+  <div class="nav-arrows">
+    <button onclick="zoomAnterior()"><i class="fas fa-chevron-left"></i></button>
+    <button onclick="zoomProximo()"><i class="fas fa-chevron-right"></i></button>
   </div>
 
+  <img id="zoom-image" src="" alt="Ampliar imagem">
+
+  <div class="zoom-indicator" id="zoom-indicator">🔍 Arraste para explorar</div>
+
+  <div class="zoom-controls">
+    <button onclick="aplicarZoom(-0.5)" title="Diminuir zoom">
+      <i class="fas fa-search-minus"></i>
+    </button>
+    <button onclick="resetZoom()" title="Resetar zoom">
+      <i class="fas fa-compress"></i>
+    </button>
+    <button onclick="aplicarZoom(0.5)" title="Aumentar zoom">
+      <i class="fas fa-search-plus"></i>
+    </button>
+  </div>
+
+  <div style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px;" id="zoom-thumbnails"></div>
+</div>
+
   <!-- BOTÃO WHATSAPP -->
-  <a href="https://wa.me/5588999049636" target="_blank"
-    class="fixed bottom-6 right-6 bg-[#25d366] text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-xl animate-breathe z-[9999]">
-    <i class="fa-brands fa-whatsapp"></i>
-  </a>
+ <a href="https://wa.me/5588999049636" target="_blank"
+   class="btn-whatsapp-flutuante fixed bottom-6 right-6 text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-xl animate-breathe z-[9999]">
+  <i class="fa-brands fa-whatsapp"></i>
+</a>
 
   <!-- FOOTER -->
   <footer id="sobre-empresa" class="bg-accent text-white pt-20 pb-10 px-6 mt-20 border-t border-white/5">
