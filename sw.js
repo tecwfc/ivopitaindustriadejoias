@@ -1,4 +1,6 @@
-const CACHE_NAME = 'ivo-pita-v10';
+const CACHE_NAME = 'ivo-pita-v11';
+const CACHE_IMAGENS = 'ivo-imagens-v1';
+
 const urlsToCache = [
   './styles.css',
   './script.js',
@@ -23,13 +25,13 @@ self.addEventListener('install', event => {
   );
 });
 
-// ACTIVATE — Limpa TODOS os caches antigos
+// ACTIVATE — Limpa caches antigos (exceto o de imagens)
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
-          if (cache !== CACHE_NAME) {
+          if (cache !== CACHE_NAME && cache !== CACHE_IMAGENS) {
             console.log('🗑️ Removendo cache antigo:', cache);
             return caches.delete(cache);
           }
@@ -39,7 +41,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-// FETCH — HTML sempre da rede; CSS/JS podem usar cache
+// FETCH
 self.addEventListener('fetch', event => {
   const url = event.request.url;
 
@@ -57,10 +59,43 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 🚫 NUNCA cacheia imagens do Google Drive nem CDNs/APIs
+  // ✅ NOVO: Cache-First para imagens do Google Drive (resolve 403 e lentidão)
+  if (url.includes('googleusercontent.com') || url.includes('lh3.google.com')) {
+    event.respondWith(
+      caches.open(CACHE_IMAGENS).then(cache => {
+        return cache.match(event.request).then(cached => {
+          if (cached) {
+            // Atualiza em background (stale-while-revalidate)
+            fetch(event.request).then(response => {
+              if (response && response.status === 200) {
+                cache.put(event.request, response);
+              }
+            }).catch(() => { /* ignora erro de rede */ });
+            return cached;
+          }
+
+          // Não está em cache: baixa e guarda
+          return fetch(event.request).then(response => {
+            if (response && response.status === 200) {
+              cache.put(event.request, response.clone());
+            }
+            return response;
+          }).catch(() => {
+            // Fallback: placeholder SVG inline
+            return new Response(
+              '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="#f0f7f2"/><text x="200" y="210" font-family="Arial" font-size="14" fill="#2f6b4f" text-anchor="middle">Imagem indisponível</text></svg>',
+              { headers: { 'Content-Type': 'image/svg+xml' } }
+            );
+          });
+        });
+      })
+    );
+    return;
+  }
+
+  // 🚫 NUNCA cacheia outros serviços externos
   if (
-    url.includes('googleusercontent.com') ||  // ⚡ ESSA LINHA
-    url.includes('drive.google.com') ||       // ⚡ ESSA LINHA
+    url.includes('drive.google.com') ||
     url.includes('cdn.tailwindcss.com') ||
     url.includes('cdn.jsdelivr.net') ||
     url.includes('cdnjs.cloudflare.com') ||
