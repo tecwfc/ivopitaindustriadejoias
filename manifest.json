@@ -1,21 +1,21 @@
 {
-  "name": "WR Aromatizantes",
-  "short_name": "WR Aroma",
-  "description": "O cheirinho mais querido do Brasil",
-  "start_url": "/",
+  "name": "Ivo Pita Joias",
+  "short_name": "Ivo Pita",
+  "description": "Indústria de Joias e Acessórios",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#6d28d9",
-  "background_color": "#faf8ff",
+  "theme_color": "#2f6b4f",
+  "background_color": "#f6f8f5",
   "icons": [
     {
-      "src": "assets/Logo.png",
+      "src": "assets/papel_ivo_preto.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/Logo.png",
+      "src": "assets/papel_ivo_preto.png",
       "sizes": "192x192",
       "type": "image/png"
     }
