@@ -1027,7 +1027,7 @@ function atualizarResumoCliente() {
 
   if (clienteEstaCadastrado() && c) {
     if (resumo) resumo.classList.remove('hidden');
-    if (btnTexto) btnTexto.textContent = 'Editar Meus Dados';
+  if (btnTexto) btnTexto.textContent = 'Editar Dados';
 
     if (resumoNome) resumoNome.textContent = c.nome || '—';
     if (resumoEndereco) {
@@ -1048,7 +1048,7 @@ function atualizarResumoCliente() {
     }
   } else {
     if (resumo) resumo.classList.add('hidden');
-    if (btnTexto) btnTexto.textContent = 'Cadastrar Meus Dados';
+    if (btnTexto) btnTexto.textContent = 'Cadastrar Dados';
   }
 }
 
@@ -1173,6 +1173,60 @@ window.salvarDadosCliente = function () {
   atualizarResumoCliente();
   fecharModalCliente();
   showToast("✅ Dados salvos com sucesso!", "success", 3000);
+};
+
+// ============================================
+// 🗑️ LIMPAR DADOS DO CLIENTE
+// ============================================
+window.limparDadosCliente = function () {
+  // Confirmação em duas etapas para evitar clique acidental
+  const temDadosSalvos = !!carregarDadosCliente();
+  const temRascunho = !!carregarRascunhoCliente();
+
+  if (!temDadosSalvos && !temRascunho) {
+    showToast("ℹ️ Não há dados para limpar", "info", 2500);
+    return;
+  }
+
+  const msg = "⚠️ Tem certeza que deseja limpar TODOS os seus dados?\n\n" +
+              "• Nome\n• CPF/CNPJ\n• Endereço completo\n• Contato\n\n" +
+              "Você precisará preencher tudo de novo na próxima compra.";
+
+  if (!confirm(msg)) return;
+
+  try {
+    // Remove dados salvos
+    localStorage.removeItem(CLIENTE_STORAGE_KEY);
+    // Remove rascunho (auto-save)
+    localStorage.removeItem(CLIENTE_RASCUNHO_KEY);
+  } catch (e) {
+    console.warn("Erro ao limpar storage:", e);
+  }
+
+  // Limpa todos os campos visuais do formulário
+  const campos = [
+    'cliente-nome', 'cliente-cpf', 'cliente-ie',
+    'cliente-nascimento', 'cliente-celular', 'cliente-email',
+    'cliente-cep', 'cliente-endereco', 'cliente-numero',
+    'cliente-complemento', 'cliente-bairro', 'cliente-cidade',
+    'cliente-estado'
+  ];
+  campos.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  // Reset do tipo (F/J) para o padrão
+  const tipoEl = document.getElementById('cliente-tipo');
+  if (tipoEl) tipoEl.value = 'F';
+  atualizarLabelsTipo('F');
+
+  // Atualiza o resumo no carrinho (vai esconder o card "Dados cadastrados")
+  atualizarResumoCliente();
+
+  // Fecha o modal e avisa o usuário
+  fecharModalCliente();
+  showToast("🗑️ Dados limpos com sucesso!", "success", 3000);
 };
 
 // ============================================
@@ -1413,11 +1467,11 @@ function updateCart() {
 
   if (cart.length === 0) {
     container.innerHTML = `
-      <div class="cart-empty-state">
-        <div class="cart-empty-icon"><i class="fas fa-shopping-bag"></i></div>
-        <p class="cart-empty-title">Sua sacola está vazia</p>
-        <p class="cart-empty-subtitle">Adicione produtos para começar</p>
-      </div>`;
+  <div class="cart-empty-state">
+    <div class="cart-empty-icon"><i class="fas fa-shopping-bag"></i></div>
+    <p class="cart-empty-title">Sacola vazia</p>
+    <p class="cart-empty-subtitle">Adicione produtos</p>
+  </div>`;
   } else {
     cart.forEach((item) => {
       subtotal += item.price;
@@ -1472,7 +1526,7 @@ function updateCart() {
     const percent = (subtotal / FRETE_GRATIS_VALOR) * 100;
     const falta = FRETE_GRATIS_VALOR - subtotal;
     if (bar) bar.style.width = `${Math.min(percent, 100)}%`;
-    if (text) text.innerHTML = `Faltam R$ ${falta.toFixed(2).replace(".", ",")} para frete grátis`;
+   if (text) text.innerHTML = `Faltam R$ ${falta.toFixed(2).replace(".", ",")} p/ frete grátis`;
     if (shippingEl) shippingEl.innerText = `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
     if (totalEl) totalEl.innerText = `R$ ${(subtotal + TAXA_FRETE).toFixed(2).replace(".", ",")}`;
   }
@@ -2315,10 +2369,12 @@ function gerarConteudoPDF() {
     totalItens += item.quantity;
     itensHTML += `
       <tr>
-        <td style="padding: 8px 6px; text-align: center; font-size: 9px; color: #6b7280; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">${String(index + 1).padStart(2, '0')}</td>
+        <td style="padding: 8px 6px; text-align: center; font-size: 10px; color: #6b7280; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">${index + 1}</td>
+        <td style="padding: 8px 6px; text-align: center; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
+          <div style="font-size: 9px; color: #182420; font-weight: 600; letter-spacing: 0.02em;">${item.ref || '—'}</div>
+        </td>
         <td style="padding: 8px 6px; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
           <div style="font-size: 10px; font-weight: 600; color: #182420; line-height: 1.35;">${item.name}</div>
-          ${item.ref ? `<div style="font-size: 9px; color: #182420; margin-top: 3px; font-weight: 600; letter-spacing: 0.02em;">REF. ${item.ref}</div>` : ""}
         </td>
         <td style="padding: 8px 6px; text-align: center; font-size: 10px; color: #182420; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">${item.quantity}</td>
         <td style="padding: 8px 6px; text-align: right; font-size: 10px; color: #6b7280; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">R$ ${precoUnitario.toFixed(2).replace(".", ",")}</td>
@@ -2399,10 +2455,11 @@ function gerarConteudoPDF() {
           <table style="width: 100%; border-collapse: collapse;">
             <thead>
               <tr style="border-bottom: 1.5px solid #1f4d38;">
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 40px;">Item</th>
+                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 45px;">Itens</th>
+                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 90px;">Referência</th>
                 <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: left;">Descrição</th>
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 50px;">Qtd</th>
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 85px;">Valor unit.</th>
+                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 50px;">Qtde</th>
+                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 85px;">Valor Uni.</th>
                 <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 95px;">Total</th>
               </tr>
             </thead>
@@ -2442,6 +2499,7 @@ function gerarConteudoPDF() {
     <div style="height: 3px; background: linear-gradient(90deg, #c9a86a 0%, #2f6b4f 100%);"></div>
   </div>`;
 }
+
 
 async function visualizarPDF() {
   if (cart.length === 0) {
