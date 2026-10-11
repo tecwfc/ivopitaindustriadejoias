@@ -1,15 +1,13 @@
 // ============================================
-// IVO PITA JOIAS - SCRIPT OTIMIZADO v2 (sem banner)
+// WR AROMATIZANTES - SCRIPT PRINCIPAL v2
+// (SEM: referência, subcategoria, cores, tamanhos, destaque)
 // ============================================
 
-const PLANILHA_ID = "142Ir0-8yfUuu2sSbbRo8x6SwjeQL74MLMUpNElVn1rc";
+const ESTOQUE_API_URL = "https://script.google.com/macros/s/AKfycbz54JYWtZOJOVJtPWLxydLrrn6h18NKCdYb90LT_UGHMnzUKc98kVX8QVI-Wvw4rQJj/exec";
 
-const ESTOQUE_API_URL =
-  "https://script.google.com/macros/s/AKfycbwtdqgkfRH8mXRFRCfSTYSkmvXWtp0xAmdW6Qd_j8hCCrPl5ynOMeyolSCzvtoON1yyWQ/exec";
-
-const CACHE_KEY_DADOS = 'ivo_dados_v3';
-const CACHE_KEY_TIME = 'ivo_dados_time_v3';
-const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutos (antes era 5)
+const CACHE_KEY_DADOS = 'wr_dados_v1';
+const CACHE_KEY_TIME = 'wr_dados_time_v1';
+const CACHE_TTL_MS = 15 * 60 * 1000;
 
 const IMG_SIZE_CARD = 400;
 const IMG_SIZE_MODAL = 600;
@@ -18,25 +16,24 @@ const IMG_SIZE_ZOOM = 1200;
 let siteConfig = {
   whatsapp: "5588999049636",
   whatsappDisplay: "(88) 99904-9636",
-  email: "contato@ivopita.com.br",
+  email: "contato@wraromatizantes.com.br",
   endereco: "Juazeiro do Norte, CE",
-  telefone: "(88) 99909-9999",
-  sobreTexto:
-    "A IVO PITA nasceu para celebrar momentos especiais com peças que unem design sofisticado e materiais nobres.",
-  freteGratisValor: 3500,
-  taxaFrete: 15,
+  telefone: "(88) 99904-9636",
+  sobreTexto: "A WR Aromatizantes nasceu para levar o cheirinho mais querido do Brasil para casas, carros e escritórios.",
+  freteGratisValor: 100,
+  taxaFrete: 5,
   pixDesconto: 5,
 };
 
-let FRETE_GRATIS_VALOR = 3500;
-let TAXA_FRETE = 75;
+let FRETE_GRATIS_VALOR = 100;
+let TAXA_FRETE = 5;
 
 const PLACEHOLDER_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
-  <rect width="400" height="400" fill="#f0f7f2"/>
-  <rect x="20" y="20" width="360" height="360" fill="none" stroke="#c9a86a" stroke-width="2" stroke-dasharray="8,6" rx="20"/>
-  <text x="200" y="210" font-family="Montserrat, Arial, sans-serif" font-size="16" font-weight="600" fill="#2f6b4f" text-anchor="middle">SEM IMAGEM</text>
-  <text x="200" y="235" font-family="Montserrat, Arial, sans-serif" font-size="11" fill="#5c6b63" text-anchor="middle">Ivo Pita Joias</text>
+  <rect width="400" height="400" fill="#faf8ff"/>
+  <rect x="20" y="20" width="360" height="360" fill="none" stroke="#6d28d9" stroke-width="2" stroke-dasharray="8,6" rx="20"/>
+  <text x="200" y="210" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="16" font-weight="700" fill="#6d28d9" text-anchor="middle">SEM IMAGEM</text>
+  <text x="200" y="235" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">WR Aromatizantes</text>
 </svg>
 `)}`;
 
@@ -44,20 +41,13 @@ window.PLACEHOLDER_SVG = PLACEHOLDER_SVG;
 
 let allProducts = [];
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
-let selectedColor = "";
 let tempProduct = null;
 let subtotal = 0;
 let imagensZoom = [];
 let zoomIndex = 0;
-let quantidadeSelecionada = 0;
-let coresSelecionadas = {};
-let coresDisponiveis = [];
-let estruturaCategorias = [];
-let sidebarDinamicaAtiva = false;
-let __dadosCarregados = null;
 
 const ESTOQUE_CACHE = new Map();
-const ESTOQUE_CACHE_TTL = 5 * 1000; // 5 segundos
+const ESTOQUE_CACHE_TTL = 30 * 1000;
 
 function getEstoqueCache(produtoId) {
   const entry = ESTOQUE_CACHE.get(String(produtoId));
@@ -80,7 +70,7 @@ function invalidarEstoqueCache() {
 function showToast(texto, tipo = 'success', duracao = 2500) {
   if (typeof Toastify === 'undefined') { console.log('[Toast]', texto); return; }
   const cores = {
-    success: 'linear-gradient(135deg, #2f6b4f, #1f4d38)',
+    success: 'linear-gradient(135deg, #6d28d9, #4c1d95)',
     error: '#ef4444', warning: '#f59e0b', info: '#3b82f6'
   };
   Toastify({
@@ -88,7 +78,7 @@ function showToast(texto, tipo = 'success', duracao = 2500) {
     style: {
       background: cores[tipo] || cores.success, borderRadius: '14px', fontWeight: '700',
       fontSize: '13px', padding: '14px 20px',
-      boxShadow: '0 10px 30px rgba(15, 47, 34, 0.25)', maxWidth: '340px'
+      boxShadow: '0 10px 30px rgba(109, 40, 217, 0.25)', maxWidth: '340px'
     },
     offset: { x: 16, y: 90 }
   }).showToast();
@@ -107,22 +97,19 @@ function normalizarPalavraBusca(palavra) {
 function driveImg(url, size = IMG_SIZE_CARD) {
   if (!url || url === 'placeholder.png') return PLACEHOLDER_SVG;
 
-  // Já é do Google Drive cacheado → força tamanho correto
   if (url.includes("googleusercontent.com")) {
-    // Remove qualquer parâmetro de tamanho antigo e aplica o novo
     return url.replace(/=s\d+.*$/, `=s${size}`).replace(/=w\d+.*$/, `=s${size}`);
   }
 
-  // Extrai ID do Google Drive
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (match) {
-    // ✅ "=s" força o Google a redimensionar de verdade (mais rápido que "=w")
     return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=s${size}`;
   }
 
   if (url.startsWith("http")) return url;
   return PLACEHOLDER_SVG;
 }
+
 async function carregarTudo() {
   const cache = localStorage.getItem(CACHE_KEY_DADOS);
   const cacheTime = parseInt(localStorage.getItem(CACHE_KEY_TIME) || '0');
@@ -132,7 +119,6 @@ async function carregarTudo() {
       const dados = JSON.parse(cache);
       console.log('⚡ Renderizando do cache local');
       aplicarDados(dados);
-      __dadosCarregados = dados;
       setTimeout(() => atualizarEmBackground(false), 200);
       return;
     } catch (e) {
@@ -154,7 +140,7 @@ async function atualizarEmBackground(mostrarLoading = false) {
 
     const t0 = performance.now();
     const dados = await new Promise((resolve, reject) => {
-      const cb = 'ivo_load_' + Date.now();
+      const cb = 'wr_load_' + Date.now();
       let script = null;
       const timeout = setTimeout(() => {
         delete window[cb];
@@ -187,7 +173,6 @@ async function atualizarEmBackground(mostrarLoading = false) {
       localStorage.setItem(CACHE_KEY_TIME, String(Date.now()));
     } catch (e) {}
 
-    __dadosCarregados = dados;
     aplicarDados(dados);
   } catch (err) {
     console.error('❌ Erro:', err);
@@ -222,17 +207,12 @@ function aplicarDados(dados) {
   aplicarConfig(dados.config || {});
   renderizarMarquee(dados.marquee || []);
 
-  if (dados.estrutura && Array.isArray(dados.estrutura) && dados.estrutura.length > 0) {
-    estruturaCategorias = dados.estrutura;
-    renderizarSidebarDinamica();
-  }
-
   if (allProducts.length === 0) {
     const container = document.getElementById("produtos-container");
     if (container) {
       container.innerHTML = `
         <div class="col-span-full text-center py-12">
-          <i class="fas fa-gem text-4xl text-primary/30 mb-4"></i>
+          <i class="fas fa-spray-can text-4xl text-primary/30 mb-4"></i>
           <p class="text-textMuted">Nenhum produto disponível.</p>
         </div>`;
     }
@@ -245,187 +225,7 @@ function aplicarDados(dados) {
 }
 
 // ============================================
-// 🆕 SIDEBAR DINÂMICA
-// ============================================
-function renderizarSidebarDinamica() {
-  const scroll = document.getElementById('sidebar-scroll');
-  if (!scroll) return;
-
-  const btnTodas = scroll.querySelector('.sidebar-item[data-categoria="todos"]');
-  scroll.innerHTML = '';
-
-  if (btnTodas) {
-    scroll.appendChild(btnTodas);
-  } else {
-    const novaTodas = document.createElement('button');
-    novaTodas.className = 'sidebar-item sidebar-item-active';
-    novaTodas.setAttribute('data-categoria', 'todos');
-    novaTodas.innerHTML = `
-      <span class="sidebar-icon"><i class="fas fa-gem"></i></span>
-      <span class="sidebar-label">Todas as Joias</span>
-      <span class="sidebar-count" id="count-todos">0</span>
-    `;
-    scroll.appendChild(novaTodas);
-  }
-
-  if (!estruturaCategorias || estruturaCategorias.length === 0) {
-    console.log('ℹ️ Sem estrutura dinâmica — mantendo HTML estático');
-    return;
-  }
-
-  const grupos = {};
-  estruturaCategorias.forEach(item => {
-    const g = item.grupo || 'Outros';
-    if (!grupos[g]) grupos[g] = {};
-    const c = item.categoria || 'Sem categoria';
-    if (!grupos[g][c]) grupos[g][c] = [];
-    if (item.subcategoria && item.subcategoria.trim() !== '') {
-      grupos[g][c].push(item.subcategoria);
-    }
-  });
-
-  const iconesGrupo = {
-    'Folheado Dourado': 'fa-solid fa-crown',
-    'Folheado Prata': 'fa-regular fa-gem'
-  };
-  const coresGrupo = {
-    'Folheado Dourado': 'linear-gradient(135deg, #fef3c7, #fcd34d)',
-    'Folheado Prata': 'linear-gradient(135deg, #f1f5f9, #cbd5e1)'
-  };
-  const coresIconeGrupo = {
-    'Folheado Dourado': '#92400e',
-    'Folheado Prata': '#475569'
-  };
-
-  Object.keys(grupos).forEach(nomeGrupo => {
-    const groupDiv = document.createElement('div');
-    groupDiv.className = 'sidebar-group';
-
-    const titulo = document.createElement('button');
-    titulo.className = 'sidebar-group-title';
-    titulo.setAttribute('type', 'button');
-    titulo.onclick = function () { toggleSidebarGroup(this); };
-    titulo.innerHTML = `
-      <span class="sidebar-group-icon" style="background: ${coresGrupo[nomeGrupo] || 'linear-gradient(135deg, #eef4ef, #d9e7de)'};">
-        <i class="${iconesGrupo[nomeGrupo] || 'fa-solid fa-gem'}" style="color: ${coresIconeGrupo[nomeGrupo] || '#1f4d38'};"></i>
-      </span>
-      <span>${nomeGrupo}</span>
-      <i class="fas fa-chevron-down sidebar-group-arrow"></i>
-    `;
-    groupDiv.appendChild(titulo);
-
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'sidebar-group-content';
-
-    const categoriasOrdenadas = Object.keys(grupos[nomeGrupo]).sort((a, b) => a.localeCompare(b, 'pt-BR'));
-
-    categoriasOrdenadas.forEach(nomeCategoria => {
-      const subs = grupos[nomeGrupo][nomeCategoria];
-
-      if (subs.length === 0) {
-        const btn = document.createElement('button');
-        btn.className = 'sidebar-item-sub';
-        btn.setAttribute('type', 'button');
-        btn.setAttribute('data-categoria', nomeCategoria.toLowerCase());
-        btn.innerHTML = `<span>${nomeCategoria}</span>`;
-        contentDiv.appendChild(btn);
-        return;
-      }
-
-      const nomeCurto = nomeCategoria
-        .replace(/\s+(dourado|dourada|dourados|douradas)\s*$/i, '')
-        .replace(/\s+(prata|prateado|prateada|prateados|prateadas)\s*$/i, '')
-        .trim();
-
-      if (subs.length === 1 && subs[0].toLowerCase() === nomeCurto.toLowerCase()) {
-        const btn = document.createElement('button');
-        btn.className = 'sidebar-item-sub';
-        btn.setAttribute('type', 'button');
-        btn.setAttribute('data-categoria', nomeCategoria.toLowerCase());
-        btn.innerHTML = `<span>${nomeCategoria}</span>`;
-        contentDiv.appendChild(btn);
-        return;
-      }
-
-      const subDiv = document.createElement('div');
-      subDiv.className = 'sidebar-subgroup';
-
-      const subTitle = document.createElement('button');
-      subTitle.className = 'sidebar-subgroup-title';
-      subTitle.setAttribute('type', 'button');
-      subTitle.onclick = function () { toggleSidebarSubgroup(this); };
-      subTitle.innerHTML = `<span>${nomeCurto}</span><i class="fas fa-chevron-down"></i>`;
-      subDiv.appendChild(subTitle);
-
-      const subContent = document.createElement('div');
-      subContent.className = 'sidebar-subgroup-content';
-
-      subs.forEach(sub => {
-        const btn = document.createElement('button');
-        btn.className = 'sidebar-item-sub';
-        btn.setAttribute('type', 'button');
-        btn.setAttribute('data-categoria', (nomeCategoria + ' ' + sub).toLowerCase());
-        btn.innerHTML = `<span>${sub}</span>`;
-        subContent.appendChild(btn);
-      });
-
-      subDiv.appendChild(subContent);
-      contentDiv.appendChild(subDiv);
-    });
-
-    groupDiv.appendChild(contentDiv);
-    scroll.appendChild(groupDiv);
-  });
-
-  sidebarDinamicaAtiva = true;
-  rebindSidebarEvents();
-
-  const searchInput = document.getElementById('sidebar-search');
-  if (searchInput && searchInput.value.trim()) {
-    aplicarBuscaSidebar(searchInput.value);
-  }
-}
-
-function rebindSidebarEvents() {
-  document.querySelectorAll('.sidebar-item').forEach(btn => {
-    btn.onclick = function (e) {
-      e.preventDefault();
-      const categoria = this.getAttribute('data-categoria');
-      if (!categoria) return;
-      marcarItemSidebarAtivo(categoria);
-      filtrarPorCategoria(categoria);
-      if (window.innerWidth <= 900) fecharSidebarMobile();
-    };
-  });
-
-  document.querySelectorAll('.sidebar-item-sub').forEach(btn => {
-    btn.onclick = function (e) {
-      e.preventDefault();
-      const categoria = this.getAttribute('data-categoria');
-      if (!categoria) return;
-      marcarItemSidebarAtivo(categoria);
-      filtrarPorCategoria(categoria);
-      if (window.innerWidth <= 900) fecharSidebarMobile();
-    };
-  });
-
-  atualizarContadoresSidebar();
-}
-
-function aplicarBuscaSidebar(termo) {
-  const termoNorm = normalizar(termo);
-  const elementos = document.querySelectorAll(
-    '.sidebar-item, .sidebar-item-sub, .sidebar-group-title, .sidebar-subgroup-title'
-  );
-  elementos.forEach(el => {
-    const texto = normalizar(el.textContent);
-    const match = !termoNorm || texto.includes(termoNorm);
-    el.style.display = match ? '' : 'none';
-  });
-}
-
-// ============================================
-// SIDEBAR - TOGGLE
+// SIDEBAR
 // ============================================
 function toggleSidebarGroup(btn) {
   const group = btn.closest('.sidebar-group');
@@ -442,9 +242,6 @@ function toggleSidebarSubgroup(btn) {
 window.toggleSidebarGroup = toggleSidebarGroup;
 window.toggleSidebarSubgroup = toggleSidebarSubgroup;
 
-// ============================================
-// SIDEBAR - ABRIR/FECHAR MOBILE
-// ============================================
 function abrirSidebarMobile() {
   const mobileMenu = document.getElementById('mobile-menu');
   const mobileOverlay = document.getElementById('mobile-overlay');
@@ -474,9 +271,6 @@ function fecharSidebarMobile() {
 window.abrirSidebarMobile = abrirSidebarMobile;
 window.fecharSidebarMobile = fecharSidebarMobile;
 
-// ============================================
-// SIDEBAR - MARCAR ITEM ATIVO
-// ============================================
 function marcarItemSidebarAtivo(categoria) {
   document.querySelectorAll('.sidebar-item, .sidebar-item-sub').forEach(el => {
     el.classList.remove('sidebar-item-active', 'active');
@@ -493,7 +287,7 @@ function marcarItemSidebarAtivo(categoria) {
 }
 
 // ============================================
-// ATUALIZAR CONTADOR DE PRODUTOS (HEADER)
+// CONTADORES
 // ============================================
 function atualizarContadorProdutos() {
   const countEl = document.getElementById('products-count');
@@ -503,9 +297,6 @@ function atualizarContadorProdutos() {
   }
 }
 
-// ============================================
-// ATUALIZAR CONTADORES NA SIDEBAR
-// ============================================
 function atualizarContadoresSidebar() {
   if (!allProducts || allProducts.length === 0) return;
 
@@ -546,33 +337,8 @@ function atualizarContadoresSidebar() {
     }
     countSpan.textContent = total;
   });
-
-  document.querySelectorAll('.sidebar-subgroup').forEach(subgroup => {
-    const subgroupTitle = subgroup.querySelector('.sidebar-subgroup-title');
-    const content = subgroup.querySelector('.sidebar-subgroup-content');
-    if (!subgroupTitle || !content) return;
-
-    let total = 0;
-    content.querySelectorAll('.sidebar-item-sub[data-categoria]').forEach(btn => {
-      const categoria = btn.getAttribute('data-categoria');
-      total += contarProdutosPorCategoria(categoria);
-    });
-
-    let countSpan = subgroupTitle.querySelector('.sidebar-count');
-    if (!countSpan) {
-      countSpan = document.createElement('span');
-      countSpan.className = 'sidebar-count';
-      const icon = subgroupTitle.querySelector('i');
-      if (icon) subgroupTitle.insertBefore(countSpan, icon);
-      else subgroupTitle.appendChild(countSpan);
-    }
-    countSpan.textContent = total;
-  });
 }
 
-// ============================================
-// CONTAR PRODUTOS DE UMA CATEGORIA
-// ============================================
 function contarProdutosPorCategoria(categoria) {
   if (!allProducts || allProducts.length === 0) return 0;
 
@@ -582,18 +348,13 @@ function contarProdutosPorCategoria(categoria) {
 
   return allProducts.filter((p) => {
     const catProduto = normalizar(p["Categoria"] || "");
-    const subcatProduto = normalizar(p["Subcategoria"] || "");
     const nomeProduto = normalizar(p["Nome do Produto"] || "");
-    const refProduto = normalizar(p["referencia"] || "");
-    const combinado = catProduto + " " + subcatProduto + " " + nomeProduto + " " + refProduto;
+    const combinado = catProduto + " " + nomeProduto;
     const combinadoNorm = combinado.split(/\s+/).map(normalizarPalavraBusca).join(" ");
     return palavrasFiltroNorm.every((palavra) => combinadoNorm.includes(palavra));
   }).length;
 }
 
-// ============================================
-// ORDENAR PRODUTOS
-// ============================================
 function ordenarProdutos(tipo) {
   if (!allProducts || allProducts.length === 0) return;
 
@@ -628,139 +389,17 @@ function ordenarProdutos(tipo) {
 }
 
 // ============================================
-// FUNÇÕES DO MODAL DE CORES
+// MODAL DE QUANTIDADE (SEM CORES)
 // ============================================
-function renderizarCores() {
-  const container = document.getElementById("colors-container");
-  if (!container) return;
-
-  container.innerHTML = "";
-
-  if (!Array.isArray(coresDisponiveis) || coresDisponiveis.length === 0) {
-    container.innerHTML = `<p class="text-sm text-gray-500">Nenhuma cor disponível.</p>`;
-    return;
-  }
-
-  coresDisponiveis.forEach(function (nomeCor) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = nomeCor;
-    btn.className =
-      "px-4 py-3 rounded-xl border border-primary/20 " +
-      "bg-white hover:bg-primary hover:text-white " +
-      "transition-all duration-200 font-semibold text-sm";
-    btn.onclick = function () { window.selectColor(nomeCor); };
-    container.appendChild(btn);
-  });
-}
-
-window.renderizarCores = renderizarCores;
-
-function selectColor(cor) {
-  if (quantidadeSelecionada <= 0) {
-    showToast("Escolha a quantidade primeiro!", "error", 2000);
-    return;
-  }
-
-  const corLower = cor.toLowerCase();
-  const qtd = quantidadeSelecionada;
-
-  if (coresSelecionadas[corLower]) {
-    coresSelecionadas[corLower] += qtd;
-  } else {
-    coresSelecionadas[corLower] = qtd;
-  }
-
-  window.renderizarCores();
-  quantidadeSelecionada = 0;
-  window.atualizarResumoSelecao();
-
-  showToast(`🎨 ${qtd}x ${cor} adicionado`, "success", 2000);
-
-  document.querySelectorAll(".qty-option-btn").forEach((btn) => btn.classList.remove("selected"));
-
-  const instruction = document.getElementById("color-instruction");
-  if (instruction) {
-    instruction.innerText = "Escolha a quantidade primeiro";
-    instruction.classList.remove("highlight");
-  }
-}
-window.selectColor = selectColor;
-
-function atualizarUISelecao() {
-  document.querySelectorAll(".qty-option-btn").forEach((btn) => {
-    btn.classList.remove("selected");
-    if (parseInt(btn.innerText) === quantidadeSelecionada) {
-      btn.classList.add("selected");
-    }
-  });
-
-  const instruction = document.getElementById("color-instruction");
-  if (instruction) {
-    if (quantidadeSelecionada > 0) {
-      instruction.innerText = `Agora escolha a cor para ${quantidadeSelecionada} unidade(s)`;
-      instruction.classList.add("highlight");
-    } else {
-      instruction.innerText = "Escolha a quantidade primeiro";
-      instruction.classList.remove("highlight");
-    }
-  }
-}
-window.atualizarUISelecao = atualizarUISelecao;
-
-function atualizarResumoSelecao() {
-  const resumoContainer = document.getElementById("selection-summary");
-  if (!resumoContainer) return;
-
-  const entradas = Object.entries(coresSelecionadas).filter(([_, qtd]) => qtd > 0);
-
-  if (entradas.length === 0) {
-    resumoContainer.innerHTML = "";
-    resumoContainer.classList.add("hidden");
-    return;
-  }
-
-  resumoContainer.classList.remove("hidden");
-
-  let html = `<p class="summary-title">Seleção atual:</p><div class="summary-items">`;
-  let totalItens = 0;
-
-  entradas.forEach(([cor, qtd]) => {
-    const corOriginal = coresDisponiveis.find((c) => c.toLowerCase() === cor) || cor;
-    html += `<div class="summary-item">
-            <span class="summary-color">${corOriginal}</span>
-            <span class="summary-qty">${qtd}x</span>
-        </div>`;
-    totalItens += qtd;
-  });
-
-  html += `</div><p class="summary-total">Total: ${totalItens} unidade(s)</p>`;
-  resumoContainer.innerHTML = html;
-}
-window.atualizarResumoSelecao = atualizarResumoSelecao;
-
 function resetarModalUI() {
-  const resumoContainer = document.getElementById("selection-summary");
-  if (resumoContainer) {
-    resumoContainer.innerHTML = "";
-    resumoContainer.classList.add("hidden");
-  }
-
-  const instruction = document.getElementById("color-instruction");
-  if (instruction) {
-    instruction.innerText = "Escolha a quantidade primeiro";
-    instruction.classList.remove("highlight");
-  }
-
   const inputCustom = document.getElementById("custom-quantity");
   if (inputCustom) inputCustom.value = 1;
 
   document.querySelectorAll(".qty-option-btn").forEach((btn) => btn.classList.remove("selected"));
-  document.querySelectorAll(".color-name-btn").forEach((btn) => btn.classList.remove("selected"));
 }
 window.resetarModalUI = resetarModalUI;
 
-function adicionarSemCor(quantidade, buttonElement) {
+function adicionarSemCor(quantidade) {
   if (!tempProduct) return;
 
   const estoqueDisponivel = tempProduct.estoqueDisponivel || 0;
@@ -778,86 +417,21 @@ function adicionarSemCor(quantidade, buttonElement) {
   const uniqueId = `${tempProduct.id}-unico`;
   const totalPrice = tempProduct.price * quantidade;
 
-  addToCart(
-    uniqueId,
-    tempProduct.name,
-    totalPrice,
-    tempProduct.img,
-    tempProduct.id,
-    tempProduct.ref,
-    quantidade,
-    buttonElement || tempProduct.buttonElement
-  );
+  addToCart(uniqueId, tempProduct.name, totalPrice, tempProduct.img, tempProduct.id, quantidade);
   window.closeSizeModal();
 }
 window.adicionarSemCor = adicionarSemCor;
 
-
 function confirmarSelecao() {
-  const instruction = document.getElementById("color-instruction");
-
-  if (coresDisponiveis.length === 0) {
-    const inputCustom = document.getElementById("custom-quantity");
-    let qtd = parseInt(inputCustom?.value) || 0;
-    if (!qtd || qtd <= 0) {
-      showToast("Digite uma quantidade válida", "error", 2000);
-      return;
-    }
-    window.adicionarSemCor(qtd);
+  const inputCustom = document.getElementById("custom-quantity");
+  let qtd = parseInt(inputCustom?.value) || 0;
+  if (!qtd || qtd <= 0) {
+    showToast("Digite uma quantidade válida", "error", 2000);
     return;
   }
-
-  if (quantidadeSelecionada > 0) {
-    showToast(
-      `Você escolheu ${quantidadeSelecionada} unidade(s). Clique em uma cor para confirmar!`,
-      "warning", 3000
-    );
-    if (instruction) {
-      instruction.classList.add("highlight");
-      instruction.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-    return;
-  }
-
-  const entradas = Object.entries(coresSelecionadas).filter(([_, qtd]) => qtd > 0);
-
-  if (entradas.length === 0) {
-    showToast("Selecione pelo menos uma cor!", "error", 2000);
-    return;
-  }
-
-  const totalSelecionado = entradas.reduce((soma, [_, qtd]) => soma + qtd, 0);
-  const estoqueDisponivel = tempProduct.estoqueDisponivel || 0;
-
-  if (totalSelecionado > estoqueDisponivel) {
-    showToast(
-      `Total selecionado (${totalSelecionado}) ultrapassa o estoque disponível (${estoqueDisponivel}).`,
-      "error", 3000
-    );
-    return;
-  }
-
-  entradas.forEach(([cor, qtd]) => {
-    const corOriginal = coresDisponiveis.find((c) => c.toLowerCase() === cor) || cor;
-    const uniqueId = `${tempProduct.id}-${corOriginal}`;
-    const fullName = `${tempProduct.name} - ${corOriginal}`;
-    const totalPrice = tempProduct.price * qtd;
-    addToCart(
-      uniqueId,
-      fullName,
-      totalPrice,
-      tempProduct.img,
-      tempProduct.id,
-      tempProduct.ref,
-      qtd,
-      tempProduct.buttonElement
-    );
-  });
-
-  window.closeSizeModal();
+  window.adicionarSemCor(qtd);
 }
 window.confirmarSelecao = confirmarSelecao;
-
 
 window.closeSizeModal = function () {
   const modal = document.getElementById("size-modal");
@@ -865,10 +439,7 @@ window.closeSizeModal = function () {
     modal.classList.add("hidden");
     modal.classList.remove("flex");
   }
-  selectedColor = "";
   tempProduct = null;
-  quantidadeSelecionada = 0;
-  coresSelecionadas = {};
 
   const imagemContainer = document.getElementById("product-single-image");
   if (imagemContainer) imagemContainer.remove();
@@ -956,7 +527,6 @@ function updateCart() {
         </div>
         <div class="cart-item-details">
           <h4 class="cart-item-name">${item.name}</h4>
-          ${item.ref ? `<p class="cart-item-ref">Ref: ${item.ref}</p>` : ""}
           <div class="cart-item-price-row">
             <span class="cart-item-unit-price">R$ ${precoUnitario.toFixed(2).replace(".", ",")} <small>/un</small></span>
             <span class="cart-item-total-price">R$ ${item.price.toFixed(2).replace(".", ",")}</span>
@@ -1017,127 +587,38 @@ window.removeCartItem = function (id) {
 window.changeQty = function (id, delta) {
   const item = cart.find((i) => i.id === id);
   if (!item) return;
-
+  const precoUnitario = item.price / item.quantity;
   if (delta > 0) {
     item.quantity++;
+    item.price = precoUnitario * item.quantity;
   } else {
     if (item.quantity > 1) {
       item.quantity--;
+      item.price = precoUnitario * item.quantity;
     } else {
       cart = cart.filter((i) => i.id !== id);
-      updateCart();
-      return;
     }
   }
-
-  // ✅ SEMPRE recalcula do preço unitário original (evita arredondamento)
-  item.price = item.precoUnitario * item.quantity;
   updateCart();
 };
 
-
-// ✅ NOVA FUNÇÃO: Valida o carrinho antes de abrir/renderizar
-async function validarCarrinho() {
-  if (cart.length === 0) return;
-
-  const ids = [...new Set(cart.map(i => i.baseId))];
-  const produtosDesatualizados = [];
-
-  // Verifica em paralelo para não travar
-  const checks = await Promise.all(
-    ids.map(async (id) => {
-      const resp = await verificarEstoqueServidor(id);
-      return { id, resp };
-    })
-  );
-
-  for (const { id, resp } of checks) {
-    // Se falhou ou saldo é 0, mas o produto está no carrinho, remove
-    if (resp && resp.success) {
-      const quantidadeNoCart = quantidadeNoCarrinho(id);
-      const saldoServidor = parseInt(resp.saldo) || 0;
-
-      if (saldoServidor <= 0) {
-        produtosDesatualizados.push({ id, motivo: 'esgotado' });
-      } else if (quantidadeNoCart > saldoServidor) {
-        // Ajusta para o máximo disponível
-        produtosDesatualizados.push({ id, motivo: 'ajustar', saldo: saldoServidor });
-      }
-    }
-  }
-
-  if (produtosDesatualizados.length === 0) return;
-
-  produtosDesatualizados.forEach(item => {
-    if (item.motivo === 'esgotado') {
-      cart = cart.filter(i => String(i.baseId) !== String(item.id));
-    } else if (item.motivo === 'ajustar') {
-      // Reduz a quantidade para o máximo disponível
-      let restante = item.saldo;
-      cart = cart.filter(i => {
-        if (String(i.baseId) !== String(item.id)) return true;
-        if (restante <= 0) return false;
-        if (i.quantity <= restante) {
-          restante -= i.quantity;
-          return true;
-        }
-        i.quantity = restante;
-        i.price = i.precoUnitario * i.quantity;
-        restante = 0;
-        return true;
-      });
-    }
-  });
-
-  updateCart();
-  showToast("⚠️ Itens do carrinho foram ajustados (estoque esgotou).", "warning", 4000);
-}
-window.validarCarrinho = validarCarrinho;
-
-
-function addToCart(id, name, price, img, baseId, ref, quantity, buttonElement) {
+function addToCart(id, name, price, img, baseId, quantity) {
   const qty = quantity || 1;
   const existing = cart.find((i) => i.id === id);
 
   if (existing) {
     existing.quantity += qty;
-    existing.price = existing.precoUnitario * existing.quantity;
+    existing.price += price;
   } else {
-    cart.push({
-      id,
-      name,
-      price,
-      img,
-      quantity: qty,
-      baseId,
-      ref,
-      precoUnitario: price / qty // ✅ Guarda o preço unitário original
-    });
+    cart.push({ id, name, price, img, quantity: qty, baseId });
   }
 
-  invalidarEstoqueCache(); // ✅ Força refetch do estoque
   showToast(`✅ ${name.substring(0, 30)} adicionado!`, "success", 2000);
   updateCart();
-
-  // ✅ NOVO: Feedback visual no botão
-  if (buttonElement) {
-    const originalContent = buttonElement.innerHTML;
-    const originalBg = buttonElement.style.background;
-
-    buttonElement.innerHTML = '<i class="fas fa-check"></i> Adicionado!';
-    buttonElement.style.background = 'linear-gradient(135deg, #28a745, #218838)';
-    buttonElement.disabled = true;
-
-    setTimeout(() => {
-      buttonElement.innerHTML = originalContent;
-      buttonElement.style.background = originalBg;
-      buttonElement.disabled = false;
-    }, 1500);
-  }
 }
 
 // ============================================
-// RENDERIZAR PRODUTOS
+// RENDERIZAR PRODUTOS (SEM REF/SUBCAT/CAT)
 // ============================================
 function renderProducts(products) {
   const container = document.getElementById("produtos-container");
@@ -1159,16 +640,10 @@ function renderProducts(products) {
 
   products.forEach((p, index) => {
     const estoque = parseInt(p["Saldo Estoque"]) || 0;
-    const temCores = p["Cores"] && String(p["Cores"]).trim() !== "";
     const preco = parseFloat(p["Preço"]) || 0;
-
     const nome = p["Nome do Produto"] || "Produto sem nome";
-    const referencia = p["referencia"] || "";
-    const categoria = p["Categoria"] || "";
-    const subcategoria = p["Subcategoria"] || "";
     const imagem = p["Imagem"] || "";
 
-    // Badge de estoque
     let stockBadge = "";
     if (estoque <= 0) {
       stockBadge = `<span class="stock-out"><i class="fas fa-times-circle"></i> Indisponível</span>`;
@@ -1178,51 +653,18 @@ function renderProducts(products) {
       stockBadge = `<span class="stock-available"><i class="fas fa-check-circle"></i> ${estoque} disponíveis</span>`;
     }
 
-    // Botão
     const nomeEscapado = nome.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-    const refEscapada = referencia.replace(/'/g, "\\'").replace(/"/g, "&quot;");
     const imgEscapada = imagem.replace(/"/g, "&quot;");
 
     let botaoHTML = "";
     if (estoque <= 0) {
       botaoHTML = `<button disabled class="product-card-btn-disabled">Indisponível</button>`;
-    } else if (temCores) {
-      botaoHTML = `<button onclick='openSizeSelector("${p["ID"]}", "${nomeEscapado}", "${refEscapada}", ${preco}, "${imgEscapada}")' class="product-card-btn">
-        <i class="fas fa-palette"></i> Escolher Opções
-      </button>`;
     } else {
-      botaoHTML = `<button onclick='openSizeSelector("${p["ID"]}", "${nomeEscapado}", "${refEscapada}", ${preco}, "${imgEscapada}")' class="product-card-btn product-card-btn-direct">
+      botaoHTML = `<button onclick='openSizeSelector("${p["ID"]}", "${nomeEscapado}", ${preco}, "${imgEscapada}")' class="product-card-btn product-card-btn-direct">
         <i class="fas fa-cart-plus"></i> Adicionar
       </button>`;
     }
 
-    // Categoria + Subcategoria mostra os dois
-    // let categoriaHTML = "";
-    // if (categoria || subcategoria) {
-    //   const partes = [];
-    //   if (categoria) partes.push(categoria);
-    //   if (subcategoria) partes.push(subcategoria);
-    //   categoriaHTML = `<p class="product-card-category">${partes.join(" • ")}</p>`;
-    // }
-    // ---------- CATEGORIA (oculta via CSS) ----------
-      let categoriaHTML = "";
-      if (categoria) {
-        categoriaHTML = `<p class="product-card-category">${categoria}</p>`;
-      }
-
-      // ---------- SUBCATEGORIA (visível) ----------
-      let subcategoriaHTML = "";
-      if (subcategoria) {
-        subcategoriaHTML = `<p class="product-card-subcategory">${subcategoria}</p>`;
-      }
-
-    // Referência
-    const refHTML = referencia
-      ? `<p class="product-card-ref">REF: ${referencia}</p>`
-      : "";
-
-    // ⚡ PRIMEIRAS 5 IMAGENS: carregam imediatamente (LCP rápido)
-    // ⚡ RESTO: lazy load com IntersectionObserver
     const isPriority = index < 5;
     const imgSrc = driveImg(imagem, IMG_SIZE_CARD);
 
@@ -1246,9 +688,6 @@ function renderProducts(products) {
       </div>
       <div class="product-card-content">
         <h3 class="product-card-title">${nome}</h3>
-        ${refHTML}
-        ${categoriaHTML}
-        ${subcategoriaHTML}
         <p class="product-card-price">R$ ${preco.toFixed(2).replace(".", ",")}</p>
         <div class="product-card-stock">${stockBadge}</div>
         ${botaoHTML}
@@ -1259,20 +698,16 @@ function renderProducts(products) {
   });
 
   container.appendChild(fragment);
-
-  // ⚡ Ativa lazy loading para as imagens com data-src
   ativarLazyLoading();
-
   setTimeout(atualizarContadorProdutos, 100);
 }
 
 // ============================================
-// LAZY LOADING COM INTERSECTION OBSERVER
+// LAZY LOADING
 // ============================================
 let lazyObserver = null;
 
 function ativarLazyLoading() {
-  // Se o navegador não suporta, carrega tudo de uma vez
   if (!('IntersectionObserver' in window)) {
     document.querySelectorAll('img[data-src]').forEach(img => {
       img.src = img.dataset.src;
@@ -1281,7 +716,6 @@ function ativarLazyLoading() {
     return;
   }
 
-  // Cria o observer só uma vez
   if (!lazyObserver) {
     lazyObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -1296,19 +730,18 @@ function ativarLazyLoading() {
         }
       });
     }, {
-      rootMargin: '300px 0px', // começa a carregar 300px antes de aparecer
+      rootMargin: '300px 0px',
       threshold: 0.01
     });
   }
 
-  // Observa todas as imagens com data-src
   document.querySelectorAll('img[data-src]').forEach(img => {
     lazyObserver.observe(img);
   });
 }
 
 // ============================================
-// MARQUEE DINÂMICO
+// MARQUEE
 // ============================================
 function renderizarMarquee(items) {
   const track = document.getElementById("marquee-track");
@@ -1316,12 +749,12 @@ function renderizarMarquee(items) {
 
   if (!items || items.length === 0) {
     items = [
-      { texto: "Frete Grátis acima de R$ 3.500", icone: "fa-solid fa-crown", cor: "dourado" },
-      { texto: "Enviamos para todo o Brasil", icone: "fa-solid fa-truck-fast", cor: "branco" },
-      { texto: "Joias Folheadas a Ouro e Prata", icone: "fa-solid fa-gem", cor: "dourado" },
+      { texto: "Frete Grátis acima de R$ 100", icone: "fa-solid fa-truck-fast", cor: "dourado" },
+      { texto: "Enviamos para todo o Cariri", icone: "fa-solid fa-location-dot", cor: "branco" },
+      { texto: "Fragrâncias de Luxo", icone: "fa-solid fa-crown", cor: "dourado" },
       { texto: "5% OFF no PIX", icone: "fa-solid fa-percent", cor: "branco" },
-      { texto: "@ivopita", icone: "fa-brands fa-instagram", cor: "dourado" },
-      { texto: "Qualidade e Elegância", icone: "fa-solid fa-star", cor: "branco" },
+      { texto: "@wraromatizantes", icone: "fa-brands fa-instagram", cor: "dourado" },
+      { texto: "O Cheirinho Mais Querido do Brasil", icone: "fa-solid fa-star", cor: "branco" },
     ];
   }
 
@@ -1346,8 +779,8 @@ function aplicarConfig(cfg) {
 
   siteConfig = Object.assign({}, siteConfig, cfg);
 
-  if (cfg.freteGratisValor) FRETE_GRATIS_VALOR = parseFloat(cfg.freteGratisValor) || 3500;
-  if (cfg.taxaFrete) TAXA_FRETE = parseFloat(cfg.taxaFrete) || 15;
+  if (cfg.freteGratisValor) FRETE_GRATIS_VALOR = parseFloat(cfg.freteGratisValor) || 100;
+  if (cfg.taxaFrete) TAXA_FRETE = parseFloat(cfg.taxaFrete) || 5;
 
   const whatsNumero = String(cfg.whatsapp || siteConfig.whatsapp).replace(/\D/g, "");
   const whatsLink = `https://wa.me/${whatsNumero}`;
@@ -1356,47 +789,18 @@ function aplicarConfig(cfg) {
     a.href = whatsLink;
   });
 
-  const instaUser = String(cfg.instagram || siteConfig.instagram).replace("@", "");
+  const instaUser = String(cfg.instagram || siteConfig.instagram || '').replace("@", "");
   document.querySelectorAll('a[href*="instagram.com"]').forEach((a) => {
     a.href = `https://www.instagram.com/${instaUser}`;
   });
-
-  const footerEndereco = document.querySelector("footer .fa-location-dot")?.parentElement;
-  if (footerEndereco && cfg.endereco)
-    footerEndereco.innerHTML = `<i class="fa-solid fa-location-dot text-gold"></i> ${cfg.endereco}`;
-
-  const footerTelefone = document.querySelector("footer .fa-phone")?.parentElement;
-  if (footerTelefone && (cfg.telefone || cfg.whatsappDisplay)) {
-    footerTelefone.innerHTML = `<i class="fa-solid fa-phone text-gold"></i> ${cfg.telefone || cfg.whatsappDisplay}`;
-  }
-
-  const footerEmail = document.querySelector("footer .fa-envelope")?.parentElement;
-  if (footerEmail && cfg.email) {
-    footerEmail.innerHTML = `<i class="fa-solid fa-envelope text-gold"></i> ${cfg.email}`;
-  }
-
-  const sobreParagrafo = document.querySelector("footer p.text-slate-300");
-  if (sobreParagrafo && cfg.sobreTexto) {
-    sobreParagrafo.innerHTML = `<strong>IVO PITA</strong> ${cfg.sobreTexto.replace(/^A\s+IVO PITA\s*/i, "")}`;
-  }
 
   window.__whatsappNumero = whatsNumero;
 }
 window.aplicarConfig = aplicarConfig;
 
 // ============================================
-// ZOOM COM LUPA (2 NÍVEIS)
+// ZOOM
 // ============================================
-let zoomScale = 1;
-let zoomPositionX = 0;
-let zoomPositionY = 0;
-let isDragging = false;
-let dragStartX = 0;
-let dragStartY = 0;
-
-const ZOOM_MIN = 1;
-const ZOOM_MAX = 5;
-
 function abrirZoomDireto(imagem) {
   const modal = document.getElementById("image-zoom-modal");
   const img = document.getElementById("zoom-image");
@@ -1406,15 +810,8 @@ function abrirZoomDireto(imagem) {
   const imagemExibir = driveImg(imagem, IMG_SIZE_ZOOM);
   imagensZoom = [imagemExibir];
   zoomIndex = 0;
-  zoomScale = 1;
-  zoomPositionX = 0;
-  zoomPositionY = 0;
 
   img.src = imagensZoom[zoomIndex];
-  img.style.transform = 'scale(1) translate(0, 0)';
-  img.classList.remove('zoomed');
-  modal.classList.remove('zoomed-active');
-
   img.onerror = function () {
     this.onerror = null;
     this.src = PLACEHOLDER_SVG;
@@ -1425,11 +822,9 @@ function abrirZoomDireto(imagem) {
     const thumb = document.createElement("img");
     thumb.src = src;
     thumb.className = `thumbnail-image ${i === zoomIndex ? "active" : ""}`;
-    thumb.onclick = function (e) {
-      e.stopPropagation();
+    thumb.onclick = function () {
       zoomIndex = i;
       document.getElementById("zoom-image").src = imagensZoom[i];
-      resetZoom();
       document.querySelectorAll("#zoom-thumbnails .thumbnail-image").forEach((t, idx) => {
         t.classList.toggle("active", idx === i);
       });
@@ -1437,199 +832,20 @@ function abrirZoomDireto(imagem) {
     thumbnails.appendChild(thumb);
   });
 
-  configurarEventosZoom();
-
   modal.classList.add("active");
   document.body.style.overflow = "hidden";
 }
-
-function configurarEventosZoom() {
-  const img = document.getElementById("zoom-image");
-  const modal = document.getElementById("image-zoom-modal");
-  if (!img || !modal) return;
-
-  const imgClone = img.cloneNode(true);
-  img.parentNode.replaceChild(imgClone, img);
-  const newImg = document.getElementById("zoom-image");
-
-  // Clique na imagem → alterna zoom
-  newImg.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (zoomScale === 1) {
-      zoomScale = 2.5;
-      aplicarTransformacao();
-      newImg.classList.add('zoomed');
-      modal.classList.add('zoomed-active');
-    } else {
-      resetZoom();
-    }
-  });
-
-  // Duplo clique → resetar
-  newImg.addEventListener('dblclick', (e) => {
-    e.stopPropagation();
-    resetZoom();
-  });
-
-  // Arrastar quando estiver com zoom
-  newImg.addEventListener('mousedown', (e) => {
-    if (zoomScale <= 1) return;
-    e.preventDefault();
-    isDragging = true;
-    dragStartX = e.clientX - zoomPositionX;
-    dragStartY = e.clientY - zoomPositionY;
-  });
-
-  // Roda do mouse → zoom gradual
-  modal.addEventListener('wheel', (e) => {
-    if (!modal.classList.contains('active')) return;
-    e.preventDefault();
-
-    if (e.deltaY < 0) {
-      zoomScale = Math.min(zoomScale + 0.2, ZOOM_MAX);
-    } else {
-      zoomScale = Math.max(zoomScale - 0.2, ZOOM_MIN);
-    }
-
-    aplicarTransformacao();
-
-    if (zoomScale > 1) {
-      newImg.classList.add('zoomed');
-      modal.classList.add('zoomed-active');
-    } else {
-      newImg.classList.remove('zoomed');
-      modal.classList.remove('zoomed-active');
-      zoomPositionX = 0;
-      zoomPositionY = 0;
-    }
-  }, { passive: false });
-
-  // Movimento global (mouse sai da imagem)
-    // Antes de adicionar, remover os antigos
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-
-  // Touch (mobile)
-  let touchStartDistance = 0;
-  let touchStartScale = 1;
-
-  newImg.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      touchStartDistance = Math.sqrt(dx * dx + dy * dy);
-      touchStartScale = zoomScale;
-    } else if (e.touches.length === 1 && zoomScale > 1) {
-      isDragging = true;
-      dragStartX = e.touches[0].clientX - zoomPositionX;
-      dragStartY = e.touches[0].clientY - zoomPositionY;
-    }
-  });
-
-  newImg.addEventListener('touchmove', (e) => {
-    if (e.touches.length === 2) {
-      e.preventDefault();
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      zoomScale = Math.min(Math.max(touchStartScale * (distance / touchStartDistance), ZOOM_MIN), ZOOM_MAX);
-      aplicarTransformacao();
-
-      if (zoomScale > 1) {
-        newImg.classList.add('zoomed');
-        modal.classList.add('zoomed-active');
-      } else {
-        newImg.classList.remove('zoomed');
-        modal.classList.remove('zoomed-active');
-      }
-    } else if (e.touches.length === 1 && isDragging && zoomScale > 1) {
-      e.preventDefault();
-      zoomPositionX = e.touches[0].clientX - dragStartX;
-      zoomPositionY = e.touches[0].clientY - dragStartY;
-      aplicarTransformacao();
-    }
-  }, { passive: false });
-
-  newImg.addEventListener('touchend', () => {
-    isDragging = false;
-  });
-}
-
-function handleMouseMove(e) {
-  if (!isDragging || zoomScale <= 1) return;
-  zoomPositionX = e.clientX - dragStartX;
-  zoomPositionY = e.clientY - dragStartY;
-  aplicarTransformacao();
-}
-
-function handleMouseUp() {
-  isDragging = false;
-}
-
-function aplicarTransformacao() {
-  const img = document.getElementById("zoom-image");
-  if (!img) return;
-
-  const maxOffset = 200 * (zoomScale - 1);
-  zoomPositionX = Math.max(-maxOffset, Math.min(maxOffset, zoomPositionX));
-  zoomPositionY = Math.max(-maxOffset, Math.min(maxOffset, zoomPositionY));
-
-  img.style.transform = `scale(${zoomScale}) translate(${zoomPositionX / zoomScale}px, ${zoomPositionY / zoomScale}px)`;
-
-  const indicator = document.getElementById('zoom-indicator');
-  if (indicator) {
-    indicator.textContent = `🔍 Zoom ${Math.round(zoomScale * 100)}% — Arraste para explorar`;
-  }
-}
-
-function aplicarZoom(delta) {
-  zoomScale = Math.min(Math.max(zoomScale + delta, ZOOM_MIN), ZOOM_MAX);
-  aplicarTransformacao();
-
-  const img = document.getElementById("zoom-image");
-  const modal = document.getElementById("image-zoom-modal");
-
-  if (zoomScale > 1) {
-    img.classList.add('zoomed');
-    modal.classList.add('zoomed-active');
-  } else {
-    img.classList.remove('zoomed');
-    modal.classList.remove('zoomed-active');
-    zoomPositionX = 0;
-    zoomPositionY = 0;
-  }
-}
-window.aplicarZoom = aplicarZoom;
-
-function resetZoom() {
-  zoomScale = 1;
-  zoomPositionX = 0;
-  zoomPositionY = 0;
-
-  const img = document.getElementById("zoom-image");
-  const modal = document.getElementById("image-zoom-modal");
-  if (img) {
-    img.style.transform = 'scale(1) translate(0, 0)';
-    img.classList.remove('zoomed');
-  }
-  if (modal) modal.classList.remove('zoomed-active');
-}
-window.resetZoom = resetZoom;
 
 function fecharZoom() {
   const modal = document.getElementById("image-zoom-modal");
   if (modal) modal.classList.remove("active");
   document.body.style.overflow = "";
-  resetZoom();
 }
 
 function zoomAnterior() {
   if (imagensZoom.length === 0) return;
   zoomIndex = (zoomIndex - 1 + imagensZoom.length) % imagensZoom.length;
   document.getElementById("zoom-image").src = imagensZoom[zoomIndex];
-  resetZoom();
   document.querySelectorAll("#zoom-thumbnails .thumbnail-image").forEach((t, i) => {
     t.classList.toggle("active", i === zoomIndex);
   });
@@ -1639,34 +855,20 @@ function zoomProximo() {
   if (imagensZoom.length === 0) return;
   zoomIndex = (zoomIndex + 1) % imagensZoom.length;
   document.getElementById("zoom-image").src = imagensZoom[zoomIndex];
-  resetZoom();
   document.querySelectorAll("#zoom-thumbnails .thumbnail-image").forEach((t, i) => {
     t.classList.toggle("active", i === zoomIndex);
   });
-}
-
-function abrirZoomModal(imagem) {
-  abrirZoomDireto(imagem);
 }
 
 window.fecharZoom = fecharZoom;
 window.zoomAnterior = zoomAnterior;
 window.zoomProximo = zoomProximo;
 window.abrirZoomDireto = abrirZoomDireto;
-window.abrirZoomModal = abrirZoomModal;
 
 // ============================================
-// OPEN SIZE SELECTOR
+// OPEN SIZE SELECTOR (SÓ QUANTIDADE)
 // ============================================
-window.openSizeSelector = function (id, name, ref, price, img) {
-  // ✅ Captura o botão que disparou (se veio de um evento)
-  let buttonElement = null;
-  if (window.event && window.event.currentTarget) {
-    buttonElement = window.event.currentTarget;
-  } else if (window.event && window.event.target) {
-    buttonElement = window.event.target.closest('button');
-  }
-
+window.openSizeSelector = function (id, name, price, img) {
   const p = allProducts.find((prod) => String(prod["ID"]) === String(id));
   if (!p) {
     showToast("Produto não encontrado!", "error", 2000);
@@ -1694,25 +896,16 @@ window.openSizeSelector = function (id, name, ref, price, img) {
 
   const priceNum = parseFloat(price) || 0;
   tempProduct = {
-    id: p["ID"],
-    name: name,
-    price: priceNum,
-    img: img,
-    ref: ref,
-    estoqueDisponivel: estoqueDisponivel,
-    buttonElement: buttonElement // ✅ Guarda o botão
+    id: p["ID"], name: name, price: priceNum, img: img,
+    estoqueDisponivel: estoqueDisponivel
   };
-
-  quantidadeSelecionada = 0;
-  coresSelecionadas = {};
-  selectedColor = "";
 
   const nameEl = document.getElementById("size-product-name");
   const refEl = document.getElementById("size-product-ref");
   const priceEl = document.getElementById("size-product-price");
 
   if (nameEl) nameEl.innerText = name;
-  if (refEl) refEl.innerText = ref ? `Ref: ${ref}` : "Ref: —";
+  if (refEl) refEl.style.display = "none"; // 🚫 Sem referência
   if (priceEl) {
     priceEl.innerHTML = `
       R$ ${priceNum.toFixed(2).replace(".", ",")} cada
@@ -1729,43 +922,15 @@ window.openSizeSelector = function (id, name, ref, price, img) {
            decoding="async"
            onerror="this.onerror=null; this.src=window.PLACEHOLDER_SVG;">`;
     imgContainer.onclick = function () {
-      abrirZoomModal(p["Imagem"]);
+      abrirZoomDireto(p["Imagem"]);
     };
   }
 
-  coresDisponiveis = p["Cores"]
-    ? p["Cores"].split(",").map((c) => c.trim()).filter((c) => c)
-    : [];
-  const temCores = coresDisponiveis.length > 0;
-
+  // 🚫 Cores removidas — sempre esconde
   const colorStep = document.getElementById("color-step");
-  const sizeStep = document.getElementById("size-step");
   const summaryContainer = document.getElementById("selection-summary");
-  const btnAddCustomQty = document.getElementById("add-custom-qty");
-
-  if (temCores) {
-    if (colorStep) colorStep.classList.remove("hidden");
-    if (sizeStep) sizeStep.classList.remove("hidden");
-    if (summaryContainer) summaryContainer.classList.remove("hidden");
-    const titleEl = document.getElementById("modal-step-title");
-    if (titleEl) titleEl.innerText = "Selecione a Quantidade";
-    if (btnAddCustomQty) {
-      btnAddCustomQty.innerHTML = "Selecionar";
-      btnAddCustomQty.classList.remove("btn-direct-add");
-    }
-    window.renderizarCores();
-  } else {
-    if (colorStep) colorStep.classList.add("hidden");
-    if (sizeStep) sizeStep.classList.remove("hidden");
-    if (summaryContainer) summaryContainer.classList.add("hidden");
-    const titleEl = document.getElementById("modal-step-title");
-    if (titleEl) titleEl.innerText = "Escolha a Quantidade";
-    if (btnAddCustomQty) {
-      btnAddCustomQty.innerHTML = '<i class="fas fa-cart-plus"></i> Adicionar';
-      btnAddCustomQty.classList.add("btn-direct-add");
-    }
-    selectedColor = "Único";
-  }
+  if (colorStep) colorStep.classList.add("hidden");
+  if (summaryContainer) summaryContainer.classList.add("hidden");
 
   const optionsContainer = document.getElementById("options-container");
   if (!optionsContainer) return;
@@ -1784,12 +949,7 @@ window.openSizeSelector = function (id, name, ref, price, img) {
     btn.className = "qty-option-btn";
     btn.innerText = qtd;
     btn.onclick = function () {
-      if (temCores) {
-        quantidadeSelecionada = qtd;
-        window.atualizarUISelecao();
-      } else {
-        window.adicionarSemCor(qtd, buttonElement);
-      }
+      window.adicionarSemCor(qtd);
     };
     optionsContainer.appendChild(btn);
   });
@@ -1833,20 +993,18 @@ window.openSizeSelector = function (id, name, ref, price, img) {
 };
 
 // ============================================
-// BUSCA
+// BUSCA (SÓ POR NOME)
 // ============================================
 function performSearch(termo) {
   const termoNormalizado = normalizar(termo);
   const filtrados = allProducts.filter(
-    (p) =>
-      normalizar(p["Nome do Produto"]).includes(termoNormalizado) ||
-      normalizar(p["referencia"]).includes(termoNormalizado)
+    (p) => normalizar(p["Nome do Produto"]).includes(termoNormalizado)
   );
   renderProducts(filtrados);
 }
 
 // ============================================
-// PDF — MODELO PROFISSIONAL A4
+// PDF (SEM REF)
 // ============================================
 function gerarConteudoPDF() {
   const nomeCliente = document.getElementById("customer-name").value || "Não informado";
@@ -1868,12 +1026,11 @@ function gerarConteudoPDF() {
       <tr>
         <td style="padding: 8px 6px; text-align: center; font-size: 9px; color: #6b7280; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">${String(index + 1).padStart(2, '0')}</td>
         <td style="padding: 8px 6px; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
-          <div style="font-size: 10px; font-weight: 600; color: #182420; line-height: 1.35;">${item.name}</div>
-          ${item.ref ? `<div style="font-size: 9px; color: #182420; margin-top: 3px; font-weight: 600; letter-spacing: 0.02em;">REF. ${item.ref}</div>` : ""}
+          <div style="font-size: 10px; font-weight: 600; color: #1a1a2e; line-height: 1.35;">${item.name}</div>
         </td>
-        <td style="padding: 8px 6px; text-align: center; font-size: 10px; color: #182420; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">${item.quantity}</td>
+        <td style="padding: 8px 6px; text-align: center; font-size: 10px; color: #1a1a2e; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">${item.quantity}</td>
         <td style="padding: 8px 6px; text-align: right; font-size: 10px; color: #6b7280; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">R$ ${precoUnitario.toFixed(2).replace(".", ",")}</td>
-        <td style="padding: 8px 6px; text-align: right; font-size: 10px; font-weight: 700; color: #1f4d38; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">R$ ${item.price.toFixed(2).replace(".", ",")}</td>
+        <td style="padding: 8px 6px; text-align: right; font-size: 10px; font-weight: 700; color: #6d28d9; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">R$ ${item.price.toFixed(2).replace(".", ",")}</td>
       </tr>`;
   });
 
@@ -1883,31 +1040,31 @@ function gerarConteudoPDF() {
     min-height: 297mm;
     padding: 0;
     background: #ffffff;
-    font-family: 'Montserrat', Arial, sans-serif;
+    font-family: 'Plus Jakarta Sans', Arial, sans-serif;
     box-sizing: border-box;
-    color: #182420;
+    color: #1a1a2e;
     display: flex;
     flex-direction: column;
     position: relative;
   ">
-    <div style="height: 4px; background: linear-gradient(90deg, #2f6b4f 0%, #c9a86a 100%);"></div>
+    <div style="height: 4px; background: linear-gradient(90deg, #6d28d9 0%, #f59e0b 100%);"></div>
     <div style="flex: 1; padding: 6mm 2mm 6mm 2mm; display: flex; flex-direction: column;">
       <div style="flex: 1; padding: 0 6mm; display: flex; flex-direction: column;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb; margin-bottom: 18px;">
           <div>
-            <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: #1f4d38; letter-spacing: 0.02em; line-height: 1;">IVO PITA</div>
-            <div style="font-size: 8px; font-weight: 600; color: #9ca3af; letter-spacing: 0.25em; text-transform: uppercase; margin-top: 3px;">Indústria de Joias</div>
+            <div style="font-size: 22px; font-weight: 800; color: #6d28d9; letter-spacing: 0.02em; line-height: 1;">WR AROMATIZANTES</div>
+            <div style="font-size: 8px; font-weight: 600; color: #9ca3af; letter-spacing: 0.25em; text-transform: uppercase; margin-top: 3px;">O cheirinho mais querido do Brasil</div>
           </div>
           <div style="text-align: right;">
             <div style="font-size: 8px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 2px;">Pedido nº</div>
-            <div style="font-size: 12px; font-weight: 700; color: #1f4d38; letter-spacing: 0.03em;">#${anoAtual}-${numeroPedido}</div>
+            <div style="font-size: 12px; font-weight: 700; color: #6d28d9; letter-spacing: 0.03em;">#${anoAtual}-${numeroPedido}</div>
             <div style="font-size: 9px; color: #9ca3af; margin-top: 3px;">${dataAtual} · ${horaAtual}</div>
           </div>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 18px;">
           <div>
             <div style="font-size: 8px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px;">Cliente</div>
-            <div style="font-size: 11px; font-weight: 600; color: #182420; line-height: 1.35;">${nomeCliente}</div>
+            <div style="font-size: 11px; font-weight: 600; color: #1a1a2e; line-height: 1.35;">${nomeCliente}</div>
           </div>
           <div>
             <div style="font-size: 8px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px;">Endereço de entrega</div>
@@ -1917,12 +1074,12 @@ function gerarConteudoPDF() {
         <div style="margin-bottom: 16px;">
           <table style="width: 100%; border-collapse: collapse;">
             <thead>
-              <tr style="border-bottom: 1.5px solid #1f4d38;">
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 40px;">Item</th>
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: left;">Descrição</th>
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 50px;">Qtd</th>
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 85px;">Valor unit.</th>
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 95px;">Total</th>
+              <tr style="border-bottom: 1.5px solid #6d28d9;">
+                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #6d28d9; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 40px;">Item</th>
+                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #6d28d9; text-transform: uppercase; letter-spacing: 0.12em; text-align: left;">Descrição</th>
+                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #6d28d9; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 50px;">Qtd</th>
+                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #6d28d9; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 85px;">Valor unit.</th>
+                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #6d28d9; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 95px;">Total</th>
               </tr>
             </thead>
             <tbody>${itensHTML}</tbody>
@@ -1932,66 +1089,73 @@ function gerarConteudoPDF() {
           <div style="width: 260px; border-top: 1px solid #e5e7eb; padding-top: 10px;">
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 10px; color: #6b7280;">
               <span>Subtotal (${totalItens} ${totalItens === 1 ? 'item' : 'itens'})</span>
-              <span style="color: #182420; font-weight: 600;">R$ ${subtotal.toFixed(2).replace(".", ",")}</span>
+              <span style="color: #1a1a2e; font-weight: 600;">R$ ${subtotal.toFixed(2).replace(".", ",")}</span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 10px; color: #6b7280;">
               <span>Frete</span>
-              <span style="color: ${subtotal >= FRETE_GRATIS_VALOR ? '#16a34a' : '#182420'}; font-weight: 600;">${freteTexto}</span>
+              <span style="color: ${subtotal >= FRETE_GRATIS_VALOR ? '#16a34a' : '#1a1a2e'}; font-weight: 600;">${freteTexto}</span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0 6px; border-top: 1px solid #e5e7eb; margin-top: 6px;">
-              <span style="font-size: 10px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.1em;">Total</span>
-              <span style="font-size: 15px; font-weight: 800; color: #1f4d38; letter-spacing: -0.02em;">R$ ${totalFinal.toFixed(2).replace(".", ",")}</span>
+              <span style="font-size: 10px; font-weight: 700; color: #6d28d9; text-transform: uppercase; letter-spacing: 0.1em;">Total</span>
+              <span style="font-size: 15px; font-weight: 800; color: #6d28d9; letter-spacing: -0.02em;">R$ ${totalFinal.toFixed(2).replace(".", ",")}</span>
             </div>
           </div>
         </div>
         <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 8px; color: #9ca3af;">
           <div>
-            <div style="font-weight: 700; color: #1f4d38; letter-spacing: 0.05em; font-size: 9px; margin-bottom: 3px;">IVO PITA — INDÚSTRIA DE JOIAS</div>
-            <div>${siteConfig.whatsappDisplay || "(88) 99904-9636"} · ${siteConfig.email || "contato@ivopita.com.br"}</div>
+            <div style="font-weight: 700; color: #6d28d9; letter-spacing: 0.05em; font-size: 9px; margin-bottom: 3px;">WR AROMATIZANTES</div>
+            <div>${siteConfig.whatsappDisplay || "(88) 99904-9636"} · ${siteConfig.email || "contato@wraromatizantes.com.br"}</div>
           </div>
           <div style="text-align: right;">
-            <div style="font-weight: 700; color: #1f4d38; letter-spacing: 0.05em; font-size: 9px; margin-bottom: 3px;">${siteConfig.instagramDisplay || "@ivopita"}</div>
+            <div style="font-weight: 700; color: #6d28d9; letter-spacing: 0.05em; font-size: 9px; margin-bottom: 3px;">${siteConfig.instagramDisplay || "@wraromatizantes"}</div>
             <div>${siteConfig.endereco || "Juazeiro do Norte, CE"}</div>
           </div>
         </div>
       </div>
     </div>
-    <div style="height: 3px; background: linear-gradient(90deg, #c9a86a 0%, #2f6b4f 100%);"></div>
+    <div style="height: 3px; background: linear-gradient(90deg, #f59e0b 0%, #6d28d9 100%);"></div>
   </div>`;
 }
 
 async function visualizarPDF() {
-  if (cart.length === 0) {
-    showToast("Sacola vazia!", "error", 2000);
-    return;
-  }
-  if (!document.getElementById("customer-name").value.trim()) {
-    showToast("Informe seu nome!", "error", 2000);
-    return;
-  }
-  if (!document.getElementById("address").value.trim()) {
-    showToast("Informe o endereço!", "error", 2000);
-    return;
-  }
+  if (cart.length === 0) { showToast("Sacola vazia!", "error", 2000); return; }
+  if (!document.getElementById("customer-name").value.trim()) { showToast("Informe seu nome!", "error", 2000); return; }
+  if (!document.getElementById("address").value.trim()) { showToast("Informe o endereço!", "error", 2000); return; }
 
-  // Carrega as libs só agora
   const ok = await carregarLibsPDF();
-  if (!ok) {
-    showToast("Erro ao carregar gerador de PDF", "error");
-    return;
-  }
+  if (!ok) { showToast("Erro ao carregar gerador de PDF", "error"); return; }
 
-  if (document.fonts && document.fonts.ready) {
-    await document.fonts.ready;
-  }
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
   document.getElementById("pdf-preview-content").innerHTML = gerarConteudoPDF();
   document.getElementById("pdf-preview-modal").classList.remove("hidden");
   document.getElementById("pdf-preview-modal").classList.add("flex");
 }
-// ============================================
-// PROCESSAR PEDIDO VIA JSONP
-// ============================================
+
+let pdfLibsLoaded = false;
+
+async function carregarLibsPDF() {
+  if (pdfLibsLoaded) return true;
+  if (window.jspdf && window.html2canvas) { pdfLibsLoaded = true; return true; }
+
+  return new Promise((resolve) => {
+    const loadScript = (src) => {
+      return new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = res;
+        s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    };
+
+    Promise.all([
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'),
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
+    ]).then(() => { pdfLibsLoaded = true; resolve(true); }).catch(() => resolve(false));
+  });
+}
+
 async function processarPedidoPublico(nomeCliente, endereco) {
   const itensParaBaixar = {};
   cart.forEach((item) => {
@@ -2000,12 +1164,10 @@ async function processarPedidoPublico(nomeCliente, endereco) {
     itensParaBaixar[baseId] += item.quantity;
   });
 
-  const itemsCompactos = Object.keys(itensParaBaixar)
-    .map((id) => `${id}:${itensParaBaixar[id]}`)
-    .join(',');
+  const itemsCompactos = Object.keys(itensParaBaixar).map((id) => `${id}:${itensParaBaixar[id]}`).join(',');
 
   const itensTexto = cart
-    .map((i) => `${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} (R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada)`)
+    .map((i) => `${i.quantity}x ${i.name} (R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada)`)
     .join(" | ");
 
   const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
@@ -2024,9 +1186,7 @@ async function processarPedidoPublico(nomeCliente, endereco) {
       resolve(dados);
     };
 
-    window[callbackName] = function (data) {
-      finalizar(data);
-    };
+    window[callbackName] = function (data) { finalizar(data); };
 
     script = document.createElement("script");
     const params =
@@ -2043,58 +1203,16 @@ async function processarPedidoPublico(nomeCliente, endereco) {
 
     script.src = `${ESTOQUE_API_URL}?${params}`;
 
-    script.onerror = function () {
-      finalizar({ success: false, error: "Erro de rede ao enviar pedido" });
-    };
-
-    setTimeout(() => {
-      finalizar({ success: false, error: "Timeout ao processar pedido" });
-    }, 20000);
+    script.onerror = function () { finalizar({ success: false, error: "Erro de rede ao enviar pedido" }); };
+    setTimeout(() => { finalizar({ success: false, error: "Timeout ao processar pedido" }); }, 20000);
 
     document.body.appendChild(script);
   });
 }
 
-
-let pdfLibsLoaded = false;
-
-async function carregarLibsPDF() {
-  if (pdfLibsLoaded) return true;
-  if (window.jspdf && window.html2canvas) {
-    pdfLibsLoaded = true;
-    return true;
-  }
-
-  return new Promise((resolve) => {
-    const loadScript = (src) => {
-      return new Promise((res, rej) => {
-        const s = document.createElement('script');
-        s.src = src;
-        s.onload = res;
-        s.onerror = rej;
-        document.head.appendChild(s);
-      });
-    };
-
-    Promise.all([
-      loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'),
-      loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
-    ]).then(() => {
-      pdfLibsLoaded = true;
-      resolve(true);
-    }).catch(() => resolve(false));
-  });
-}
-// ============================================
-// DOWNLOAD PDF
-// ============================================
 async function downloadPDF() {
   let element = document.getElementById("pdf-content-to-print");
-  if (!element) {
-    await visualizarPDF();
-    setTimeout(() => downloadPDF(), 500);
-    return;
-  }
+  if (!element) { await visualizarPDF(); setTimeout(() => downloadPDF(), 500); return; }
 
   const nomeCliente = document.getElementById("customer-name").value.trim();
   const endereco = document.getElementById("address").value.trim();
@@ -2105,35 +1223,26 @@ async function downloadPDF() {
 
   const btn = document.getElementById("download-pdf-btn");
   const original = btn ? btn.innerHTML : "";
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
-  }
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...'; }
 
   showToast("Gerando PDF...", "info", 2000);
 
   try {
-    // Garante que as libs estão carregadas
     await carregarLibsPDF();
-
-    if (document.fonts && document.fonts.ready) {
-      await document.fonts.ready;
-    }
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
     const canvas = await html2canvas(element, {
-      scale: 2, // reduzido de 3 para 2 (mais rápido e menor arquivo)
+      scale: 2,
       backgroundColor: "#ffffff",
       useCORS: true,
       logging: false,
       windowWidth: element.scrollWidth,
       windowHeight: element.scrollHeight
     });
-    const imgData = canvas.toDataURL("image/jpeg", 0.85); // JPEG em vez de PNG (muito mais leve)
+    const imgData = canvas.toDataURL("image/jpeg", 0.85);
 
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      orientation: "portrait", unit: "mm", format: "a4", compress: true
-    });
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
 
     const pageWidth = 210;
     const pageHeight = 297;
@@ -2160,7 +1269,7 @@ async function downloadPDF() {
     }
 
     const dataArquivo = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-    pdf.save(`Pedido_IvoPita_${dataArquivo}.pdf`);
+    pdf.save(`Pedido_WRAromatizantes_${dataArquivo}.pdf`);
 
     const resultado = await processarPedidoPublico(nomeCliente, endereco);
 
@@ -2188,46 +1297,20 @@ async function downloadPDF() {
     console.error("❌ Erro:", error);
     showToast("❌ Erro: " + error.message + " — O PDF foi baixado, mas o pedido NÃO foi salvo.", "error", 6000);
   } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = original;
-    }
+    if (btn) { btn.disabled = false; btn.innerHTML = original; }
   }
 }
 
-// ============================================
-// FINALIZAR PEDIDO VIA WHATSAPP
-// ============================================
 async function finalizarPedidoDireto() {
   const nomeCliente = document.getElementById("customer-name").value;
   const endereco = document.getElementById("address").value;
 
   if (cart.length === 0) { showToast("Sacola vazia!", "error", 2000); return; }
-  if (!nomeCliente.trim()) {
-    showToast("Informe seu nome!", "error", 2000);
-    document.getElementById("customer-name").focus();
-    return;
-  }
-  if (!endereco.trim()) {
-    showToast("Informe o endereço!", "error", 2000);
-    document.getElementById("address").focus();
-    return;
-  }
-
-  // ✅ NOVO: Valida estoque antes de tentar finalizar
-  showToast("Validando estoque...", "info", 1500);
-  await validarCarrinho();
-
-  if (cart.length === 0) {
-    showToast("Seu carrinho ficou vazio (itens esgotaram).", "error", 3000);
-    return;
-  }
+  if (!nomeCliente.trim()) { showToast("Informe seu nome!", "error", 2000); document.getElementById("customer-name").focus(); return; }
+  if (!endereco.trim()) { showToast("Informe o endereço!", "error", 2000); document.getElementById("address").focus(); return; }
 
   const checkoutBtn = document.getElementById("checkout-btn");
-  if (checkoutBtn) {
-    checkoutBtn.disabled = true;
-    checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
-  }
+  if (checkoutBtn) { checkoutBtn.disabled = true; checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...'; }
 
   try {
     const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
@@ -2236,36 +1319,12 @@ async function finalizarPedidoDireto() {
     const resultado = await processarPedidoPublico(nomeCliente, endereco);
 
     if (!resultado || !resultado.success) {
-      const erro = (resultado && resultado.error) || "Erro ao salvar pedido";
-
-      // ✅ NOVO: Tratamento específico para erro de estoque
-      if (erro.toLowerCase().includes("estoque insuficiente") ||
-          erro.toLowerCase().includes("não encontrado")) {
-        showToast("⚠️ Um item esgotou enquanto você finalizava. Atualizando...", "warning", 5000);
-
-        invalidarEstoqueCache();
-        localStorage.removeItem(CACHE_KEY_DADOS);
-
-        setTimeout(async () => {
-          await carregarTudo();
-          await validarCarrinho();
-          // Reabre o carrinho
-          document.getElementById("cart-modal")?.classList.remove("hidden");
-          document.getElementById("cart-modal")?.classList.add("flex");
-        }, 1500);
-
-        throw new Error("Estoque desatualizado — revise seu carrinho");
-      }
-
-      throw new Error(erro);
+      throw new Error((resultado && resultado.error) || "Erro ao salvar pedido");
     }
 
-    const mensagemWhats = `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n👤 *CLIENTE:* ${nomeCliente.toUpperCase()}\n📍 *ENDEREÇO:* ${endereco}\n\n*📦 ITENS DO PEDIDO:*\n${cart.map((i) => `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`).join("\n")}\n\n*💰 RESUMO DO PEDIDO:*\n─────────────────\nSubtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\nFrete: ${freteExibicao}\n─────────────────\n*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n─────────────────\n\n✨ *Obrigado pela preferência!*`;
+    const mensagemWhats = `🛍️ *NOVO PEDIDO - WR AROMATIZANTES* 🛍️\n\n👤 *CLIENTE:* ${nomeCliente.toUpperCase()}\n📍 *ENDEREÇO:* ${endereco}\n\n*📦 ITENS DO PEDIDO:*\n${cart.map((i) => `✅ ${i.quantity}x ${i.name} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`).join("\n")}\n\n*💰 RESUMO DO PEDIDO:*\n─────────────────\nSubtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\nFrete: ${freteExibicao}\n─────────────────\n*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n─────────────────\n\n✨ *Obrigado pela preferência!*`;
 
     const numeroWhats = window.__whatsappNumero || String(siteConfig.whatsapp).replace(/\D/g, "") || "5588999049636";
-
-    // ✅ NOVO: Guarda timestamp do último pedido (evita duplicidade acidental)
-    localStorage.setItem("ultimo_pedido_ts", Date.now().toString());
 
     cart = [];
     updateCart();
@@ -2284,7 +1343,7 @@ async function finalizarPedidoDireto() {
 
   } catch (error) {
     console.error("❌ Erro:", error);
-    showToast("❌ " + error.message, "error", 5000);
+    showToast("❌ Erro: " + error.message, "error", 4000);
   } finally {
     if (checkoutBtn) {
       checkoutBtn.disabled = false;
@@ -2294,26 +1353,40 @@ async function finalizarPedidoDireto() {
 }
 
 // ============================================
-// FILTRAR POR CATEGORIA
+// FILTRAR POR CATEGORIA (SÓ NOME/CATEGORIA)
 // ============================================
 function filtrarPorCategoria(categoria) {
   if (typeof allProducts === "undefined" || typeof renderProducts === "undefined") return;
 
-  const catFiltro = normalizar(categoria);
-  const palavrasFiltro = catFiltro.split(/\s+/).filter((p) => p.length > 0);
-  const palavrasFiltroNorm = palavrasFiltro.map(normalizarPalavraBusca);
+  // 🎯 Mapa de aliases: o que o usuário clica → o que buscar
+  const aliases = {
+    "1litro": ["refil", "1l", "1 litro", "litro"],
+    "spray 120ml": ["spray 120", "120ml", "120 ml"],
+    "spray 500ml": ["spray 500", "500ml", "500 ml"],
+    "automotivo": ["automotiv", "carro", "moto", "auto"]
+  };
+
+  const catNorm = normalizar(categoria);
+  
+  // Se tem alias, usa os termos alternativos; senão, usa o próprio
+  const termosBusca = aliases[catNorm] || [catNorm];
 
   const filtrados =
     categoria === "todos"
       ? allProducts
       : allProducts.filter((p) => {
           const catProduto = normalizar(p["Categoria"] || "");
-          const subcatProduto = normalizar(p["Subcategoria"] || "");
           const nomeProduto = normalizar(p["Nome do Produto"] || "");
-          const refProduto = normalizar(p["referencia"] || "");
-          const combinado = catProduto + " " + subcatProduto + " " + nomeProduto + " " + refProduto;
-          const combinadoNorm = combinado.split(/\s+/).map(normalizarPalavraBusca).join(" ");
-          return palavrasFiltroNorm.every((palavra) => combinadoNorm.includes(palavra));
+          const combinado = catProduto + " " + nomeProduto;
+
+          // Verifica se ALGUM dos termos de busca está no combinado
+          return termosBusca.some(termo => {
+            const termoNorm = normalizar(termo);
+            const palavrasTermo = termoNorm.split(/\s+/).filter((w) => w.length > 0);
+            const palavrasTermoNorm = palavrasTermo.map(normalizarPalavraBusca);
+            const combinadoNorm = combinado.split(/\s+/).map(normalizarPalavraBusca).join(" ");
+            return palavrasTermoNorm.every((palavra) => combinadoNorm.includes(palavra));
+          });
         });
 
   renderProducts(filtrados);
@@ -2330,8 +1403,8 @@ function filtrarPorCategoria(categoria) {
   const subtitleEl = document.getElementById('products-subtitle');
 
   if (categoria === 'todos') {
-    if (titleEl) titleEl.textContent = 'Nossas Joias';
-    if (subtitleEl) subtitleEl.textContent = 'Explore nossa coleção exclusiva';
+    if (titleEl) titleEl.textContent = 'Nossas Fragrâncias';
+    if (subtitleEl) subtitleEl.textContent = 'O cheirinho mais querido do Brasil';
   } else {
     const nomeFormatado = categoria
       .split(' ')
@@ -2344,35 +1417,17 @@ function filtrarPorCategoria(categoria) {
 window.filtrarPorCategoria = filtrarPorCategoria;
 
 // ============================================
-// TOGGLE SUBMENU MOBILE (compat)
-// ============================================
-function toggleSubmenuMobile(btn) {
-  const parent = btn.closest(".space-y-1");
-  const submenu = parent?.querySelector(".submenu-mobile");
-  const icon = btn.querySelector(".fa-chevron-down");
-  if (submenu) {
-    submenu.classList.toggle("hidden");
-    if (icon) icon.classList.toggle("rotate-180");
-  }
-}
-window.toggleSubmenuMobile = toggleSubmenuMobile;
-
-// ============================================
 // INICIALIZAÇÃO
 // ============================================
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("🚀 Ivo Pita - Inicializando (versão otimizada)...");
+  console.log("🚀 WR Aromatizantes - Inicializando...");
 
-  // ⚡ UMA única chamada que traz TUDO
   carregarTudo();
   updateCart();
 
-  // Event listeners
-  document.getElementById('sidebar-open-btn')?.addEventListener('click', abrirSidebarMobile);
   document.getElementById('sidebar-close-mobile')?.addEventListener('click', fecharSidebarMobile);
   document.getElementById('sidebar-overlay')?.addEventListener('click', fecharSidebarMobile);
 
-  // Sidebar estática (fallback — sempre ativa)
   document.querySelectorAll('.sidebar-item').forEach(btn => {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
@@ -2396,7 +1451,12 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.getElementById('sidebar-search')?.addEventListener('input', function (e) {
-    aplicarBuscaSidebar(e.target.value);
+    const termo = normalizar(e.target.value);
+    document.querySelectorAll('.sidebar-item, .sidebar-item-sub, .sidebar-group-title, .sidebar-subgroup-title').forEach(el => {
+      const texto = normalizar(el.textContent);
+      const match = !termo || texto.includes(termo);
+      el.style.display = match ? '' : 'none';
+    });
   });
 
   document.getElementById('sort-select')?.addEventListener('change', function () {
@@ -2408,23 +1468,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("mobile-search-btn")?.addEventListener("click", () => {
     document.getElementById("search-overlay")?.classList.remove("-translate-y-full");
-    setTimeout(() => {
-      document.getElementById("search-input-mobile")?.focus();
-    }, 300);
+    setTimeout(() => { document.getElementById("search-input-mobile")?.focus(); }, 300);
   });
 
   document.getElementById("mobile-search-close")?.addEventListener("click", () => {
     document.getElementById("search-overlay")?.classList.add("-translate-y-full");
   });
 
- // ✅ MODIFICADO: Valida o carrinho ao abrir
-document.getElementById("cart-btn")?.addEventListener("click", async () => {
-  document.getElementById("cart-modal")?.classList.remove("hidden");
-  document.getElementById("cart-modal")?.classList.add("flex");
-
-  // Valida em background (não trava a abertura do modal)
-  validarCarrinho().catch(err => console.warn("Erro ao validar carrinho:", err));
-});
+  document.getElementById("cart-btn")?.addEventListener("click", () => {
+    document.getElementById("cart-modal")?.classList.remove("hidden");
+    document.getElementById("cart-modal")?.classList.add("flex");
+  });
 
   document.getElementById("close-modal-btn")?.addEventListener("click", () => {
     document.getElementById("cart-modal")?.classList.add("hidden");
@@ -2453,9 +1507,7 @@ document.getElementById("cart-btn")?.addEventListener("click", async () => {
     };
   }
 
-  document.getElementById("mobile-menu-btn")?.addEventListener("click", () => {
-    abrirSidebarMobile();
-  });
+  document.getElementById("mobile-menu-btn")?.addEventListener("click", () => { abrirSidebarMobile(); });
 
   document.getElementById("cart-modal")?.addEventListener("click", (e) => {
     if (e.target === document.getElementById("cart-modal")) {
@@ -2473,28 +1525,16 @@ document.getElementById("cart-btn")?.addEventListener("click", async () => {
   });
 
   document.getElementById("add-custom-qty")?.addEventListener("click", () => {
-  const input = document.getElementById("custom-quantity");
-  const qty = parseInt(input.value);
+    const input = document.getElementById("custom-quantity");
+    const qty = parseInt(input.value);
 
-  if (!qty || qty <= 0) {
-    showToast("Digite uma quantidade válida", "error", 2000);
-    return;
-  }
+    if (!qty || qty <= 0) { showToast("Digite uma quantidade válida", "error", 2000); return; }
 
-  if (coresDisponiveis.length > 0) {
-    quantidadeSelecionada = qty;
-    window.atualizarUISelecao();
-  } else {
-    const btn = document.getElementById("add-custom-qty");
-    window.adicionarSemCor(qty, btn);
-  }
-});
+    window.adicionarSemCor(qty);
+  });
 
   document.getElementById("custom-quantity")?.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      document.getElementById("add-custom-qty").click();
-    }
+    if (e.key === "Enter") { e.preventDefault(); document.getElementById("add-custom-qty").click(); }
   });
 
   document.addEventListener("keydown", function (e) {
@@ -2513,9 +1553,7 @@ document.getElementById("cart-btn")?.addEventListener("click", async () => {
 
   const produtosContainer = document.getElementById('produtos-container');
   if (produtosContainer) {
-    const observer = new MutationObserver(() => {
-      atualizarContadorProdutos();
-    });
+    const observer = new MutationObserver(() => { atualizarContadorProdutos(); });
     observer.observe(produtosContainer, { childList: true, subtree: true });
   }
 
@@ -2529,7 +1567,7 @@ document.getElementById("cart-btn")?.addEventListener("click", async () => {
     performSearch(searchParam);
   }
 
-  console.log("✅ Ivo Pita - Sistema pronto!");
+  console.log("✅ WR Aromatizantes - Sistema pronto!");
 });
 
 // Limpar carrinho antigo
@@ -2538,14 +1576,9 @@ document.getElementById("cart-btn")?.addEventListener("click", async () => {
     const stored = localStorage.getItem("cart");
     if (!stored) return;
     const cartAntigo = JSON.parse(stored);
-    const temFormatoAntigo = cartAntigo.some(
-      (item) => /\d{13,}/.test(item.id) || /Math.random/.test(item.id)
-    );
-    if (temFormatoAntigo) {
-      localStorage.removeItem("cart");
-      console.log("🧹 Carrinho antigo limpo");
-    }
+    const temFormatoAntigo = cartAntigo.some((item) => /\d{13,}/.test(item.id) || /Math.random/.test(item.id));
+    if (temFormatoAntigo) { localStorage.removeItem("cart"); console.log("🧹 Carrinho antigo limpo"); }
   } catch (e) {}
 })();
 
-console.log("✅ Script Ivo Pita (sem banner) carregado!");
+console.log("✅ Script WR Aromatizantes carregado!");
