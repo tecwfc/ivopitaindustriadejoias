@@ -5,17 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Ivo Pita - Login Admin</title>
+    <title>WR Aromatizantes - Login Admin</title>
 
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary: #2f6b4f;
-            --primary-dark: #1f4d38;
-            --gold: #c9a86a;
+            --primary: #6d28d9;
+            --primary-dark: #4c1d95;
+            --gold: #f59e0b;
         }
 
         * { box-sizing: border-box; }
@@ -23,8 +23,8 @@
         body {
             margin: 0;
             min-height: 100vh;
-            background: linear-gradient(135deg, #0f2f22 0%, #1f4d38 50%, #2f6b4f 100%);
-            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f0717 0%, #4c1d95 50%, #6d28d9 100%);
+            font-family: 'Plus Jakarta Sans', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -47,7 +47,7 @@
         }
 
         .login-header {
-            background: linear-gradient(135deg, #2f6b4f, #1f4d38);
+            background: linear-gradient(135deg, #6d28d9, #4c1d95);
             padding: 40px 30px 30px;
             text-align: center;
             color: white;
@@ -75,9 +75,8 @@
         }
 
         .login-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 32px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 800;
             letter-spacing: -0.5px;
             margin: 0;
             line-height: 1;
@@ -89,7 +88,7 @@
             letter-spacing: 0.2em;
             text-transform: uppercase;
             color: var(--gold);
-            margin-top: 4px;
+            margin-top: 6px;
         }
 
         .login-body { padding: 30px; }
@@ -117,7 +116,7 @@
 
         .login-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(47, 107, 79, 0.1);
+            box-shadow: 0 0 0 4px rgba(109, 40, 217, 0.1);
         }
 
         .login-input::placeholder { color: #9ca3af; }
@@ -125,7 +124,7 @@
         .login-btn {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #2f6b4f, #1f4d38);
+            background: linear-gradient(135deg, #6d28d9, #4c1d95);
             color: white;
             border: none;
             border-radius: 12px;
@@ -135,16 +134,17 @@
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 8px 20px rgba(47, 107, 79, 0.3);
+            box-shadow: 0 8px 20px rgba(109, 40, 217, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            font-family: inherit;
         }
 
         .login-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(47, 107, 79, 0.4);
+            box-shadow: 0 12px 30px rgba(109, 40, 217, 0.4);
         }
 
         .login-btn:disabled {
@@ -170,7 +170,7 @@
         .login-footer {
             text-align: center;
             padding: 20px 30px;
-            background: #f9fafb;
+            background: #faf8ff;
             border-top: 1px solid #e5e7eb;
             font-size: 10px;
             color: #9ca3af;
@@ -217,9 +217,9 @@
     <div class="login-card">
         <div class="login-header">
             <div class="login-logo">
-                <img src="assets/papel_ivo_preto.png" alt="Ivo Pita" onerror="this.style.display='none'">
+                <img src="assets/Logo.png" alt="WR Aromatizantes" onerror="this.style.display='none'">
             </div>
-            <h1 class="login-title">IVO PITA</h1>
+            <h1 class="login-title">WR Aromatizantes</h1>
             <p class="login-subtitle">Painel de Controle</p>
         </div>
 
@@ -251,27 +251,27 @@
         </div>
 
         <div class="login-footer">
-            &copy; 2026 Ivo Pita - Acesso Restrito
+            &copy; 2026 WR Aromatizantes - Acesso Restrito
         </div>
     </div>
 
     <script>
-  const ESTOQUE_API_URL = "https://script.google.com/macros/s/AKfycbwtdqgkfRH8mXRFRCfSTYSkmvXWtp0xAmdW6Qd_j8hCCrPl5ynOMeyolSCzvtoON1yyWQ/exec";
+  const ESTOQUE_API_URL = "https://script.google.com/macros/s/AKfycbz54JYWtZOJOVJtPWLxydLrrn6h18NKCdYb90LT_UGHMnzUKc98kVX8QVI-Wvw4rQJj/exec";
 
-  // ✅ Se já estiver logado (com token válido), vai direto para o admin
+  // ✅ Se já estiver logado, vai direto para o admin
   (function() {
     try {
-      var auth = sessionStorage.getItem("ivo_auth");
+      var auth = sessionStorage.getItem("wr_auth");
       if (auth) {
         var user = JSON.parse(auth);
         if (user && user.token && user.loginAt) {
           window.location.href = "admin.html";
         } else {
-          sessionStorage.removeItem("ivo_auth");
+          sessionStorage.removeItem("wr_auth");
         }
       }
     } catch (e) {
-      sessionStorage.removeItem("ivo_auth");
+      sessionStorage.removeItem("wr_auth");
     }
   })();
 
@@ -320,8 +320,7 @@
       console.log('📥 Resposta do login:', data);
 
       if (data && data.success && data.token) {
-        // ✅ Salva o TOKEN (nunca a senha)
-        sessionStorage.setItem("ivo_auth", JSON.stringify({
+        sessionStorage.setItem("wr_auth", JSON.stringify({
           token: data.token,
           email: data.usuario.email,
           nome: data.usuario.nome,
