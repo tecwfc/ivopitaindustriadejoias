@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Ivo Pita - Admin</title>
+    <title>WR Aromatizantes - Admin</title>
 
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,7 +16,7 @@
 
     <script>
         (function () {
-            var auth = sessionStorage.getItem("ivo_auth");
+            var auth = sessionStorage.getItem("wr_auth");
             if (!auth) {
                 window.location.href = "login.html";
                 return;
@@ -24,18 +24,18 @@
             try {
                 var user = JSON.parse(auth);
                 if (!user.token || !user.email || !user.loginAt) {
-                    sessionStorage.removeItem("ivo_auth");
+                    sessionStorage.removeItem("wr_auth");
                     window.location.href = "login.html";
                 }
             } catch (e) {
-                sessionStorage.removeItem("ivo_auth");
+                sessionStorage.removeItem("wr_auth");
                 window.location.href = "login.html";
             }
         })();
 
         window.getToken = function () {
             try {
-                var auth = JSON.parse(sessionStorage.getItem("ivo_auth") || "{}");
+                var auth = JSON.parse(sessionStorage.getItem("wr_auth") || "{}");
                 return auth.token || "";
             } catch (e) { return ""; }
         };
@@ -43,9 +43,9 @@
 
     <style>
         :root {
-            --primary: #2f6b4f;
-            --primary-dark: #1f4d38;
-            --gold: #d4af37;
+            --primary: #6d28d9;
+            --primary-dark: #4c1d95;
+            --gold: #f59e0b;
         }
 
         * { box-sizing: border-box; }
@@ -73,7 +73,7 @@
 
         .dataTables_wrapper .dataTables_filter input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(47, 107, 79, 0.2);
+            box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.2);
         }
 
         table.dataTable thead th {
@@ -178,7 +178,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 10px;
-            background: #f8faf8;
+            background: #f8f8fb;
             padding: 14px;
             border-radius: 12px;
             border: 1px solid #e5e7eb;
@@ -200,7 +200,7 @@
         .filtros-container input:focus,
         .filtros-container select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(47, 107, 79, 0.15);
+            box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.15);
         }
 
         .filtros-actions { display: flex; gap: 6px; align-items: flex-end; }
@@ -217,7 +217,7 @@
         .btn-limpar:hover { background: #d1d5db; }
 
         .vendas-table th {
-            background: #f0f5f1 !important;
+            background: #f8f4fd !important;
             color: var(--primary) !important;
             font-size: 10px !important;
             text-transform: uppercase;
@@ -240,7 +240,7 @@
 
         .campo-categoria input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(47, 107, 79, 0.2);
+            box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.2);
         }
 
         .campo-categoria button {
@@ -257,14 +257,8 @@
 
         .badge-categoria {
             display: inline-block; padding: 2px 8px; border-radius: 10px;
-            font-size: 10px; font-weight: 700; background: #eef4ef;
-            color: var(--primary); border: 1px solid rgba(47, 107, 79, 0.15);
-        }
-
-        .badge-subcategoria {
-            display: inline-block; padding: 2px 8px; border-radius: 10px;
-            font-size: 10px; font-weight: 700; background: #f5eed9;
-            color: #92400e; border: 1px solid rgba(201, 168, 106, 0.3);
+            font-size: 10px; font-weight: 700; background: #f3e8ff;
+            color: var(--primary); border: 1px solid rgba(109, 40, 217, 0.15);
         }
 
         select.form-select {
@@ -289,15 +283,6 @@
         .loading-overlay.active { display: flex; }
 
         @media (max-width: 639px) {
-            #produtosTable th:nth-child(6), #produtosTable td:nth-child(6),
-            #produtosTable th:nth-child(7), #produtosTable td:nth-child(7),
-            #produtosTable th:nth-child(8), #produtosTable td:nth-child(8),
-            #produtosTable th:nth-child(9), #produtosTable td:nth-child(9),
-            #produtosTable th:nth-child(10), #produtosTable td:nth-child(10),
-            #produtosTable th:nth-child(12), #produtosTable td:nth-child(12) {
-                display: none !important;
-            }
-
             #produtosTable th, #produtosTable td {
                 font-size: 9px !important;
                 padding: 3px 2px !important;
@@ -313,7 +298,7 @@
                 gap: 1px !important;
             }
 
-            .badge-categoria, .badge-subcategoria {
+            .badge-categoria {
                 font-size: 8px !important;
                 padding: 1px 5px !important;
             }
@@ -328,12 +313,6 @@
         }
 
         @media (min-width: 640px) and (max-width: 1024px) {
-            #produtosTable th:nth-child(6), #produtosTable td:nth-child(6),
-            #produtosTable th:nth-child(9), #produtosTable td:nth-child(9),
-            #produtosTable th:nth-child(10), #produtosTable td:nth-child(10) {
-                display: none !important;
-            }
-
             #produtosTable th, #produtosTable td {
                 font-size: 10px !important;
                 padding: 4px 3px !important;
@@ -369,13 +348,13 @@
         #modalProduto .modal-content {
             max-width: 900px;
             border-radius: 20px;
-            box-shadow: 0 30px 80px rgba(15, 47, 34, 0.35);
+            box-shadow: 0 30px 80px rgba(76, 29, 149, 0.35);
         }
 
         #modalProduto .modal-content>div:first-child {
-            background: linear-gradient(135deg, #2f6b4f 0%, #1f4d38 100%);
+            background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
             padding: 20px 24px;
-            border-bottom: 3px solid #c9a86a;
+            border-bottom: 3px solid #f59e0b;
         }
 
         #modalProduto .modal-content>div:first-child h3 { font-size: 1.15rem; letter-spacing: -0.01em; }
@@ -390,16 +369,16 @@
 
         #modalProduto .modal-content>div:nth-child(2) {
             padding: 24px 28px;
-            background: #f8faf8;
+            background: #f8f8fb;
         }
 
         .form-section {
             background: #ffffff;
-            border: 1px solid rgba(47, 107, 79, 0.1);
+            border: 1px solid rgba(109, 40, 217, 0.1);
             border-radius: 14px;
             padding: 18px 20px;
             margin-bottom: 18px;
-            box-shadow: 0 1px 4px rgba(15, 47, 34, 0.04);
+            box-shadow: 0 1px 4px rgba(76, 29, 149, 0.04);
             position: relative;
         }
 
@@ -408,7 +387,7 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 3px;
-            background: linear-gradient(90deg, #2f6b4f, #c9a86a);
+            background: linear-gradient(90deg, #6d28d9, #f59e0b);
             border-radius: 14px 14px 0 0;
             opacity: 0;
             transition: opacity 0.3s;
@@ -420,14 +399,14 @@
             display: flex; align-items: center; gap: 8px;
             font-size: 11px; font-weight: 800;
             text-transform: uppercase; letter-spacing: 0.1em;
-            color: #1f4d38; margin-bottom: 14px; padding-bottom: 10px;
-            border-bottom: 1.5px dashed rgba(47, 107, 79, 0.15);
+            color: #4c1d95; margin-bottom: 14px; padding-bottom: 10px;
+            border-bottom: 1.5px dashed rgba(109, 40, 217, 0.15);
         }
 
         .form-section-title i {
             width: 22px; height: 22px;
-            background: linear-gradient(135deg, #eef4ef, #d9e7de);
-            color: #2f6b4f; border-radius: 7px;
+            background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+            color: #6d28d9; border-radius: 7px;
             display: inline-flex; align-items: center; justify-content: center;
             font-size: 10px;
         }
@@ -450,7 +429,7 @@
             align-items: center; gap: 4px;
             font-size: 11px !important;
             font-weight: 700 !important;
-            color: #1f4d38 !important;
+            color: #4c1d95 !important;
             text-transform: uppercase !important;
             letter-spacing: 0.06em !important;
             margin-bottom: 6px !important;
@@ -463,11 +442,11 @@
         #formProduto textarea {
             width: 100%;
             padding: 11px 14px !important;
-            border: 1.5px solid #e5ebe7 !important;
+            border: 1.5px solid #ece9f5 !important;
             border-radius: 10px !important;
             font-size: 13px !important;
-            color: #182420 !important;
-            background: #fafcfb !important;
+            color: #1a1a2e !important;
+            background: #fdfcff !important;
             outline: none !important;
             transition: all 0.2s ease !important;
             font-family: inherit !important;
@@ -476,16 +455,16 @@
         #formProduto input:focus,
         #formProduto select:focus,
         #formProduto textarea:focus {
-            border-color: #2f6b4f !important;
+            border-color: #6d28d9 !important;
             background: #ffffff !important;
-            box-shadow: 0 0 0 4px rgba(47, 107, 79, 0.12) !important;
+            box-shadow: 0 0 0 4px rgba(109, 40, 217, 0.12) !important;
         }
 
-        #formProduto input::placeholder { color: #a8b5b0 !important; font-weight: 400; }
+        #formProduto input::placeholder { color: #b8b0c8 !important; font-weight: 400; }
 
         #formProduto input[readonly] {
-            background: #f0f4f1 !important;
-            color: #6b7a72 !important;
+            background: #f5f1fc !important;
+            color: #7d6a94 !important;
             font-family: 'Courier New', monospace !important;
             font-weight: 700;
             cursor: not-allowed;
@@ -494,14 +473,14 @@
         #formProduto .field-hint,
         #formProduto small {
             font-size: 10px !important;
-            color: #7d8a84 !important;
+            color: #7d7a8a !important;
             margin-top: 4px !important;
             line-height: 1.4 !important;
             display: block !important;
         }
 
         #formProduto .field-hint strong,
-        #formProduto small strong { color: #2f6b4f !important; font-weight: 700; }
+        #formProduto small strong { color: #6d28d9 !important; font-weight: 700; }
 
         #formProduto .campo-categoria {
             display: flex !important;
@@ -513,7 +492,7 @@
         #formProduto .campo-categoria input { flex: 1; min-width: 0; }
 
         #formProduto .campo-categoria button {
-            background: linear-gradient(135deg, #2f6b4f, #1f4d38) !important;
+            background: linear-gradient(135deg, #6d28d9, #4c1d95) !important;
             color: #ffffff !important;
             border: none !important;
             border-radius: 10px !important;
@@ -525,20 +504,20 @@
             white-space: nowrap;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(47, 107, 79, 0.25);
+            box-shadow: 0 4px 10px rgba(109, 40, 217, 0.25);
         }
 
         #formProduto .campo-categoria button:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(47, 107, 79, 0.35);
+            box-shadow: 0 6px 16px rgba(109, 40, 217, 0.35);
         }
 
         #formProduto .checkbox-group {
             display: flex; gap: 20px; flex-wrap: wrap;
             padding: 14px 16px;
-            background: linear-gradient(135deg, #f0f7f2, #e8f3ec);
+            background: linear-gradient(135deg, #faf5ff, #f3e8ff);
             border-radius: 12px;
-            border: 1.5px dashed rgba(47, 107, 79, 0.2);
+            border: 1.5px dashed rgba(109, 40, 217, 0.2);
         }
 
         #formProduto .checkbox-group label {
@@ -549,44 +528,44 @@
             font-size: 13px !important;
             font-weight: 600 !important;
             letter-spacing: 0 !important;
-            color: #182420 !important;
+            color: #1a1a2e !important;
             margin-bottom: 0 !important;
         }
 
         #formProduto .checkbox-group input[type="checkbox"] {
             width: 18px !important;
             height: 18px !important;
-            accent-color: #2f6b4f;
+            accent-color: #6d28d9;
             cursor: pointer;
         }
 
         .image-preview-box {
             margin-top: 10px;
-            border: 2px dashed rgba(47, 107, 79, 0.25);
+            border: 2px dashed rgba(109, 40, 217, 0.25);
             border-radius: 12px;
             padding: 12px;
-            background: #f8faf8;
+            background: #faf8ff;
             display: flex; align-items: center; gap: 14px;
             transition: all 0.2s ease;
             min-height: 80px;
         }
 
-        .image-preview-box.has-image { border-style: solid; border-color: #2f6b4f; background: #ffffff; }
+        .image-preview-box.has-image { border-style: solid; border-color: #6d28d9; background: #ffffff; }
 
         .image-preview-box img {
             width: 70px; height: 70px;
             border-radius: 10px; object-fit: cover;
-            border: 1px solid rgba(47, 107, 79, 0.15);
+            border: 1px solid rgba(109, 40, 217, 0.15);
             flex-shrink: 0; background: #fff;
         }
 
         .image-preview-box .preview-info { flex: 1; min-width: 0; }
-        .image-preview-box .preview-info p { margin: 0; font-size: 11px; color: #7d8a84; line-height: 1.4; }
-        .image-preview-box .preview-info .preview-title { font-size: 12px; font-weight: 700; color: #1f4d38; margin-bottom: 2px; }
+        .image-preview-box .preview-info p { margin: 0; font-size: 11px; color: #7d7a8a; line-height: 1.4; }
+        .image-preview-box .preview-info .preview-title { font-size: 12px; font-weight: 700; color: #4c1d95; margin-bottom: 2px; }
 
         #modalProduto .modal-footer {
             background: #ffffff;
-            border-top: 2px solid rgba(47, 107, 79, 0.08);
+            border-top: 2px solid rgba(109, 40, 217, 0.08);
             padding: 16px 28px;
             display: flex; gap: 10px; justify-content: flex-end;
             position: sticky; bottom: 0; z-index: 5;
@@ -606,37 +585,37 @@
 
         #modalProduto .modal-footer .btn-cancel-produto {
             background: #ffffff;
-            color: #5c6b63;
-            border: 1.5px solid #e5ebe7 !important;
+            color: #6d6d7d;
+            border: 1.5px solid #ece9f5 !important;
         }
 
         #modalProduto .modal-footer .btn-cancel-produto:hover {
-            background: #f0f7f2;
-            color: #2f6b4f;
-            border-color: #2f6b4f !important;
+            background: #faf5ff;
+            color: #6d28d9;
+            border-color: #6d28d9 !important;
         }
 
         #modalProduto .modal-footer .btn-save-produto {
-            background: linear-gradient(135deg, #2f6b4f, #1f4d38);
+            background: linear-gradient(135deg, #6d28d9, #4c1d95);
             color: #ffffff;
-            box-shadow: 0 6px 18px rgba(47, 107, 79, 0.3);
+            box-shadow: 0 6px 18px rgba(109, 40, 217, 0.3);
             min-width: 160px;
         }
 
         #modalProduto .modal-footer .btn-save-produto:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(47, 107, 79, 0.4);
+            box-shadow: 0 10px 24px rgba(109, 40, 217, 0.4);
         }
 
         #formProduto .id-auto {
             display: inline-flex; align-items: center; gap: 5px;
             font-size: 10px; font-weight: 700;
-            color: #2f6b4f;
-            background: linear-gradient(135deg, #eef4ef, #d9e7de);
+            color: #6d28d9;
+            background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
             padding: 6px 12px; border-radius: 8px;
             text-transform: uppercase; letter-spacing: 0.05em;
             white-space: nowrap;
-            border: 1px solid rgba(47, 107, 79, 0.15);
+            border: 1px solid rgba(109, 40, 217, 0.15);
         }
 
         #formProduto label:has(+ input[required])::after,
@@ -666,43 +645,6 @@
             background-color: #c2410c !important;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4);
-        }
-
-        .estrutura-item-card {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 8px;
-        }
-
-        .estrutura-badge-grupo {
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 2px 8px;
-            border-radius: 6px;
-        }
-
-        .estrutura-sub-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 999px;
-            padding: 4px 10px;
-            font-size: 11px;
-            margin: 2px;
-        }
-
-        .estrutura-sub-chip button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 2px;
-            font-size: 10px;
         }
 
         /* AÇÕES RÁPIDAS */
@@ -748,9 +690,6 @@
 
         .btn-acao.btn-ocultar.esta-oculto { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
 
-        .btn-acao.btn-destaque { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
-        .btn-acao.btn-destaque.esta-destaque { background: #fef9c3; color: #ca8a04; border-color: #facc15; }
-
         .btn-acao.btn-esgotar { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
         .btn-acao.btn-esgotar:hover { background: #fecaca; }
 
@@ -762,17 +701,17 @@
             max-width: 440px;
             border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 30px 80px rgba(15, 47, 34, 0.35);
+            box-shadow: 0 30px 80px rgba(76, 29, 149, 0.35);
         }
 
         #modalRepor .modal-header-repor {
-            background: linear-gradient(135deg, #2f6b4f 0%, #1f4d38 100%);
+            background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
             padding: 18px 22px;
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 3px solid #c9a86a;
+            border-bottom: 3px solid #f59e0b;
         }
 
         #modalRepor .modal-header-repor h3 {
@@ -784,36 +723,29 @@
             gap: 8px;
         }
 
-        #modalRepor .modal-body-repor { padding: 22px; background: #f8faf8; }
+        #modalRepor .modal-body-repor { padding: 22px; background: #faf8ff; }
 
         #modalRepor .produto-info {
             background: #ffffff;
             border-radius: 12px;
             padding: 14px 16px;
             margin-bottom: 18px;
-            border: 1px solid rgba(47, 107, 79, 0.12);
+            border: 1px solid rgba(109, 40, 217, 0.12);
         }
 
         #modalRepor .produto-info .nome {
             font-weight: 700;
             font-size: 14px;
-            color: #1f4d38;
+            color: #4c1d95;
             margin-bottom: 4px;
             line-height: 1.3;
-        }
-
-        #modalRepor .produto-info .ref {
-            font-size: 11px;
-            color: #6b7280;
-            font-family: 'Courier New', monospace;
-            font-weight: 700;
         }
 
         #modalRepor .estoque-atual {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #eef4ef;
+            background: #f3e8ff;
             border-radius: 10px;
             padding: 12px 16px;
             margin-bottom: 16px;
@@ -827,7 +759,7 @@
             letter-spacing: 0.05em;
         }
 
-        #modalRepor .estoque-atual .valor { font-size: 20px; font-weight: 800; color: #2f6b4f; }
+        #modalRepor .estoque-atual .valor { font-size: 20px; font-weight: 800; color: #6d28d9; }
 
         #modalRepor .atalhos-qtd {
             display: grid;
@@ -850,9 +782,9 @@
         }
 
         #modalRepor .atalhos-qtd button:hover {
-            background: #2f6b4f;
+            background: #6d28d9;
             color: #fff;
-            border-color: #2f6b4f;
+            border-color: #6d28d9;
             transform: translateY(-1px);
         }
 
@@ -870,11 +802,11 @@
         #modalRepor .campo-qtd-custom input {
             flex: 1;
             padding: 11px 14px;
-            border: 1.5px solid #e5ebe7;
+            border: 1.5px solid #ece9f5;
             border-radius: 10px;
             font-size: 15px;
             font-weight: 700;
-            color: #1f4d38;
+            color: #4c1d95;
             outline: none;
             text-align: center;
             background: #ffffff;
@@ -882,8 +814,8 @@
         }
 
         #modalRepor .campo-qtd-custom input:focus {
-            border-color: #2f6b4f;
-            box-shadow: 0 0 0 4px rgba(47, 107, 79, 0.12);
+            border-color: #6d28d9;
+            box-shadow: 0 0 0 4px rgba(109, 40, 217, 0.12);
         }
 
         #modalRepor .preview-novo {
@@ -902,7 +834,7 @@
 
         #modalRepor .modal-footer-repor {
             background: #ffffff;
-            border-top: 2px solid rgba(47, 107, 79, 0.08);
+            border-top: 2px solid rgba(109, 40, 217, 0.08);
             padding: 14px 22px;
             display: flex;
             gap: 8px;
@@ -924,24 +856,24 @@
 
         #modalRepor .btn-cancelar-repor {
             background: #ffffff;
-            color: #5c6b63;
-            border: 1.5px solid #e5ebe7 !important;
+            color: #6d6d7d;
+            border: 1.5px solid #ece9f5 !important;
         }
         #modalRepor .btn-cancelar-repor:hover {
-            background: #f0f7f2;
-            color: #2f6b4f;
-            border-color: #2f6b4f !important;
+            background: #faf5ff;
+            color: #6d28d9;
+            border-color: #6d28d9 !important;
         }
 
         #modalRepor .btn-confirmar-repor {
-            background: linear-gradient(135deg, #2f6b4f, #1f4d38);
+            background: linear-gradient(135deg, #6d28d9, #4c1d95);
             color: #ffffff;
-            box-shadow: 0 6px 18px rgba(47, 107, 79, 0.3);
+            box-shadow: 0 6px 18px rgba(109, 40, 217, 0.3);
             min-width: 140px;
         }
         #modalRepor .btn-confirmar-repor:hover {
             transform: translateY(-1px);
-            box-shadow: 0 10px 24px rgba(47, 107, 79, 0.4);
+            box-shadow: 0 10px 24px rgba(109, 40, 217, 0.4);
         }
         #modalRepor .btn-confirmar-repor:disabled {
             opacity: 0.6;
@@ -961,8 +893,8 @@
             flex-wrap: wrap;
             gap: 10px;
             padding: 14px 16px;
-            background: #f8faf8;
-            border-bottom: 1px solid #e8ede9;
+            background: #faf8ff;
+            border-bottom: 1px solid #ece9f5;
             align-items: center;
         }
 
@@ -970,7 +902,7 @@
             flex: 1;
             min-width: 180px;
             padding: 8px 14px;
-            border: 1.5px solid #e5ebe7;
+            border: 1.5px solid #ece9f5;
             border-radius: 10px;
             font-size: 13px;
             outline: none;
@@ -979,8 +911,8 @@
         }
 
         .cards-filtros-topo .filtro-input:focus {
-            border-color: #2f6b4f;
-            box-shadow: 0 0 0 3px rgba(47, 107, 79, 0.12);
+            border-color: #6d28d9;
+            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.12);
         }
 
         .cards-filtros-topo select.filtro-input {
@@ -1014,7 +946,7 @@
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 16px;
             padding: 16px;
-            background: #f6f8f5;
+            background: #f8f8fb;
         }
 
         @media (max-width: 900px) {
@@ -1043,18 +975,18 @@
         .produto-card {
             background: #ffffff;
             border-radius: 14px;
-            border: 1.5px solid #e8ede9;
+            border: 1.5px solid #ece9f5;
             overflow: hidden;
             transition: all 0.25s ease;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 2px 8px rgba(15, 47, 34, 0.04);
+            box-shadow: 0 2px 8px rgba(76, 29, 149, 0.04);
         }
 
         .produto-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 10px 28px rgba(15, 47, 34, 0.14);
-            border-color: #c9a86a;
+            box-shadow: 0 10px 28px rgba(76, 29, 149, 0.14);
+            border-color: #f59e0b;
         }
 
         .card-imagem-wrapper {
@@ -1065,7 +997,7 @@
             align-items: center;
             justify-content: center;
             padding: 16px;
-            border-bottom: 1px solid #eef4ef;
+            border-bottom: 1px solid #f3e8ff;
             overflow: hidden;
         }
 
@@ -1077,43 +1009,6 @@
         }
 
         .produto-card:hover .card-imagem { transform: scale(1.06); }
-
-        .card-ref-overlay {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 3px;
-            pointer-events: none;
-        }
-
-        .card-ref-label {
-            font-size: 9px;
-            font-weight: 700;
-            color: #1f4d38;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2px 6px;
-            border-radius: 3px;
-            line-height: 1;
-        }
-
-        .card-ref-valor {
-            font-size: 13px;
-            font-weight: 800;
-            color: #ffffff;
-            background: #16a34a;
-            padding: 3px 10px;
-            border-radius: 4px;
-            letter-spacing: 0.05em;
-            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.35);
-            line-height: 1.1;
-            white-space: nowrap;
-        }
 
         .card-badges-status {
             position: absolute;
@@ -1135,12 +1030,6 @@
             background: rgba(255, 255, 255, 0.95);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(4px);
-        }
-
-        .card-badge-status.destaque {
-            background: linear-gradient(135deg, #fef9c3, #fde047);
-            color: #ca8a04;
-            border: 1px solid #facc15;
         }
 
         .card-badge-status.oculto {
@@ -1171,34 +1060,10 @@
             min-height: 34px;
         }
 
-        .card-ref-badge {
-            display: inline-block;
-            background: #f3f4f6;
-            color: #4b5563;
-            padding: 3px 9px;
-            border-radius: 5px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.03em;
-            border: 1px solid #e5e7eb;
-            width: fit-content;
-            line-height: 1.2;
-        }
-
-        .card-subtitulo {
-            font-size: 11px;
-            color: #9ca3af;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
         .card-preco {
             font-size: 22px;
             font-weight: 800;
-            color: #1f4d38;
+            color: #4c1d95;
             letter-spacing: -0.02em;
             line-height: 1.1;
             margin-top: 4px;
@@ -1244,10 +1109,10 @@
 
         .card-acoes {
             padding: 10px 14px;
-            background: #fafcfb;
-            border-top: 1px solid #eef4ef;
+            background: #faf8ff;
+            border-top: 1px solid #f3e8ff;
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 4px;
         }
 
@@ -1262,11 +1127,8 @@
             .card-body { padding: 9px 10px; gap: 5px; }
             .card-nome { font-size: 11px; min-height: 28px; }
             .card-categoria-titulo { font-size: 10px; }
-            .card-subtitulo { font-size: 9px; }
             .card-preco { font-size: 16px; }
             .card-estoque-badge { font-size: 9px; padding: 3px 8px; }
-            .card-ref-valor { font-size: 10px; padding: 2px 7px; }
-            .card-ref-label { font-size: 7px; padding: 1px 4px; }
             .card-badge-status { width: 22px; height: 22px; font-size: 9px; }
             .card-acoes { grid-template-columns: repeat(3, 1fr); padding: 8px; gap: 3px; }
             .card-acoes .btn-acao { height: 28px; font-size: 10px; }
@@ -1286,10 +1148,10 @@
     <nav class="bg-white shadow-md px-4 py-3 flex justify-between items-center sticky top-0 z-50 border-b">
         <div class="flex items-center gap-2 min-w-0">
             <div class="bg-primary text-white p-2 rounded-lg shadow-lg flex-shrink-0">
-                <i class="fas fa-gem text-lg"></i>
+                <i class="fas fa-spray-can text-lg"></i>
             </div>
             <div class="min-w-0">
-                <h1 class="text-lg font-bold text-gray-800 truncate">Ivo Pita <span
+                <h1 class="text-lg font-bold text-gray-800 truncate">WR Aromatizantes <span
                         class="text-primary text-xs font-normal">| Admin</span></h1>
                 <span class="text-[10px] text-gray-400 hidden sm:inline">Painel de Controle</span>
             </div>
@@ -1345,10 +1207,10 @@
             <div class="card-dashboard">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="label">Em Destaque</p>
-                        <p class="value text-gold" id="total-destaques">0</p>
+                        <p class="label">Sem Estoque</p>
+                        <p class="value text-red-500" id="total-sem-estoque">0</p>
                     </div>
-                    <div class="icon bg-yellow-50 text-yellow-600"><i class="fas fa-star"></i></div>
+                    <div class="icon bg-red-50 text-red-500"><i class="fas fa-times-circle"></i></div>
                 </div>
             </div>
             <div class="card-dashboard col-span-2 sm:col-span-1">
@@ -1369,60 +1231,46 @@
                 <span class="hidden xs:inline">Gerenciar</span>
             </div>
             <div class="btn-group">
-                <button onclick="abrirModal('modalProduto')" style="background-color: #2f6b4f; color: #ffffff;"
-                    onmouseover="this.style.backgroundColor='#1f4d38'" onmouseout="this.style.backgroundColor='#2f6b4f'"
+                <button onclick="abrirModal('modalProduto')" style="background-color: #6d28d9; color: #ffffff;"
+                    onmouseover="this.style.backgroundColor='#4c1d95'" onmouseout="this.style.backgroundColor='#6d28d9'"
                     class="px-4 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
                     title="Adicionar Novo Produto">
-                    <i class="fas fa-plus-circle" style="font-size: 14px;"></i>
+                    <i class="fas fa-plus-circle" style="font-size: 14px;"></i> <span class="hidden sm:inline">Produto</span>
                 </button>
 
                 <button onclick="abrirModal('modalUsuarios')" style="background-color: #4f46e5; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#4338ca'" onmouseout="this.style.backgroundColor='#4f46e5'"
                     class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
                     title="Gerenciar Usuários">
-                    <i class="fas fa-users" style="font-size: 14px;"></i>
+                    <i class="fas fa-users" style="font-size: 14px;"></i> <span class="hidden sm:inline">Usuários</span>
                 </button>
 
                 <button onclick="abrirModal('modalConfig')" style="background-color: #374151; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#1f2937'" onmouseout="this.style.backgroundColor='#374151'"
                     class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
                     title="Configurações do Site">
-                    <i class="fas fa-sliders-h" style="font-size: 14px;"></i>
+                    <i class="fas fa-sliders-h" style="font-size: 14px;"></i> <span class="hidden sm:inline">Config</span>
                 </button>
 
                 <button onclick="abrirModal('modalMarquee')" style="background-color: #eab308; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#ca8a04'" onmouseout="this.style.backgroundColor='#eab308'"
                     class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
                     title="Frases do Marquee">
-                    <i class="fas fa-bullhorn" style="font-size: 14px;"></i>
-                </button>
-
-                <button onclick="abrirModal('modalBanner')" style="background-color: #9333ea; color: #ffffff;"
-                    onmouseover="this.style.backgroundColor='#7e22ce'" onmouseout="this.style.backgroundColor='#9333ea'"
-                    class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
-                    title="Gerenciar Banners">
-                    <i class="fas fa-image" style="font-size: 14px;"></i>
+                    <i class="fas fa-bullhorn" style="font-size: 14px;"></i> <span class="hidden sm:inline">Marquee</span>
                 </button>
 
                 <button onclick="abrirModal('modalVendas')" style="background-color: #2563eb; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#1d4ed8'" onmouseout="this.style.backgroundColor='#2563eb'"
                     class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
                     title="Relatório de Vendas">
-                    <i class="fas fa-chart-line" style="font-size: 14px;"></i>
+                    <i class="fas fa-chart-line" style="font-size: 14px;"></i> <span class="hidden sm:inline">Vendas</span>
                 </button>
 
                 <button onclick="abrirModal('modalManutencao')" style="background-color: #ea580c; color: #ffffff;"
                     onmouseover="this.style.backgroundColor='#c2410c'" onmouseout="this.style.backgroundColor='#ea580c'"
                     class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
                     title="Modo Manutenção">
-                    <i class="fas fa-tools" style="font-size: 14px;"></i>
-                </button>
-
-                <button onclick="abrirModal('modalEstrutura')" style="background-color: #059669; color: #ffffff;"
-                    onmouseover="this.style.backgroundColor='#047857'" onmouseout="this.style.backgroundColor='#059669'"
-                    class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
-                    title="Estrutura de Categorias">
-                    <i class="fas fa-sitemap" style="font-size: 14px;"></i>
+                    <i class="fas fa-tools" style="font-size: 14px;"></i> <span class="hidden sm:inline">Manutenção</span>
                 </button>
             </div>
         </div>
@@ -1455,9 +1303,6 @@
                         <span id="texto-toggle-view">Cards</span>
                     </button>
 
-                    <input type="text" id="filtro-subcategoria" placeholder="Filtrar por subcategoria..."
-                        class="border rounded-lg px-3 py-1 text-xs outline-none focus:ring-2 focus:ring-primary"
-                        style="max-width: 200px;">
                     <button onclick="togglePainelColunas()"
                         class="bg-primary text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary-dark transition flex items-center gap-1">
                         <i class="fas fa-columns"></i> Colunas
@@ -1493,7 +1338,7 @@
             <div id="produtos-cards-view" class="hidden">
                 <div class="cards-filtros-topo">
                     <input type="text" id="cards-filtro-busca" class="filtro-input" 
-                        placeholder="🔍 Buscar por nome ou referência...">
+                        placeholder="🔍 Buscar por nome...">
                     <select id="cards-filtro-categoria" class="filtro-input">
                         <option value="">Todas as categorias</option>
                     </select>
@@ -1520,16 +1365,12 @@
                         <tr>
                             <th class="text-center" style="min-width: 40px;">ID</th>
                             <th class="text-center" style="min-width: 50px;">Img</th>
-                            <th style="min-width: 120px;">Nome</th>
-                            <th style="min-width: 70px;">Referência</th>
-                            <th class="text-right" style="min-width: 60px;">Preço</th>
-                            <th style="min-width: 80px;">Quantidade</th>
+                            <th style="min-width: 180px;">Nome</th>
+                            <th class="text-right" style="min-width: 70px;">Preço</th>
+                            <th style="min-width: 80px;">Qtd</th>
                             <th style="min-width: 130px;">Categoria</th>
-                            <th style="min-width: 110px;">Subcategoria</th>
-                            <th style="min-width: 60px;">Tamanho</th>
                             <th style="min-width: 60px;">Imagem</th>
                             <th class="text-center" style="min-width: 60px;">Disponível</th>
-                            <th class="text-center" style="min-width: 60px;">Destaque</th>
                             <th class="text-center" style="min-width: 50px;">📦 Estoque</th>
                             <th class="text-center" style="min-width: 50px;">Vendidos</th>
                             <th class="text-center" style="min-width: 70px;">Saldo</th>
@@ -1543,14 +1384,14 @@
 
     </main>
 
-        <!-- ========================================== -->
-    <!-- MODAL PRODUTO -->
+    <!-- ========================================== -->
+    <!-- MODAL PRODUTO (SIMPLIFICADO) -->
     <!-- ========================================== -->
     <div id="modalProduto" class="modal-overlay">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center text-white sticky top-0 z-10">
                 <h3 class="font-bold flex items-center gap-2">
-                    <i class="fas fa-box"></i>
+                    <i class="fas fa-spray-can"></i>
                     <span id="modalProdutoTitle">Adicionar Produto</span>
                 </h3>
                 <button onclick="fecharModal('modalProduto')" class="text-white/80 hover:text-white text-xl transition">
@@ -1575,14 +1416,9 @@
                                     <span class="id-auto"><i class="fas fa-robot"></i> Auto</span>
                                 </div>
                             </div>
-                            <div>
-                                <label>Referência *</label>
-                                <input type="text" id="referencia" required placeholder="Ex: AG 001">
-                                <small class="field-hint">🔑 <strong>Único</strong> — usado para identificar o produto</small>
-                            </div>
                             <div class="col-span-2">
                                 <label>Nome do Produto *</label>
-                                <input type="text" id="Nome do Produto" required placeholder="Ex: Argola Dourada Lisa Pequena">
+                                <input type="text" id="Nome do Produto" required placeholder="Ex: Lavanda Francesa 120ml">
                             </div>
                         </div>
                     </div>
@@ -1590,15 +1426,15 @@
                     <div class="form-section">
                         <div class="form-section-title">
                             <i class="fas fa-tags"></i>
-                            Categorização
+                            Categoria
                         </div>
                         <div class="grid">
-                            <div>
+                            <div class="col-span-2">
                                 <label>Categoria *</label>
                                 <select id="Categoria" required class="form-select">
                                     <option value="">Selecione uma categoria</option>
                                 </select>
-                                <small class="field-hint">Copie <strong>exatamente</strong> como aparece no menu do site</small>
+                                <small class="field-hint">Escolha a linha do produto</small>
                                 <div class="campo-categoria">
                                     <input type="text" id="novaCategoria" placeholder="Nova categoria...">
                                     <button type="button" id="btnNovaCategoria">
@@ -1606,52 +1442,18 @@
                                     </button>
                                 </div>
                             </div>
-                            <div>
-                                <label>Subcategoria</label>
-                                <select id="Subcategoria" class="form-select">
-                                    <option value="">Selecione (opcional)</option>
-                                    <option value="Normal">Normal</option>
-                                    <option value="Zircônia">Zircônia</option>
-                                    <option value="Pequena">Pequena</option>
-                                    <option value="Média">Média</option>
-                                    <option value="Grande">Grande</option>
-                                    <option value="Click">Click</option>
-                                    <option value="Brincos de moda">Brincos de moda</option>
-                                    <option value="Feminina">Feminina</option>
-                                    <option value="Masculina">Masculina</option>
-                                    <option value="Infantil">Infantil</option>
-                                    <option value="Diversos">Diversos</option>
-                                    <option value="Feminino">Feminino</option>
-                                    <option value="Masculino">Masculino</option>
-                                    <option value="Adulto">Adulto</option>
-                                    <option value="Infantis">Infantis</option>
-                                    <option value="Brinco + Colar">Brinco + Colar</option>
-                                    <option value="Completo">Completo</option>
-                                </select>
-                                <small class="field-hint">Escolha para <strong>filtros do site</strong></small>
-                            </div>
                         </div>
                     </div>
 
                     <div class="form-section">
                         <div class="form-section-title">
-                            <i class="fas fa-palette"></i>
-                            Variações
+                            <i class="fas fa-list-ol"></i>
+                            Atalhos de Quantidade
                         </div>
                         <div class="grid">
-                            <div>
-                                <label>Cores</label>
-                                <input type="text" id="Cores" placeholder="Ex: cristal,vermelho,azul">
-                                <small class="field-hint">Separadas por <strong>vírgula, sem espaço</strong></small>
-                            </div>
-                            <div>
-                                <label>Tamanhos</label>
-                                <input type="text" id="Tamanho" placeholder="Ex: 12,14,16,18">
-                                <small class="field-hint">Separados por <strong>vírgula, sem espaço</strong></small>
-                            </div>
                             <div class="col-span-2">
                                 <label>Quantidades Sugeridas</label>
-                                <input type="text" id="Quantidade" placeholder="Ex: 5,10,20,30,40">
+                                <input type="text" id="Quantidade" placeholder="Ex: 1,2,3,5,10">
                                 <small class="field-hint">Aparecem como <strong>botões de atalho</strong> ao adicionar ao carrinho</small>
                             </div>
                         </div>
@@ -1665,7 +1467,7 @@
                         <div class="grid">
                             <div>
                                 <label>Preço (R$) *</label>
-                                <input type="number" step="0.01" id="Preço" required placeholder="Ex: 4.88">
+                                <input type="number" step="0.01" id="Preço" required placeholder="Ex: 29.90">
                                 <small class="field-hint">Use <strong>ponto</strong> em vez de vírgula</small>
                             </div>
                             <div>
@@ -1711,10 +1513,6 @@
                             <label>
                                 <input type="checkbox" id="Disponível" checked>
                                 <span>✅ Disponível no site</span>
-                            </label>
-                            <label>
-                                <input type="checkbox" id="Destaque">
-                                <span>⭐ Mostrar em Destaques</span>
                             </label>
                         </div>
                     </div>
@@ -1766,7 +1564,7 @@
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Email *</label>
                         <input type="email" id="usuarioEmail" required
                             class="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
-                            placeholder="usuario@ivopita.com">
+                            placeholder="usuario@wraromatizantes.com">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Senha *</label>
@@ -1859,13 +1657,13 @@
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Usuário (sem @) *</label>
                         <input type="text" id="cfgInstagram" required
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
-                            placeholder="ivo_pita">
+                            placeholder="wraromatizantes">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Exibição *</label>
                         <input type="text" id="cfgInstagramDisplay" required
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
-                            placeholder="@ivopita">
+                            placeholder="@wraromatizantes">
                     </div>
 
                     <div class="col-span-full mt-2">
@@ -1877,13 +1675,13 @@
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Telefone (exibição)</label>
                         <input type="text" id="cfgTelefone"
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
-                            placeholder="(88) 99909-9999">
+                            placeholder="(88) 99904-9636">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">E-mail</label>
                         <input type="email" id="cfgEmail"
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
-                            placeholder="contato@ivopita.com.br">
+                            placeholder="contato@wraromatizantes.com.br">
                     </div>
                     <div class="col-span-full">
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Endereço</label>
@@ -1895,7 +1693,7 @@
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Texto "Sobre" (footer)</label>
                         <textarea id="cfgSobreTexto" rows="3"
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
-                            placeholder="A IVO PITA nasceu para celebrar..."></textarea>
+                            placeholder="A WR Aromatizantes nasceu para levar o cheirinho mais querido do Brasil..."></textarea>
                         <small class="field-hint">Aparece no rodapé do site</small>
                     </div>
 
@@ -1908,14 +1706,14 @@
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Frete Grátis acima de (R$) *</label>
                         <input type="number" step="0.01" id="cfgFreteGratis" required
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
-                            placeholder="3500">
-                        <small class="field-hint">Ex: <code>3500</code> = R$ 3.500,00</small>
+                            placeholder="100">
+                        <small class="field-hint">Ex: <code>100</code> = R$ 100,00</small>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Taxa de Frete (R$) *</label>
                         <input type="number" step="0.01" id="cfgTaxaFrete" required
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-sm"
-                            placeholder="15">
+                            placeholder="5">
                         <small class="field-hint">Cobrado quando não atinge o frete grátis</small>
                     </div>
 
@@ -1971,7 +1769,7 @@
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Texto *</label>
                         <input type="text" id="marqueeTexto" required
                             class="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-yellow-500"
-                            placeholder="Ex: Frete Grátis acima de R$ 3.500">
+                            placeholder="Ex: Frete Grátis acima de R$ 100">
                     </div>
                     <div class="col-span-2">
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Ícone</label>
@@ -1999,76 +1797,6 @@
                         <button type="submit" id="btnSalvarMarquee"
                             class="px-4 py-2 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600 text-sm shadow">
                             <i class="fas fa-plus mr-2"></i><span id="btnSalvarMarqueeText">Adicionar</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- MODAL BANNER -->
-    <!-- ========================================== -->
-    <div id="modalBanner" class="modal-overlay">
-        <div class="modal-content modal-content-banner" onclick="event.stopPropagation()">
-            <div class="bg-purple-600 px-4 py-3 flex justify-between items-center text-white sticky top-0 z-10">
-                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-image"></i>Banners</h3>
-                <button onclick="fecharModal('modalBanner')" class="text-white/80 hover:text-white text-xl transition">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="p-4 overflow-y-auto" style="max-height: calc(95vh - 60px);">
-                <div id="banners-list" class="space-y-3 mb-6"></div>
-                <hr class="my-4">
-                <h4 class="font-bold text-gray-700 mb-3 text-sm">Adicionar Banner</h4>
-                <form id="formBanner" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="col-span-2">
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">URL da Imagem</label>
-                        <input type="text" id="bannerImagem" required
-                            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-600 outline-none text-sm"
-                            placeholder="https://drive.google.com/file/d/...">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Título</label>
-                        <input type="text" id="bannerTitulo" required
-                            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-600 outline-none text-sm"
-                            placeholder="Ex: Coleção Primavera">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Texto Botão</label>
-                        <input type="text" id="bannerBtnText"
-                            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-600 outline-none text-sm"
-                            placeholder="Ex: Ver Coleção">
-                    </div>
-                    <div class="col-span-2">
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Link do Botão</label>
-                        <input type="text" id="bannerBtnLink"
-                            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-600 outline-none text-sm"
-                            placeholder="Ex: #produtos ou https://...">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Posição do Texto</label>
-                        <select id="bannerPosicao"
-                            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-600 outline-none text-sm">
-                            <option value="centro">🎯 Centro (padrão)</option>
-                            <option value="esquerda">⬅️ Esquerda</option>
-                            <option value="direita">➡️ Direita</option>
-                        </select>
-                        <small class="field-hint">Onde o texto aparece sobre a imagem</small>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" id="bannerAtivo" checked
-                            class="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-600">
-                        <label class="text-sm font-medium text-gray-700">Ativo</label>
-                    </div>
-                    <div class="col-span-full flex flex-wrap gap-2 justify-end border-t pt-3">
-                        <button type="button" onclick="fecharModal('modalBanner')"
-                            class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition font-medium text-sm">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                            class="px-4 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 shadow transition text-sm">
-                            <i class="fas fa-plus mr-2"></i>Adicionar
                         </button>
                     </div>
                 </form>
@@ -2226,7 +1954,7 @@
                         </label>
                         <textarea id="manutencaoMensagem" rows="3"
                             class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none text-sm resize-none"
-                            placeholder="Nosso site está passando por uma atualização especial...">Nosso site está passando por uma atualização especial para trazer ainda mais elegância e qualidade para você. Voltamos em breve!</textarea>
+                            placeholder="Nosso site está passando por uma atualização especial...">Nosso site está passando por uma atualização especial para trazer ainda mais qualidade e aroma para você. Voltamos em breve!</textarea>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-2">
@@ -2258,89 +1986,6 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- MODAL ESTRUTURA -->
-    <!-- ========================================== -->
-    <div id="modalEstrutura" class="modal-overlay">
-        <div style="background: #ffffff; border-radius: 16px; width: 100%; max-width: 1000px; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); margin: auto;"
-            onclick="event.stopPropagation()">
-            <div style="background: linear-gradient(135deg, #059669, #047857); color: #ffffff; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
-                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-sitemap"></i>
-                    Estrutura de Categorias
-                </h3>
-                <button type="button" onclick="fecharModal('modalEstrutura')" style="background: rgba(255,255,255,0.15); border: none; color: #ffffff; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;"
-                    onmouseover="this.style.background='rgba(255,255,255,0.3)'"
-                    onmouseout="this.style.background='rgba(255,255,255,0.15)'"
-                    title="Fechar">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div style="flex: 1; overflow-y: auto; padding: 20px; background: #ffffff;">
-                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; font-size: 12px; color: #065f46;">
-                    <i class="fas fa-info-circle" style="margin-right: 4px;"></i>
-                    Adicione, edite ou remova categorias e subcategorias. As alterações aparecem <strong>instantaneamente</strong> no menu do site.
-                </div>
-
-                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
-                    <button type="button" onclick="filtrarEstrutura('todos')" id="btn-filtro-todos"
-                        style="padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; background: #059669; color: #fff;">
-                        Todas
-                    </button>
-                    <button type="button" onclick="filtrarEstrutura('Folheado Dourado')" id="btn-filtro-dourado"
-                        style="padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; background: #f3f4f6; color: #374151;">
-                        Folheado Dourado
-                    </button>
-                    <button type="button" onclick="filtrarEstrutura('Folheado Prata')" id="btn-filtro-prata"
-                        style="padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; background: #f3f4f6; color: #374151;">
-                        Folheado Prata
-                    </button>
-                </div>
-
-                <div id="estrutura-list" style="margin-bottom: 20px;"></div>
-
-                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 16px 0;">
-
-                <h4 id="estruturaFormTitle" style="margin: 0 0 12px 0; font-weight: 700; font-size: 14px; color: #374151;">
-                    ➕ Adicionar Item
-                </h4>
-                <input type="hidden" id="estruturaEditIndex" value="-1">
-
-                <form id="formEstrutura" style="display: grid; grid-template-columns: 1fr; gap: 12px;">
-                    <div>
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">Grupo *</label>
-                        <select id="estruturaGrupo" required style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; background: #fff;">
-                            <option value="Folheado Dourado">Folheado Dourado</option>
-                            <option value="Folheado Prata">Folheado Prata</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">Categoria *</label>
-                        <input type="text" id="estruturaCategoria" required placeholder="Ex: Brinco de Moda Dourado"
-                            style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; background: #fff;">
-                    </div>
-                    <div>
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">Subcategoria</label>
-                        <input type="text" id="estruturaSubcategoria" placeholder="Ex: Zircônia"
-                            style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; background: #fff;">
-                    </div>
-                    <div style="display: flex; justify-content: flex-end; gap: 10px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
-                        <button type="button" onclick="cancelarEdicaoEstrutura()"
-                            style="padding: 10px 20px; background: #ffffff; color: #4b5563; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
-                            Cancelar
-                        </button>
-                        <button type="submit" id="btnSalvarEstrutura"
-                            style="padding: 10px 24px; background: linear-gradient(135deg, #059669, #047857); color: #ffffff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                            <i class="fas fa-plus"></i>
-                            <span id="btnSalvarEstruturaText">Adicionar</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
     <!-- MODAL REPOR ESTOQUE -->
     <!-- ========================================== -->
     <div id="modalRepor" class="modal-overlay">
@@ -2356,7 +2001,6 @@
             <div class="modal-body-repor">
                 <div class="produto-info">
                     <div class="nome" id="reporProdutoNome">—</div>
-                    <div class="ref" id="reporProdutoRef">—</div>
                 </div>
 
                 <div class="estoque-atual">
@@ -2395,62 +2039,24 @@
             </div>
         </div>
     </div>
-    
+
     <!-- ========================================== -->
     <!-- SCRIPT PRINCIPAL -->
     <!-- ========================================== -->
     <script>
         // CONFIGURAÇÕES
-        const ESTOQUE_API_URL = "https://script.google.com/macros/s/AKfycbwtdqgkfRH8mXRFRCfSTYSkmvXWtp0xAmdW6Qd_j8hCCrPl5ynOMeyolSCzvtoON1yyWQ/exec";
+        const ESTOQUE_API_URL = "https://script.google.com/macros/s/AKfycbz54JYWtZOJOVJtPWLxydLrrn6h18NKCdYb90LT_UGHMnzUKc98kVX8QVI-Wvw4rQJj/exec";
 
         const SVG_PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f3f4f6"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="10" text-anchor="middle" dy=".3em" fill="%239ca3af"%3ESem Imagem%3C/text%3E%3C/svg%3E`;
 
         const CATEGORIAS_OFICIAIS = [
-            "Brinco de Pressão Dourado", "Brinco de Moda Dourado",
-            "Argolas Dourada", "Correntes Feminina Dourado", "Correntes Masculina Dourado",
-            "Pulseiras Feminina Dourado", "Pulseiras Masculina Dourado",
-            "Pulseiras Infantil Dourado", "Terço Dourado", "Pingentes Dourado",
-            "Braceletes Dourado", "Conjuntos Dourado", "Anéis Dourado",
-            "Colar Feminino Dourado", "Colar Masculino Dourado", "Colar Infantil Dourado",
-            "Tornozeleiras Feminina Dourado", "Tornozeleiras Infantil Dourado", "Escapulário Dourado",
-            "Brinco de Pressão Prateado", "Brinco de Moda Prateado",
-            "Argolas Prateada", "Correntes Feminina Prateado", "Correntes Masculina Prateado",
-            "Pulseiras Feminina Prateado", "Pulseiras Masculina Prateado",
-            "Pulseiras Infantil Prateado", "Terço Prateado", "Pingentes Prateado",
-            "Braceletes Prateado", "Conjuntos Prateado", "Anéis Prateado",
-            "Colar Feminino Prateado", "Colar Masculino Prateado", "Colar Infantil Prateado",
-            "Tornozeleiras Feminina Prateado", "Tornozeleiras Infantil Prateado", "Escapulário Prateado"
+            "Spray 120ml",
+            "Spray 500ml",
+            "Refil 1L",
+            "Linha Automotiva"
         ];
 
-        const SUBCATEGORIAS_POR_CATEGORIA = {
-            "Brinco de Pressão Dourado": ["Normal", "Zircônia"],
-            "Brinco de Pressão Prateado": ["Normal", "Zircônia"],
-            "Brinco de Moda Dourado": ["Brincos de moda"],
-            "Brinco de Moda Prateado": ["Brincos de moda"],
-            "Argolas Dourada": ["Pequena", "Média", "Grande", "Click"],
-            "Argolas Prateada": ["Pequena", "Média", "Grande", "Click"],
-            "Correntes Feminina Dourado": ["Feminina"], "Correntes Masculina Dourado": ["Masculina"],
-            "Correntes Feminina Prateado": ["Feminina"], "Correntes Masculina Prateado": ["Masculina"],
-            "Pulseiras Feminina Dourado": ["Feminina"], "Pulseiras Masculina Dourado": ["Masculina"],
-            "Pulseiras Infantil Dourado": ["Infantil"],
-            "Pulseiras Feminina Prateado": ["Feminina"], "Pulseiras Masculina Prateado": ["Masculina"],
-            "Pulseiras Infantil Prateado": ["Infantil"],
-            "Pingentes Dourado": ["Diversos"], "Pingentes Prateado": ["Diversos"],
-            "Terço Dourado": ["Diversos"], "Terço Prateado": ["Diversos"],
-            "Braceletes Dourado": ["Feminino", "Masculino"], "Braceletes Prateado": ["Feminino", "Masculino"],
-            "Anéis Dourado": ["Adulto", "Infantis"], "Anéis Prateado": ["Adulto", "Infantis"],
-            "Escapulário Dourado": ["Diversos"], "Escapulário Prateado": ["Diversos"],
-            "Conjuntos Dourado": ["Brinco + Colar", "Completo"], "Conjuntos Prateado": ["Brinco + Colar", "Completo"],
-            "Colar Feminino Dourado": ["Feminino"], "Colar Masculino Dourado": ["Masculino"],
-            "Colar Infantil Dourado": ["Infantil"],
-            "Colar Feminino Prateado": ["Feminino"], "Colar Masculino Prateado": ["Masculino"],
-            "Colar Infantil Prateado": ["Infantil"],
-            "Tornozeleiras Feminina Dourado": ["Feminina"], "Tornozeleiras Infantil Dourado": ["Infantil"],
-            "Tornozeleiras Feminina Prateado": ["Feminina"], "Tornozeleiras Infantil Prateado": ["Infantil"]
-        };
-
         let produtos = [];
-        let banners = [];
         let marqueeItems = [];
         let siteConfig = {};
         let vendas = [];
@@ -2462,33 +2068,35 @@
         let chartEstoque = null;
         let visualizacaoAtual = 'tabela';
 
-        // Estrutura dinâmica
-        let estruturaCache = [];
-        let filtroEstruturaAtual = 'todos';
-
         // ============================================
-        // SISTEMA DE COLUNAS
+        // SISTEMA DE COLUNAS (12 colunas agora)
         // ============================================
         const COLUNAS_TODAS = [
-            { id: 1, nome: 'ID' }, { id: 2, nome: 'Img' }, { id: 3, nome: 'Nome' },
-            { id: 4, nome: 'Referência' }, { id: 5, nome: 'Preço' }, { id: 6, nome: 'Quantidade' },
-            { id: 7, nome: 'Categoria' }, { id: 8, nome: 'Subcategoria' }, { id: 9, nome: 'Tamanho' },
-            { id: 10, nome: 'Imagem' }, { id: 11, nome: 'Disponível' }, { id: 12, nome: 'Destaque' },
-            { id: 13, nome: 'Estoque' }, { id: 14, nome: 'Vendidos' }, { id: 15, nome: 'Saldo' },
-            { id: 16, nome: 'Ações' }
+            { id: 1, nome: 'ID' },
+            { id: 2, nome: 'Img' },
+            { id: 3, nome: 'Nome' },
+            { id: 4, nome: 'Preço' },
+            { id: 5, nome: 'Quantidade' },
+            { id: 6, nome: 'Categoria' },
+            { id: 7, nome: 'Imagem' },
+            { id: 8, nome: 'Disponível' },
+            { id: 9, nome: 'Estoque' },
+            { id: 10, nome: 'Vendidos' },
+            { id: 11, nome: 'Saldo' },
+            { id: 12, nome: 'Ações' }
         ];
 
-        const COLUNAS_PADRAO_MOBILE = [1, 2, 3, 4, 5, 11, 13, 14, 15, 16];
-        const COLUNAS_PADRAO_DESKTOP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+        const COLUNAS_PADRAO_MOBILE = [1, 2, 3, 4, 8, 9, 10, 11, 12];
+        const COLUNAS_PADRAO_DESKTOP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-        let colunasVisiveis = JSON.parse(localStorage.getItem('wrj_colunas_visiveis')) || null;
+        let colunasVisiveis = JSON.parse(localStorage.getItem('wr_colunas_visiveis')) || null;
 
         function isMobile() { return window.innerWidth < 640; }
 
         function inicializarColunas() {
             if (!colunasVisiveis || colunasVisiveis.length === 0) {
                 colunasVisiveis = isMobile() ? [...COLUNAS_PADRAO_MOBILE] : [...COLUNAS_PADRAO_DESKTOP];
-                localStorage.setItem('wrj_colunas_visiveis', JSON.stringify(colunasVisiveis));
+                localStorage.setItem('wr_colunas_visiveis', JSON.stringify(colunasVisiveis));
             }
         }
 
@@ -2514,11 +2122,11 @@
             if (visivel) {
                 if (!colunasVisiveis.includes(id)) colunasVisiveis.push(id);
             } else {
-                if (id === 16) { alert('A coluna "Ações" é obrigatória!'); renderizarPainelColunas(); return; }
+                if (id === 12) { alert('A coluna "Ações" é obrigatória!'); renderizarPainelColunas(); return; }
                 colunasVisiveis = colunasVisiveis.filter(c => c !== id);
             }
             colunasVisiveis.sort((a, b) => a - b);
-            localStorage.setItem('wrj_colunas_visiveis', JSON.stringify(colunasVisiveis));
+            localStorage.setItem('wr_colunas_visiveis', JSON.stringify(colunasVisiveis));
             aplicarColunasVisiveis();
             renderizarPainelColunas();
         }
@@ -2544,15 +2152,15 @@
         }
 
         function selecionarTodasColunas(mostrar) {
-            colunasVisiveis = mostrar ? COLUNAS_TODAS.map(c => c.id) : [16];
-            localStorage.setItem('wrj_colunas_visiveis', JSON.stringify(colunasVisiveis));
+            colunasVisiveis = mostrar ? COLUNAS_TODAS.map(c => c.id) : [12];
+            localStorage.setItem('wr_colunas_visiveis', JSON.stringify(colunasVisiveis));
             aplicarColunasVisiveis();
             renderizarPainelColunas();
         }
 
         function resetarColunas() {
             colunasVisiveis = isMobile() ? [...COLUNAS_PADRAO_MOBILE] : [...COLUNAS_PADRAO_DESKTOP];
-            localStorage.setItem('wrj_colunas_visiveis', JSON.stringify(colunasVisiveis));
+            localStorage.setItem('wr_colunas_visiveis', JSON.stringify(colunasVisiveis));
             aplicarColunasVisiveis();
             renderizarPainelColunas();
         }
@@ -2606,13 +2214,13 @@
                 try {
                     const itensObj = JSON.parse(itens);
                     if (Array.isArray(itensObj) && itensObj.length > 0) {
-                        return itensObj.map(item => `${item.quantidade || 1}x ${item.nome || 'Produto'}${item.referencia ? ` (Ref: ${item.referencia})` : ''}`).join(' | ');
+                        return itensObj.map(item => `${item.quantidade || 1}x ${item.nome || 'Produto'}`).join(' | ');
                     }
                     return itens;
                 } catch (e) { return itens; }
             }
             if (Array.isArray(itens) && itens.length > 0) {
-                return itens.map(item => `${item.quantidade || 1}x ${item.nome || 'Produto'}${item.referencia ? ` (Ref: ${item.referencia})` : ''}`).join(' | ');
+                return itens.map(item => `${item.quantidade || 1}x ${item.nome || 'Produto'}`).join(' | ');
             }
             return itens || '-';
         }
@@ -2634,9 +2242,7 @@
                 for (var i = 0; i < partes.length; i++) {
                     var parte = partes[i].trim();
                     if (!parte) continue;
-                    var refMatch = parte.match(/\(Ref:\s*([^)]+)\)/);
-                    var referencia = refMatch ? refMatch[1].trim() : '';
-                    var textoLimpo = parte.replace(/\(Ref:\s*[^)]+\)/, '').trim();
+                    var textoLimpo = parte.trim();
                     var qtdMatch = textoLimpo.match(/^(\d+)x\s*/);
                     var quantidade = qtdMatch ? parseInt(qtdMatch[1]) : 1;
                     var nome = textoLimpo.replace(/^\d+x\s*/, '').trim();
@@ -2647,7 +2253,7 @@
                         nome = nome.replace(/R\$\s*[\d,]+\s*/, '').trim();
                     }
                     if (nome) {
-                        itensExtracao.push({ nome, referencia, quantidade: quantidade || 1, preco });
+                        itensExtracao.push({ nome, quantidade: quantidade || 1, preco });
                         totalItens += quantidade || 1;
                     }
                 }
@@ -2684,7 +2290,7 @@
 
                         if (data && data.error && String(data.error).toLowerCase().includes('autorizado')) {
                             alert('Sessão expirada. Faça login novamente.');
-                            sessionStorage.removeItem("ivo_auth");
+                            sessionStorage.removeItem("wr_auth");
                             window.location.href = "login.html";
                             return;
                         }
@@ -2702,28 +2308,18 @@
                     if (tipo === 'cadastrar' || tipo === 'atualizar') {
                         const p = dados.produto || {};
                         params += `&nome=${encodeURIComponent(p["Nome do Produto"] || p.nome || '')}`;
-                        params += `&ref=${encodeURIComponent(p.referencia || '')}`;
                         params += `&preco=${p.Preço || p.preco || 0}`;
                         params += `&quantidade=${encodeURIComponent(p.Quantidade || p.quantidade || '')}`;
                         params += `&categoria=${encodeURIComponent(p.Categoria || p.categoria || '')}`;
-                        params += `&subcategoria=${encodeURIComponent(p.Subcategoria || p.subcategoria || '')}`;
-                        params += `&cores=${encodeURIComponent(p.Cores || p.cores || '')}`;
-                        params += `&tamanho=${encodeURIComponent(p.Tamanho || p.tamanho || '')}`;
                         params += `&imagem=${encodeURIComponent(p.Imagem || p.imagem || '')}`;
                         params += `&disponivel=${p.Disponível || p.disponivel || 'sim'}`;
-                        params += `&destaque=${p.Destaque || p.destaque || 'nao'}`;
                         params += `&estoque=${p.Estoque || p.estoque || 0}`;
-                        params += `&vendidos=${p.Vendidos || p.vendidos || 0}`;
                         params += `&saldo_estoque=${p["Saldo Estoque"] || p.saldo_estoque || 0}`;
                         if (p.ID) params += `&id=${p.ID}`;
                     } else if (tipo === 'excluir') {
                         params += `&id=${dados.id || ''}`;
                     } else if (tipo === 'salvar_categoria') {
                         params += `&categoria=${encodeURIComponent(dados.categoria?.nome || '')}`;
-                    } else if (tipo === 'salvar_banner') {
-                        params += `&banner=${encodeURIComponent(JSON.stringify(dados.banner || {}))}`;
-                    } else if (tipo === 'excluir_banner') {
-                        params += `&index=${dados.index || ''}`;
                     } else if (tipo === 'salvar_marquee') {
                         params += `&marquee=${encodeURIComponent(JSON.stringify(dados.marquee || {}))}`;
                     } else if (tipo === 'excluir_marquee') {
@@ -2741,16 +2337,12 @@
                         params += `&usuario=${encodeURIComponent(JSON.stringify(dados.usuario || {}))}`;
                     } else if (tipo === 'excluir_usuario') {
                         params += `&index=${dados.index}`;
-                    } else if (tipo === 'salvar_estrutura') {
-                        params += `&estrutura=${encodeURIComponent(dados.estrutura || '[]')}`;
                     } else if (tipo === 'repor_estoque') {
                         params += `&id=${encodeURIComponent(dados.id || '')}`;
                         params += `&qtd=${encodeURIComponent(dados.qtd || 0)}`;
                     } else if (tipo === 'zerar_estoque') {
                         params += `&id=${encodeURIComponent(dados.id || '')}`;
                     } else if (tipo === 'toggle_disponivel') {
-                        params += `&id=${encodeURIComponent(dados.id || '')}`;
-                    } else if (tipo === 'toggle_destaque') {
                         params += `&id=${encodeURIComponent(dados.id || '')}`;
                     }
 
@@ -2801,15 +2393,6 @@
             if (totalEl) totalEl.innerText = categoriasCache.length;
         }
 
-        function atualizarSubcategorias() {
-            const categoria = document.getElementById('Categoria').value;
-            const selectSub = document.getElementById('Subcategoria');
-            if (!categoria) { selectSub.value = ''; return; }
-            const subs = SUBCATEGORIAS_POR_CATEGORIA[categoria] || [];
-            if (subs.length === 1) selectSub.value = subs[0];
-            else selectSub.value = '';
-        }
-
         // ============================================
         // CONFIGURAÇÕES
         // ============================================
@@ -2823,8 +2406,8 @@
             document.getElementById('cfgEmail').value = cfg.email || '';
             document.getElementById('cfgEndereco').value = cfg.endereco || '';
             document.getElementById('cfgSobreTexto').value = cfg.sobreTexto || '';
-            document.getElementById('cfgFreteGratis').value = cfg.freteGratisValor || 3500;
-            document.getElementById('cfgTaxaFrete').value = cfg.taxaFrete || 15;
+            document.getElementById('cfgFreteGratis').value = cfg.freteGratisValor || 100;
+            document.getElementById('cfgTaxaFrete').value = cfg.taxaFrete || 5;
             document.getElementById('cfgPixDesconto').value = cfg.pixDesconto || 5;
         }
 
@@ -2844,8 +2427,8 @@
                 email: document.getElementById('cfgEmail').value.trim(),
                 endereco: document.getElementById('cfgEndereco').value.trim(),
                 sobreTexto: document.getElementById('cfgSobreTexto').value.trim(),
-                freteGratisValor: parseFloat(document.getElementById('cfgFreteGratis').value) || 3500,
-                taxaFrete: parseFloat(document.getElementById('cfgTaxaFrete').value) || 15,
+                freteGratisValor: parseFloat(document.getElementById('cfgFreteGratis').value) || 100,
+                taxaFrete: parseFloat(document.getElementById('cfgTaxaFrete').value) || 5,
                 pixDesconto: parseFloat(document.getElementById('cfgPixDesconto').value) || 5
             };
 
@@ -2874,7 +2457,7 @@
                 const token = window.getToken();
                 if (!token) {
                     alert('Sessão expirada. Faça login novamente.');
-                    sessionStorage.removeItem("ivo_auth");
+                    sessionStorage.removeItem("wr_auth");
                     window.location.href = "login.html";
                     return;
                 }
@@ -2907,7 +2490,7 @@
 
                 if (data && data.error && String(data.error).toLowerCase().includes('autorizado')) {
                     alert('Sessão expirada. Faça login novamente.');
-                    sessionStorage.removeItem("ivo_auth");
+                    sessionStorage.removeItem("wr_auth");
                     window.location.href = "login.html";
                     return;
                 }
@@ -2918,16 +2501,11 @@
                     produtos = data.produtos.map(p => ({
                         ID: p.ID || p.id,
                         "Nome do Produto": p["Nome do Produto"] || p.nome,
-                        referencia: p.referencia || p.ref,
                         Preço: p.Preço || p.preco,
                         Quantidade: p.Quantidade || p.quantidade,
                         Categoria: p.Categoria || p.categoria,
-                        Subcategoria: p.Subcategoria || p.subcategoria || '',
-                        Cores: p.Cores || p.cores,
-                        Tamanho: p.Tamanho || p.tamanho,
                         Imagem: p.Imagem || p.imagem,
                         Disponível: String(p.Disponível || p.disponivel || '').toLowerCase().trim(),
-                        Destaque: String(p.Destaque || p.destaque || '').toLowerCase().trim(),
                         Estoque: p.Estoque || p.estoque || 0,
                         Vendidos: p.Vendidos || p.vendidos || 0,
                         "Saldo Estoque": p["Saldo Estoque"] || p.saldo_estoque || 0
@@ -2936,29 +2514,23 @@
                     produtos = [];
                 }
 
-                if (data.estrutura && Array.isArray(data.estrutura) && data.estrutura.length > 0) {
-                    estruturaCache = data.estrutura.map((e, i) => ({ ...e, index: i }));
-                    console.log("📂 Estrutura carregada:", estruturaCache.length, "itens");
-                }
-
-                banners = data.banners || [];
                 marqueeItems = data.marquee || [];
                 siteConfig = data.config || siteConfig;
 
                 const totalEstoque = produtos.reduce((s, p) => s + (p.Estoque || 0), 0);
                 const baixoEstoque = produtos.filter(p => (p["Saldo Estoque"] || 0) <= 3 && (p["Saldo Estoque"] || 0) > 0).length;
-                const destaques = produtos.filter(p => p.Destaque === 'sim').length;
+                const semEstoque = produtos.filter(p => (p["Saldo Estoque"] || 0) === 0).length;
 
                 const tpEl = document.getElementById('total-produtos');
                 const teEl = document.getElementById('total-estoque');
                 const ebEl = document.getElementById('estoque-baixo');
-                const tdEl = document.getElementById('total-destaques');
+                const tseEl = document.getElementById('total-sem-estoque');
                 const trEl = document.getElementById('total-registros');
 
                 if (tpEl) tpEl.innerText = produtos.length;
                 if (teEl) teEl.innerText = totalEstoque;
                 if (ebEl) ebEl.innerText = baixoEstoque;
-                if (tdEl) tdEl.innerText = destaques;
+                if (tseEl) tseEl.innerText = semEstoque;
                 if (trEl) trEl.innerText = `${produtos.length} registros`;
 
                 renderizarTabelaProdutos();
@@ -2966,7 +2538,6 @@
                 if (visualizacaoAtual === 'cards') {
                     renderizarCardsProdutos();
                 }
-                renderizarBanners();
                 renderizarMarqueeAdmin();
                 carregarCategoriasFixas();
                 atualizarGraficos();
@@ -2977,7 +2548,7 @@
                 if (tb) {
                     tb.innerHTML = `
                         <tr>
-                            <td colspan="16" class="text-center py-8 text-red-500 text-sm">
+                            <td colspan="12" class="text-center py-8 text-red-500 text-sm">
                                 <i class="fas fa-exclamation-triangle text-2xl block mb-2"></i>
                                 Erro ao carregar produtos: ${error.message}
                                 <br>
@@ -2998,14 +2569,12 @@
             const tbody = document.getElementById("produtos-tbody");
             if (!tbody) return;
 
-            const filtroSub = document.getElementById('filtro-subcategoria')?.value?.toLowerCase() || '';
             let produtosFiltrados = produtos;
-            if (filtroSub) produtosFiltrados = produtos.filter(p => (p.Subcategoria || '').toLowerCase().includes(filtroSub));
 
             if (produtosFiltrados.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="16" class="text-center py-6 text-gray-400 text-sm">
+                        <td colspan="12" class="text-center py-6 text-gray-400 text-sm">
                             <i class="fas fa-box-open text-2xl block mb-2"></i>
                             Nenhum produto encontrado.
                         </td>
@@ -3040,16 +2609,12 @@
                     <td class="text-center">
                         <img src="${imgSrc}" class="w-7 h-7 md:w-8 md:h-8 rounded object-cover inline-block border border-gray-200" alt="${p["Nome do Produto"]}" onerror="this.src='${SVG_PLACEHOLDER}'">
                     </td>
-                    <td class="text-xs font-medium max-w-[120px] md:max-w-none truncate" title="${p["Nome do Produto"] || ''}">${p["Nome do Produto"] || '-'}</td>
-                    <td class="text-xs text-gray-500">${p.referencia || '-'}</td>
+                    <td class="text-xs font-medium max-w-[200px] truncate" title="${p["Nome do Produto"] || ''}">${p["Nome do Produto"] || '-'}</td>
                     <td class="text-xs font-bold text-primary text-right">R$ ${parseFloat(p.Preço || 0).toFixed(2).replace(".", ",")}</td>
                     <td class="text-xs text-gray-600 max-w-[80px] truncate" title="${quantidade}">${quantidade}</td>
                     <td class="text-[10px]"><span class="badge-categoria">${p.Categoria || '-'}</span></td>
-                    <td class="text-[10px]">${p.Subcategoria ? `<span class="badge-subcategoria">${p.Subcategoria}</span>` : '<span class="text-gray-300">-</span>'}</td>
-                    <td class="text-xs text-gray-600">${p.Tamanho || '-'}</td>
                     <td class="text-[10px]">${p.Imagem ? `<a href="${p.Imagem}" target="_blank" class="text-blue-500 hover:text-blue-700" title="Ver imagem"><i class="fas fa-external-link-alt"></i></a>` : '-'}</td>
                     <td class="text-center">${String(p.Disponível || '').toLowerCase().trim() === 'sim' ? '<i class="fas fa-check-circle text-green-500 text-sm"></i>' : '<i class="fas fa-times-circle text-red-400 text-sm"></i>'}</td>
-                    <td class="text-center">${String(p.Destaque || '').toLowerCase().trim() === 'sim' ? '<i class="fas fa-star text-yellow-500 text-sm"></i>' : '<i class="fas fa-star text-gray-300 text-sm"></i>'}</td>
                     <td class="text-center"><span class="badge-estoque ${statusClass} text-[10px] md:text-xs font-bold px-2 py-1 rounded-full border inline-flex items-center gap-1 whitespace-nowrap">${statusIcon} ${estoque}</span></td>
                     <td class="text-center text-xs font-bold text-blue-600">${vendidos}</td>
                     <td class="text-center text-xs font-bold ${saldoEstoque <= 3 ? 'text-red-600' : 'text-green-600'}">${saldoEstoque}</td>
@@ -3063,9 +2628,6 @@
                             </button>
                             <button onclick="toggleDisponivelRapido('${p.ID}')" class="btn-acao btn-ocultar ${String(p.Disponível || '').toLowerCase().trim() !== 'sim' ? 'esta-oculto' : ''}" title="${String(p.Disponível || '').toLowerCase().trim() === 'sim' ? 'Ocultar do site' : 'Mostrar no site'}">
                                 <i class="fas fa-eye${String(p.Disponível || '').toLowerCase().trim() === 'sim' ? '' : '-slash'}"></i>
-                            </button>
-                            <button onclick="toggleDestaqueRapido('${p.ID}')" class="btn-acao btn-destaque ${String(p.Destaque || '').toLowerCase().trim() === 'sim' ? 'esta-destaque' : ''}" title="${String(p.Destaque || '').toLowerCase().trim() === 'sim' ? 'Remover destaque' : 'Marcar como destaque'}">
-                                <i class="fas fa-star"></i>
                             </button>
                             <button onclick="esgotarProduto('${p.ID}')" class="btn-acao btn-esgotar" title="Marcar como Esgotado">
                                 <i class="fas fa-ban"></i>
@@ -3087,42 +2649,12 @@
             });
             setTimeout(() => aplicarColunasVisiveis(), 50);
         }
-    
-        // ============================================
-        // BANNERS
-        // ============================================
-        function renderizarBanners() {
-            const container = document.getElementById("banners-list");
-            if (!container) return;
-            container.innerHTML = "";
-            if (!banners || banners.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm">Nenhum banner cadastrado.</p>';
-                return;
-            }
-            banners.forEach((b, index) => {
-                const imgSrc = getPlaceholderImage(b.imagem, 100);
-                const posLabel = { centro: '🎯 Centro', esquerda: '⬅️ Esquerda', direita: '➡️ Direita' }[b.posicao] || '🎯 Centro';
-                const div = document.createElement("div");
-                div.className = "flex items-center justify-between bg-gray-50 p-3 rounded-lg border flex-wrap gap-2";
-                div.innerHTML = `
-                    <div class="flex items-center gap-3 min-w-0">
-                        <img src="${imgSrc}" class="w-10 h-10 rounded object-cover flex-shrink-0" alt="${b.titulo}" onerror="this.src='${SVG_PLACEHOLDER}'">
-                        <div class="min-w-0">
-                            <p class="font-bold text-sm truncate">${b.titulo}</p>
-                            <p class="text-xs text-gray-500 truncate">${b.btnText} • ${posLabel} • ${b.ativo === 'sim' ? '✅ Ativo' : '❌ Inativo'}</p>
-                        </div>
-                    </div>
-                    <button onclick="excluirBanner(${index})" class="text-red-500 hover:text-red-700 flex-shrink-0"><i class="fas fa-trash-alt"></i></button>
-                `;
-                container.appendChild(div);
-            });
-        }
 
         // ============================================
         // MARQUEE
         // ============================================
         const ICONES_DISPONIVEIS = [
-            'fa-solid fa-crown', 'fa-solid fa-truck-fast', 'fa-solid fa-gem', 'fa-solid fa-percent',
+            'fa-solid fa-crown', 'fa-solid fa-truck-fast', 'fa-solid fa-spray-can', 'fa-solid fa-percent',
             'fa-brands fa-instagram', 'fa-brands fa-whatsapp', 'fa-solid fa-star', 'fa-solid fa-heart',
             'fa-solid fa-fire', 'fa-solid fa-bolt', 'fa-solid fa-gift', 'fa-solid fa-tag',
             'fa-solid fa-tags', 'fa-solid fa-cart-shopping', 'fa-solid fa-bag-shopping',
@@ -3130,8 +2662,7 @@
             'fa-solid fa-medal', 'fa-solid fa-award', 'fa-solid fa-thumbs-up', 'fa-solid fa-check-circle',
             'fa-solid fa-clock', 'fa-solid fa-calendar', 'fa-solid fa-location-dot', 'fa-solid fa-phone',
             'fa-solid fa-envelope', 'fa-solid fa-headset', 'fa-solid fa-headphones', 'fa-solid fa-rocket',
-            'fa-solid fa-leaf', 'fa-solid fa-sparkles', 'fa-regular fa-gem', 'fa-regular fa-star',
-            'fa-regular fa-heart'
+            'fa-solid fa-leaf', 'fa-solid fa-wind', 'fa-regular fa-star', 'fa-regular fa-heart'
         ];
 
         function renderizarIconesGrid() {
@@ -3271,7 +2802,7 @@
             });
             const labels = Object.keys(categorias);
             const data = Object.values(categorias);
-            const cores = ['#2f6b4f', '#3d8a64', '#d4af37', '#e8c84a', '#1f4d38', '#6b8c7a', '#a8c4b8', '#8fb5a6'];
+            const cores = ['#6d28d9', '#8b5cf6', '#f59e0b', '#fbbf24', '#4c1d95', '#a78bfa', '#c4b5fd', '#ddd6fe'];
 
             const c1 = document.getElementById('chartCategorias');
             if (!c1) return;
@@ -3293,7 +2824,7 @@
                 type: 'bar',
                 data: {
                     labels: top5.map(p => (p["Nome do Produto"] || '').substring(0, 15) + ((p["Nome do Produto"] || '').length > 15 ? '...' : '')),
-                    datasets: [{ label: 'Estoque', data: top5.map(p => p.Estoque || 0), backgroundColor: '#2f6b4f', borderRadius: 6, barThickness: 25 }]
+                    datasets: [{ label: 'Estoque', data: top5.map(p => p.Estoque || 0), backgroundColor: '#6d28d9', borderRadius: 6, barThickness: 25 }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
@@ -3453,7 +2984,7 @@
                 for (var y = 0; y < itens.length; y++) {
                     var item = itens[y];
                     var qtd = parseInt(item.quantidade) || 1;
-                    var chave = (item.nome || 'Produto') + (item.referencia ? ' (Ref: ' + item.referencia + ')' : '');
+                    var chave = item.nome || 'Produto';
                     if (!itensAgrupados[chave]) itensAgrupados[chave] = { qtd: 0, preco: parseFloat(item.preco) || 0 };
                     itensAgrupados[chave].qtd += qtd;
                     if (parseFloat(item.preco) > 0) itensAgrupados[chave].preco = parseFloat(item.preco);
@@ -3464,20 +2995,20 @@
             var html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Relatório</title>
             <style>
                 body { font-family: Arial; padding: 20px; }
-                .header { background: linear-gradient(135deg, #2f6b4f, #1f4d38); color: white; padding: 25px; border-radius: 12px 12px 0 0; }
+                .header { background: linear-gradient(135deg, #6d28d9, #4c1d95); color: white; padding: 25px; border-radius: 12px 12px 0 0; }
                 .header h1 { margin: 0; }
-                .info { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #f8faf8; padding: 15px; border-radius: 0 0 12px 12px; margin-bottom: 20px; }
+                .info { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #faf8ff; padding: 15px; border-radius: 0 0 12px 12px; margin-bottom: 20px; }
                 .info .label { font-size: 10px; color: #6b7280; font-weight: 700; text-transform: uppercase; }
-                .info .value { font-size: 15px; font-weight: 700; color: #1f4d38; }
+                .info .value { font-size: 15px; font-weight: 700; color: #4c1d95; }
                 table { width: 100%; border-collapse: collapse; }
-                th { background: #2f6b4f; color: white; padding: 8px 12px; text-align: left; }
+                th { background: #6d28d9; color: white; padding: 8px 12px; text-align: left; }
                 td { padding: 7px 12px; border-bottom: 1px solid #e5e7eb; }
                 .right { text-align: right; }
                 .center { text-align: center; }
-                .total-row { background: #eef4ef; font-weight: bold; }
+                .total-row { background: #f3e8ff; font-weight: bold; }
                 .footer { margin-top: 30px; text-align: center; color: #999; font-size: 11px; }
             </style></head><body>
-            <div class="header"><h1>💎 IVO PITA</h1><p>Relatório de Vendas - Gerado em: ${new Date().toLocaleString('pt-BR')}</p></div>
+            <div class="header"><h1>🧴 WR Aromatizantes</h1><p>Relatório de Vendas - Gerado em: ${new Date().toLocaleString('pt-BR')}</p></div>
             <div class="info">
                 <div><div class="label">Total Vendas</div><div class="value">R$ ${totalVendas.toFixed(2).replace('.', ',')}</div></div>
                 <div><div class="label">Pedidos</div><div class="value">${dados.length}</div></div>
@@ -3496,7 +3027,7 @@
                 html += `<tr><td>${idx}</td><td>${itensArray[k]}</td><td class="center">${item.qtd}</td><td class="right">R$ ${item.preco.toFixed(2).replace('.', ',')}</td><td class="right">R$ ${totalItem.toFixed(2).replace('.', ',')}</td></tr>`;
             }
 
-            html += `<tr class="total-row"><td colspan="4" class="right">SUBTOTAL</td><td class="right">R$ ${subtotalGeral.toFixed(2).replace('.', ',')}</td></tr></tbody></table><div class="footer">Ivo Pita - Relatório gerado automaticamente</div></body></html>`;
+            html += `<tr class="total-row"><td colspan="4" class="right">SUBTOTAL</td><td class="right">R$ ${subtotalGeral.toFixed(2).replace('.', ',')}</td></tr></tbody></table><div class="footer">WR Aromatizantes - Relatório gerado automaticamente</div></body></html>`;
 
             var container = document.createElement('div');
             container.style.position = 'fixed';
@@ -3507,7 +3038,7 @@
 
             html2pdf().set({
                 margin: 10,
-                filename: 'Relatorio_IvoPita_' + new Date().toISOString().slice(0, 10) + '.pdf',
+                filename: 'Relatorio_WRAromatizantes_' + new Date().toISOString().slice(0, 10) + '.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -3550,7 +3081,7 @@
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `vendas_IvoPita_${new Date().toISOString().slice(0, 10)}.csv`;
+            link.download = `vendas_WRAromatizantes_${new Date().toISOString().slice(0, 10)}.csv`;
             link.click();
             URL.revokeObjectURL(link.href);
         }
@@ -3585,7 +3116,7 @@
             previewImg.style.display = 'block';
             previewBox.classList.add('has-image');
             previewText.textContent = 'Imagem carregada com sucesso!';
-            previewText.style.color = '#2f6b4f';
+            previewText.style.color = '#6d28d9';
 
             previewImg.onerror = function () {
                 previewImg.style.display = 'none';
@@ -3606,20 +3137,13 @@
                 document.getElementById('editID').value = "";
                 document.getElementById('ID').value = "";
                 document.getElementById('Disponível').checked = true;
-                document.getElementById('Destaque').checked = false;
                 document.getElementById('Estoque').value = 0;
                 document.getElementById('Saldo Estoque').value = 0;
                 carregarCategoriasFixas();
-                document.getElementById('Subcategoria').value = "";
                 document.getElementById('modalProduto').classList.add('active');
                 document.body.style.overflow = 'hidden';
                 setTimeout(atualizarPreviewImagem, 100);
                 
-            } else if (tipo === 'modalEstrutura') {
-                document.getElementById('modalEstrutura').classList.add('active');
-                document.body.style.overflow = 'hidden';
-                carregarEstruturaAdmin();
-
             } else if (tipo === 'modalVendas') {
                 document.getElementById('modalVendas').classList.add('active');
                 document.body.style.overflow = 'hidden';
@@ -3658,11 +3182,6 @@
                 document.getElementById('modalManutencao').classList.add('active');
                 document.body.style.overflow = 'hidden';
                 carregarStatusManutencao();
-
-            } else {
-                document.getElementById('modalBanner').classList.add('active');
-                document.body.style.overflow = 'hidden';
-                renderizarBanners();
             }
         }
 
@@ -3708,30 +3227,29 @@
             e.preventDefault();
             const idEdicao = document.getElementById('editID').value;
             const nome = document.getElementById('Nome do Produto').value.trim();
-            const referencia = document.getElementById('referencia').value.trim();
             const preco = document.getElementById('Preço').value.replace(',', '.');
             const quantidade = document.getElementById('Quantidade').value.trim();
             const categoria = document.getElementById('Categoria').value;
-            const subcategoria = document.getElementById('Subcategoria').value;
-            const cores = document.getElementById('Cores').value.trim();
-            const tamanho = document.getElementById('Tamanho').value.trim();
             const imagem = document.getElementById('Imagem').value.trim();
             const disponivel = document.getElementById('Disponível').checked ? 'sim' : 'nao';
-            const destaque = document.getElementById('Destaque').checked ? 'sim' : 'nao';
             const estoque = parseInt(document.getElementById('Estoque').value) || 0;
             const saldoEstoque = parseInt(document.getElementById('Saldo Estoque').value) || 0;
 
             if (!nome) { alert('Preencha o Nome do Produto'); return; }
-            if (!referencia) { alert('Preencha a Referência'); return; }
             if (!categoria) { alert('Selecione uma Categoria'); return; }
             if (!preco || parseFloat(preco) <= 0) { alert('Preencha um Preço válido'); return; }
 
             const dados = {
-                ID: idEdicao || '', "Nome do Produto": nome, referencia: referencia,
-                Preço: parseFloat(preco) || 0, Quantidade: quantidade, Categoria: categoria,
-                Subcategoria: subcategoria, Cores: cores, Tamanho: tamanho, Imagem: imagem,
-                Disponível: disponivel, Destaque: destaque, Estoque: estoque,
-                "Saldo Estoque": saldoEstoque, Vendidos: 0
+                ID: idEdicao || '',
+                "Nome do Produto": nome,
+                Preço: parseFloat(preco) || 0,
+                Quantidade: quantidade,
+                Categoria: categoria,
+                Imagem: imagem,
+                Disponível: disponivel,
+                Estoque: estoque,
+                "Saldo Estoque": saldoEstoque,
+                Vendidos: 0
             };
 
             const tipo = idEdicao ? "atualizar" : "cadastrar";
@@ -3780,16 +3298,12 @@
             document.getElementById('editID').value = p.ID;
             document.getElementById('ID').value = p.ID;
             document.getElementById('Nome do Produto').value = p["Nome do Produto"] || '';
-            document.getElementById('referencia').value = p.referencia || '';
             document.getElementById('Preço').value = p.Preço || 0;
             document.getElementById('Quantidade').value = p.Quantidade || '';
             document.getElementById('Estoque').value = p.Estoque || 0;
-            document.getElementById('Cores').value = p.Cores || '';
-            document.getElementById('Tamanho').value = p.Tamanho || '';
             document.getElementById('Imagem').value = p.Imagem || '';
             document.getElementById('Saldo Estoque').value = p["Saldo Estoque"] || 0;
             document.getElementById('Disponível').checked = String(p.Disponível || '').toLowerCase().trim() === 'sim';
-            document.getElementById('Destaque').checked = String(p.Destaque || '').toLowerCase().trim() === 'sim';
 
             const selectCat = document.getElementById('Categoria');
             if (p.Categoria) {
@@ -3805,9 +3319,6 @@
                 }
                 selectCat.value = p.Categoria;
             }
-            const selectSub = document.getElementById('Subcategoria');
-            if (p.Subcategoria) selectSub.value = p.Subcategoria;
-            else selectSub.value = '';
 
             document.getElementById('modalProduto').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -3832,46 +3343,6 @@
             }
         }
         window.excluirProduto = excluirProduto;
-
-        // ============================================
-        // BANNERS
-        // ============================================
-        document.getElementById('formBanner').onsubmit = async (e) => {
-            e.preventDefault();
-            const banner = {
-                imagem: document.getElementById('bannerImagem').value.trim(),
-                titulo: document.getElementById('bannerTitulo').value.trim(),
-                btnText: document.getElementById('bannerBtnText').value.trim(),
-                btnLink: document.getElementById('bannerBtnLink').value.trim(),
-                ativo: document.getElementById('bannerAtivo').checked ? 'sim' : 'nao',
-                posicao: document.getElementById('bannerPosicao').value || 'centro'
-            };
-            if (!banner.imagem || !banner.titulo) { alert('Preencha a imagem e o título'); return; }
-            const result = await chamarAPI("salvar_banner", { banner: banner });
-            if (result.success) {
-                alert('Banner adicionado!');
-                document.getElementById('formBanner').reset();
-                document.getElementById('bannerAtivo').checked = true;
-                carregarProdutos();
-                setTimeout(() => carregarProdutos(), 1500);
-            } else {
-                alert('❌ Erro: ' + (result.error || 'Erro desconhecido'));
-            }
-        };
-
-        async function excluirBanner(index) {
-            if (confirm("Excluir este banner?")) {
-                const result = await chamarAPI("excluir_banner", { index: index });
-                if (result.success) {
-                    alert('Banner excluído!');
-                    carregarProdutos();
-                    setTimeout(() => carregarProdutos(), 1500);
-                } else {
-                    alert('❌ Erro: ' + (result.error || 'Erro desconhecido'));
-                }
-            }
-        }
-        window.excluirBanner = excluirBanner;
 
         // ============================================
         // DATA ATUAL
@@ -4073,7 +3544,7 @@
                         chamarAPI('logout', {}).catch(() => { });
                     }
                 } catch (e) { }
-                sessionStorage.removeItem("ivo_auth");
+                sessionStorage.removeItem("wr_auth");
                 window.location.href = "login.html";
             }
         }
@@ -4083,16 +3554,16 @@
         // INICIALIZAÇÃO
         // ============================================
         document.addEventListener('DOMContentLoaded', function () {
-            console.log("🚀 Admin Ivo Pita inicializado");
+            console.log("🚀 Admin WR Aromatizantes inicializado");
 
             try {
-                const auth = sessionStorage.getItem("ivo_auth");
+                const auth = sessionStorage.getItem("wr_auth");
                 if (auth) {
                     const user = JSON.parse(auth);
                     console.log("👤 Logado como:", user.nome, "(" + user.email + ")");
                     const titulo = document.querySelector("nav h1");
                     if (titulo && user.nome) {
-                        titulo.innerHTML = `Ivo Pita <span class="text-primary text-xs font-normal">| ${user.nome}</span>`;
+                        titulo.innerHTML = `WR Aromatizantes <span class="text-primary text-xs font-normal">| ${user.nome}</span>`;
                     }
                 }
             } catch (e) { }
@@ -4103,10 +3574,7 @@
             setInterval(atualizarData, 60000);
 
             const catSelect = document.getElementById('Categoria');
-            if (catSelect) catSelect.addEventListener('change', atualizarSubcategorias);
-
-            const filtroSub = document.getElementById('filtro-subcategoria');
-            if (filtroSub) filtroSub.addEventListener('input', renderizarTabelaProdutos);
+            if (catSelect) catSelect.addEventListener('change', () => {});
 
             setTimeout(() => aplicarColunasVisiveis(), 500);
 
@@ -4290,7 +3758,6 @@
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('btnSalvarManutencaoMsg')?.addEventListener('click', salvarMensagemManutencao);
 
-            // Event listeners dos filtros de cards
             document.getElementById('cards-filtro-busca')?.addEventListener('input', renderizarCardsProdutos);
             document.getElementById('cards-filtro-categoria')?.addEventListener('change', renderizarCardsProdutos);
             document.getElementById('cards-filtro-ordem')?.addEventListener('change', renderizarCardsProdutos);
@@ -4317,7 +3784,6 @@
             reporProdutoAtual = p;
 
             document.getElementById('reporProdutoNome').textContent = p["Nome do Produto"] || '—';
-            document.getElementById('reporProdutoRef').textContent = 'Ref: ' + (p.referencia || '—');
             document.getElementById('reporEstoqueAtual').textContent = parseInt(p.Estoque) || 0;
             document.getElementById('reporQtdInput').value = 10;
             atualizarPreviewRepor();
@@ -4394,20 +3860,6 @@
             }
         }
 
-        async function toggleDestaqueRapido(id) {
-            try {
-                const result = await chamarAPI('toggle_destaque', { id: id });
-                if (result.success) {
-                    showToast(result.message, 'success');
-                    carregarProdutos();
-                } else {
-                    alert('❌ Erro: ' + (result.error || 'Erro desconhecido'));
-                }
-            } catch (error) {
-                alert('❌ Erro: ' + error.message);
-            }
-        }
-
         async function esgotarProduto(id) {
             const p = produtos.find(prod => String(prod.ID) === String(id));
             if (!p) return;
@@ -4445,7 +3897,6 @@
         window.atualizarPreviewRepor = atualizarPreviewRepor;
         window.confirmarRepor = confirmarRepor;
         window.toggleDisponivelRapido = toggleDisponivelRapido;
-        window.toggleDestaqueRapido = toggleDestaqueRapido;
         window.esgotarProduto = esgotarProduto;
 
         // ============================================
@@ -4484,7 +3935,6 @@
             const select = document.getElementById('cards-filtro-categoria');
             if (!select) return;
 
-            // Guarda contra produtos ainda não carregados
             if (!produtos || produtos.length === 0) return;
 
             const valorAtual = select.value;
@@ -4514,9 +3964,7 @@
             if (busca) {
                 filtrados = filtrados.filter(p => {
                     const nome = (p["Nome do Produto"] || '').toLowerCase();
-                    const ref = (p.referencia || '').toLowerCase();
-                    const sub = (p.Subcategoria || '').toLowerCase();
-                    return nome.includes(busca) || ref.includes(busca) || sub.includes(busca);
+                    return nome.includes(busca);
                 });
             }
 
@@ -4564,7 +4012,6 @@
                 const saldoEstoque = parseInt(p["Saldo Estoque"]) || 0;
                 const imgSrc = getPlaceholderImage(p.Imagem, 400);
                 const estaDisponivel = String(p.Disponível || '').toLowerCase().trim() === 'sim';
-                const estaDestaque = String(p.Destaque || '').toLowerCase().trim() === 'sim';
 
                 let classeEstoque = '';
                 let textoEstoque = `${saldoEstoque} disponíveis`;
@@ -4586,29 +4033,17 @@
                         <img src="${imgSrc}" class="card-imagem" alt="${p["Nome do Produto"] || ''}" 
                             onerror="this.src='${SVG_PLACEHOLDER}'">
                         
-                        ${(estaDestaque || !estaDisponivel) ? `
+                        ${!estaDisponivel ? `
                             <div class="card-badges-status">
-                                ${estaDestaque ? '<div class="card-badge-status destaque" title="Destaque"><i class="fas fa-star"></i></div>' : ''}
-                                ${!estaDisponivel ? '<div class="card-badge-status oculto" title="Oculto no site"><i class="fas fa-eye-slash"></i></div>' : ''}
+                                <div class="card-badge-status oculto" title="Oculto no site"><i class="fas fa-eye-slash"></i></div>
                             </div>
                         ` : ''}
-
-                        <div class="card-ref-overlay">
-                            <div class="card-ref-label">Referência</div>
-                            <div class="card-ref-valor">${p.referencia || '—'}</div>
-                        </div>
                     </div>
 
                     <div class="card-body">
                         <div class="card-categoria-titulo">${p.Categoria || 'Sem categoria'}</div>
                         
                         <div class="card-nome" title="${p["Nome do Produto"] || ''}">${p["Nome do Produto"] || '—'}</div>
-                        
-                        <div class="card-ref-badge">REF: ${p.referencia || '—'}</div>
-                        
-                        <div class="card-subtitulo">
-                            ${p.Categoria || ''}${p.Subcategoria ? ' · ' + p.Subcategoria : ''}
-                        </div>
                         
                         <div class="card-preco">R$ ${parseFloat(p.Preço || 0).toFixed(2).replace('.', ',')}</div>
                         
@@ -4629,11 +4064,6 @@
                             class="btn-acao btn-ocultar ${!estaDisponivel ? 'esta-oculto' : ''}" 
                             title="${estaDisponivel ? 'Ocultar do site' : 'Mostrar no site'}">
                             <i class="fas fa-eye${estaDisponivel ? '' : '-slash'}"></i>
-                        </button>
-                        <button onclick="toggleDestaqueRapido('${p.ID}')" 
-                            class="btn-acao btn-destaque ${estaDestaque ? 'esta-destaque' : ''}" 
-                            title="${estaDestaque ? 'Remover destaque' : 'Marcar como destaque'}">
-                            <i class="fas fa-star"></i>
                         </button>
                         <button onclick="esgotarProduto('${p.ID}')" class="btn-acao btn-esgotar" title="Marcar como Esgotado">
                             <i class="fas fa-ban"></i>
@@ -4700,177 +4130,44 @@
             }
         })();
 
+
         // ============================================
-        // ESTRUTURA DE CATEGORIAS
-        // ============================================
-        async function carregarEstruturaAdmin() {
-            try {
-                const result = await chamarAPI('listar_estrutura_admin');
-                if (result.success) {
-                    estruturaCache = result.estrutura || [];
-                    renderizarEstrutura();
-                } else {
-                    document.getElementById('estrutura-list').innerHTML =
-                        '<p style="color: #dc2626; font-size: 13px;">Erro: ' + (result.error || 'desconhecido') + '</p>';
+// 🛡️ PROTEÇÃO CONTRA ELEMENTOS NULOS
+// ============================================
+(function protegerInnerText() {
+    // Sobrescreve o setter de innerText e innerHTML
+    // para ignorar erros quando o elemento é null
+    const descriptorInnerText = Object.getOwnPropertyDescriptor(Element.prototype, 'innerText');
+    if (descriptorInnerText && descriptorInnerText.set) {
+        Object.defineProperty(Element.prototype, 'innerText', {
+            set: function (val) {
+                try {
+                    descriptorInnerText.set.call(this, val);
+                } catch (e) {
+                    console.warn('⚠️ innerText ignorado em elemento inválido:', this);
                 }
-            } catch (e) {
-                console.error('Erro ao carregar estrutura:', e);
-            }
-        }
+            },
+            get: descriptorInnerText.get,
+            configurable: true
+        });
+    }
 
-        function filtrarEstrutura(grupo) {
-            filtroEstruturaAtual = grupo;
-            document.querySelectorAll('[id^="btn-filtro-"]').forEach(btn => {
-                btn.style.background = '#f3f4f6';
-                btn.style.color = '#374151';
-            });
-            const btnAtivo = document.getElementById('btn-filtro-' +
-                (grupo === 'todos' ? 'todos' : grupo === 'Folheado Dourado' ? 'dourado' : 'prata'));
-            if (btnAtivo) {
-                btnAtivo.style.background = '#059669';
-                btnAtivo.style.color = '#fff';
-            }
-            renderizarEstrutura();
-        }
-
-        function renderizarEstrutura() {
-            const container = document.getElementById('estrutura-list');
-            if (!container) return;
-
-            const filtrados = filtroEstruturaAtual === 'todos'
-                ? estruturaCache
-                : estruturaCache.filter(e => e.grupo === filtroEstruturaAtual);
-
-            if (filtrados.length === 0) {
-                container.innerHTML = '<p style="color: #9ca3af; text-align: center; padding: 16px; font-size: 13px;">Nenhum item. Adicione abaixo 👇</p>';
-                return;
-            }
-
-            const agrupado = {};
-            filtrados.forEach(e => {
-                const chave = e.grupo + '|' + e.categoria;
-                if (!agrupado[chave]) agrupado[chave] = { grupo: e.grupo, categoria: e.categoria, subs: [] };
-                agrupado[chave].subs.push(e);
-            });
-
-            container.innerHTML = '';
-            Object.values(agrupado).forEach(g => {
-                const div = document.createElement('div');
-                div.className = 'estrutura-item-card';
-                const corGrupo = g.grupo === 'Folheado Dourado' ? '#92400e' : '#475569';
-                const bgGrupo = g.grupo === 'Folheado Dourado' ? '#fef3c7' : '#f1f5f9';
-                div.innerHTML = `
-                    <div style="display: flex; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
-                        <span class="estrutura-badge-grupo" style="background: ${bgGrupo}; color: ${corGrupo};">
-                            ${g.grupo}
-                        </span>
-                        <span style="font-weight: 700; font-size: 13px; color: #1f2937; margin-left: 4px;">
-                            ${g.categoria}
-                        </span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                        ${g.subs.map(s => `
-                            <span class="estrutura-sub-chip">
-                                ${s.subcategoria || '<em style="color: #9ca3af;">sem sub</em>'}
-                                <button onclick="editarEstrutura(${s.index})" style="color: #3b82f6; margin-left: 4px;" title="Editar">
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                                <button onclick="excluirEstrutura(${s.index})" style="color: #ef4444;" title="Excluir">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </span>
-                        `).join('')}
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function editarEstrutura(index) {
-            const item = estruturaCache.find(e => e.index === index);
-            if (!item) return;
-            document.getElementById('estruturaEditIndex').value = index;
-            document.getElementById('estruturaGrupo').value = item.grupo;
-            document.getElementById('estruturaCategoria').value = item.categoria;
-            document.getElementById('estruturaSubcategoria').value = item.subcategoria || '';
-            document.getElementById('estruturaFormTitle').innerText = '✏️ Editando item';
-            document.getElementById('btnSalvarEstruturaText').innerText = 'Salvar Edição';
-            document.getElementById('formEstrutura').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        function cancelarEdicaoEstrutura() {
-            document.getElementById('estruturaEditIndex').value = -1;
-            document.getElementById('formEstrutura').reset();
-            document.getElementById('estruturaGrupo').value = 'Folheado Dourado';
-            document.getElementById('estruturaFormTitle').innerText = '➕ Adicionar Item';
-            document.getElementById('btnSalvarEstruturaText').innerText = 'Adicionar';
-        }
-
-        async function excluirEstrutura(index) {
-            if (!confirm('Excluir este item da estrutura?')) return;
-            const nova = estruturaCache.filter(e => e.index !== index);
-            await salvarEstruturaCompleta(nova);
-        }
-
-        async function salvarEstruturaCompleta(lista) {
-            try {
-                const payload = lista.map((e, i) => ({
-                    grupo: e.grupo,
-                    categoria: e.categoria,
-                    subcategoria: e.subcategoria || '',
-                    ordem: i + 1
-                }));
-                const result = await chamarAPI('salvar_estrutura', { estrutura: JSON.stringify(payload) });
-                if (result.success) {
-                    alert('✅ Estrutura salva!');
-                    await carregarEstruturaAdmin();
-                } else {
-                    alert('❌ Erro: ' + (result.error || 'desconhecido'));
+    const descriptorInnerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+    if (descriptorInnerHTML && descriptorInnerHTML.set) {
+        Object.defineProperty(Element.prototype, 'innerHTML', {
+            set: function (val) {
+                try {
+                    descriptorInnerHTML.set.call(this, val);
+                } catch (e) {
+                    console.warn('⚠️ innerHTML ignorado em elemento inválido:', this);
                 }
-            } catch (e) {
-                alert('❌ Erro: ' + e.message);
-            }
-        }
+            },
+            get: descriptorInnerHTML.get,
+            configurable: true
+        });
+    }
+})();
 
-        document.getElementById('formEstrutura').onsubmit = async function (e) {
-            e.preventDefault();
-            const grupo = document.getElementById('estruturaGrupo').value;
-            const categoria = document.getElementById('estruturaCategoria').value.trim();
-            const subcategoria = document.getElementById('estruturaSubcategoria').value.trim();
-            const indexEdit = parseInt(document.getElementById('estruturaEditIndex').value, 10);
-
-            if (!grupo || !categoria) { alert('Grupo e Categoria são obrigatórios'); return; }
-
-            const btn = document.getElementById('btnSalvarEstrutura');
-            const original = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Salvando...';
-
-            try {
-                let novaLista;
-                if (indexEdit >= 0) {
-                    novaLista = estruturaCache.map(e => {
-                        if (e.index === indexEdit) return { grupo, categoria, subcategoria };
-                        return { grupo: e.grupo, categoria: e.categoria, subcategoria: e.subcategoria };
-                    });
-                } else {
-                    novaLista = estruturaCache.map(e => ({
-                        grupo: e.grupo, categoria: e.categoria, subcategoria: e.subcategoria
-                    }));
-                    novaLista.push({ grupo, categoria, subcategoria });
-                }
-                await salvarEstruturaCompleta(novaLista);
-                cancelarEdicaoEstrutura();
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = original;
-            }
-        };
-
-        window.filtrarEstrutura = filtrarEstrutura;
-        window.editarEstrutura = editarEstrutura;
-        window.excluirEstrutura = excluirEstrutura;
-        window.cancelarEdicaoEstrutura = cancelarEdicaoEstrutura;
     </script>
 </body>
 
