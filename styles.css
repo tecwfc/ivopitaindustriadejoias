@@ -2635,3 +2635,94 @@ a[href*="wa.me"].animate-breathe i { color: #ffffff !important; }
     padding: 9px 10px !important;
   }
 }
+/* ========================================== */
+/* 27. SUB-SUBCATEGORIA (TAMANHOS)             */
+/* ========================================== */
+.sidebar-item-tamanho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 10px 5px 28px; /* Mais indentado que a subcategoria */
+  margin-bottom: 1px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 10.5px; /* Menor que a subcategoria */
+  font-weight: 500;
+  color: #8c9a92;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  text-align: left;
+}
+
+.sidebar-item-tamanho > span:first-child {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sidebar-item-tamanho:hover {
+  background: rgba(47, 107, 79, 0.05);
+  color: #2f6b4f;
+  padding-left: 32px;
+}
+
+.sidebar-item-tamanho.active {
+  background: rgba(201, 168, 106, 0.12);
+  color: #92400e;
+  font-weight: 700;
+  border-left: 2px solid #c9a86a;
+  padding-left: 25px;
+}
+
+.sidebar-item-tamanho .sidebar-count {
+  font-size: 9px;
+  font-weight: 700;
+  background: rgba(201, 168, 106, 0.15);
+  color: #92400e;
+  padding: 1px 6px;
+  border-radius: 8px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.sidebar-item-tamanho.active .sidebar-count {
+  background: rgba(201, 168, 106, 0.4);
+  color: #78350f;
+}
+
+/* No mobile, deixa maior para toque */
+@media (max-width: 900px) {
+  .sidebar-item-tamanho {
+    padding: 10px 16px 10px 40px;
+    font-size: 12.5px;
+    border-radius: 8px;
+    margin-bottom: 3px;
+    background: #ffffff;
+    border: 1px solid rgba(47, 107, 79, 0.05);
+  }
+  .sidebar-item-tamanho:hover {
+    background: #f0f7f2;
+    padding-left: 44px;
+  }
+  .sidebar-item-tamanho.active {
+    padding-left: 37px;
+  }
+}
+.sidebar-item-tamanho:hover {
+  background: rgba(47, 107, 79, 0.05);
+  color: #2f6b4f;
+  padding-left: 32px;
+}
+
+.sidebar-item-tamanho.active {
+  background: rgba(201, 168, 106, 0.12);
+  color: #92400e;
+  font-weight: 700;
+  border-left: 2px solid #c9a86a;
+  padding-left: 25px;
+}
