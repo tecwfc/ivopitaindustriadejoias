@@ -1424,6 +1424,14 @@
                     title="Estrutura de Categorias">
                     <i class="fas fa-sitemap" style="font-size: 14px;"></i>
                 </button>
+
+                <button onclick="abrirModal('modalTamanhos')" style="background-color: #0891b2; color: #ffffff;"
+                onmouseover="this.style.backgroundColor='#0e7490'" onmouseout="this.style.backgroundColor='#0891b2'"
+                class="px-3 py-2 rounded-xl font-bold text-xs shadow transition flex items-center gap-1 justify-center"
+                title="Gerenciar Tamanhos">
+                <i class="fas fa-ruler-combined" style="font-size: 14px;"></i>
+
+            </button>
             </div>
         </div>
 
@@ -2395,6 +2403,81 @@
             </div>
         </div>
     </div>
+
+  <!-- ========================================== -->
+<!-- MODAL TAMANHOS -->
+<!-- ========================================== -->
+<div id="modalTamanhos" class="modal-overlay">
+    <div class="modal-content modal-content-config" onclick="event.stopPropagation()">
+        <div style="background: linear-gradient(135deg, #0891b2, #0e7490); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; color: #fff; position: sticky; top: 0; z-index: 10;">
+            <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-ruler-combined"></i> Gerenciar Tamanhos
+            </h3>
+            <button type="button" onclick="fecharModal('modalTamanhos')" 
+                style="background: rgba(255,255,255,0.15); border: none; color: #ffffff; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;"
+                onmouseover="this.style.background='rgba(255,255,255,0.3)'"
+                onmouseout="this.style.background='rgba(255,255,255,0.15)'"
+                title="Fechar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div style="padding: 20px; overflow-y: auto; max-height: calc(95vh - 80px);">
+            <div style="background: #ecfeff; border: 1px solid #a5f3fc; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; font-size: 12px; color: #155e75;">
+                <i class="fas fa-info-circle" style="margin-right: 4px;"></i>
+                Adicione, edite ou remova os <strong>tamanhos</strong> que aparecem na sidebar
+                (sub-subcategorias). Eles são vinculados por <strong>chave</strong> (correntes, pulseiras, aneis, etc.)
+                e por <strong>cor</strong> (dourado/prata).
+            </div>
+
+            <div id="tamanhos-list" style="margin-bottom: 20px;"></div>
+
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 16px 0;">
+
+            <h4 id="tamanhoFormTitle" style="margin: 0 0 12px 0; font-weight: 700; font-size: 14px; color: #374151;">
+                ➕ Adicionar Tamanho
+            </h4>
+            <input type="hidden" id="tamanhoEditIndex" value="-1">
+
+            <form id="formTamanho" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">Cor *</label>
+                    <select id="tamanhoCor" required style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; background: #fff;">
+                        <option value="dourado">🟡 Dourado</option>
+                        <option value="prata">⚪ Prata</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">Chave *</label>
+                    <input type="text" id="tamanhoChave" required placeholder="Ex: correntes, pulseiras, aneis"
+                        style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; background: #fff; font-family: monospace;">
+                    <small style="font-size: 10px; color: #9ca3af;">Palavra-chave que bate com a categoria</small>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">Label (exibido) *</label>
+                    <input type="text" id="tamanhoLabel" required placeholder="Ex: 40cm, 18, M"
+                        style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; background: #fff;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: #4b5563; text-transform: uppercase; margin-bottom: 4px;">Valor (busca) *</label>
+                    <input type="text" id="tamanhoValor" required placeholder="Ex: 40, 18"
+                        style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; background: #fff; font-family: monospace;">
+                    <small style="font-size: 10px; color: #9ca3af;">Como está na coluna "Tamanho" da planilha</small>
+                </div>
+                <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                    <button type="button" onclick="cancelarEdicaoTamanho()"
+                        style="padding: 10px 20px; background: #ffffff; color: #4b5563; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="btnSalvarTamanho"
+                        style="padding: 10px 24px; background: linear-gradient(135deg, #0891b2, #0e7490); color: #ffffff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(8,145,178,0.3);">
+                        <i class="fas fa-plus"></i>
+                        <span id="btnSalvarTamanhoText">Adicionar</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
     
     <!-- ========================================== -->
     <!-- SCRIPT PRINCIPAL -->
@@ -2664,123 +2747,127 @@
             }
         }
 
-        // ============================================
-        // API
-        // ============================================
-        function chamarAPI(tipo, dados) {
-            return new Promise((resolve, reject) => {
-                try {
-                    const callbackName = 'jsonp_callback_' + Date.now();
-                    const token = window.getToken();
+    /// ============================================
+    // API
+    // ============================================
+    function chamarAPI(tipo, dados) {
+    return new Promise((resolve, reject) => {
+        try {
+            const callbackName = 'jsonp_callback_' + Date.now();
+            const token = window.getToken();
 
-                    if (!token) {
-                        reject(new Error('Sessão expirada. Faça login novamente.'));
-                        return;
-                    }
+            if (!token) {
+                reject(new Error('Sessão expirada. Faça login novamente.'));
+                return;
+            }
 
-                    window[callbackName] = function (data) {
-                        delete window[callbackName];
-                        if (script.parentNode) script.parentNode.removeChild(script);
+            window[callbackName] = function (data) {
+                delete window[callbackName];
+                if (script.parentNode) script.parentNode.removeChild(script);
 
-                        if (data && data.error && String(data.error).toLowerCase().includes('autorizado')) {
-                            alert('Sessão expirada. Faça login novamente.');
-                            sessionStorage.removeItem("ivo_auth");
-                            window.location.href = "login.html";
-                            return;
-                        }
+                if (data && data.error && String(data.error).toLowerCase().includes('autorizado')) {
+                    alert('Sessão expirada. Faça login novamente.');
+                    sessionStorage.removeItem("ivo_auth");
+                    window.location.href = "login.html";
+                    return;
+                }
 
-                        resolve(data);
-                    };
+                resolve(data);
+            };
 
-                    let params;
-                    if (tipo === 'ativar_manutencao' || tipo === 'status_manutencao') {
-                        params = `modo=publico&tipo=${tipo}`;
-                    } else {
-                        params = `modo=admin&token=${encodeURIComponent(token)}&tipo=${tipo}`;
-                    }
+            let params;
+            if (tipo === 'ativar_manutencao' || tipo === 'status_manutencao') {
+                params = `modo=publico&tipo=${tipo}`;
+            } else {
+                params = `modo=admin&token=${encodeURIComponent(token)}&tipo=${tipo}`;
+            }
 
-                    if (tipo === 'cadastrar' || tipo === 'atualizar') {
-                        const p = dados.produto || {};
-                        params += `&nome=${encodeURIComponent(p["Nome do Produto"] || p.nome || '')}`;
-                        params += `&ref=${encodeURIComponent(p.referencia || '')}`;
-                        params += `&preco=${p.Preço || p.preco || 0}`;
-                        params += `&quantidade=${encodeURIComponent(p.Quantidade || p.quantidade || '')}`;
-                        params += `&categoria=${encodeURIComponent(p.Categoria || p.categoria || '')}`;
-                        params += `&subcategoria=${encodeURIComponent(p.Subcategoria || p.subcategoria || '')}`;
-                        params += `&cores=${encodeURIComponent(p.Cores || p.cores || '')}`;
-                        params += `&tamanho=${encodeURIComponent(p.Tamanho || p.tamanho || '')}`;
-                        params += `&imagem=${encodeURIComponent(p.Imagem || p.imagem || '')}`;
-                        params += `&disponivel=${p.Disponível || p.disponivel || 'sim'}`;
-                        params += `&destaque=${p.Destaque || p.destaque || 'nao'}`;
-                        params += `&estoque=${p.Estoque || p.estoque || 0}`;
-                        params += `&vendidos=${p.Vendidos || p.vendidos || 0}`;
-                        params += `&saldo_estoque=${p["Saldo Estoque"] || p.saldo_estoque || 0}`;
-                        if (p.ID) params += `&id=${p.ID}`;
-                    } else if (tipo === 'excluir') {
-                        params += `&id=${dados.id || ''}`;
-                    } else if (tipo === 'salvar_categoria') {
-                        params += `&categoria=${encodeURIComponent(dados.categoria?.nome || '')}`;
-                    } else if (tipo === 'salvar_banner') {
-                        params += `&banner=${encodeURIComponent(JSON.stringify(dados.banner || {}))}`;
-                    } else if (tipo === 'excluir_banner') {
-                        params += `&index=${dados.index || ''}`;
-                    } else if (tipo === 'salvar_marquee') {
-                        params += `&marquee=${encodeURIComponent(JSON.stringify(dados.marquee || {}))}`;
-                    } else if (tipo === 'excluir_marquee') {
-                        params += `&index=${dados.index || ''}`;
-                    } else if (tipo === 'editar_marquee') {
-                        params += `&index=${dados.index}`;
-                        params += `&marquee=${encodeURIComponent(JSON.stringify(dados.marquee || {}))}`;
-                    } else if (tipo === 'ativar_manutencao') {
-                        params += `&ativar=${dados.ativar || 'nao'}`;
-                        params += `&mensagem=${encodeURIComponent(dados.mensagem || '')}`;
-                        params += `&whatsapp=${encodeURIComponent(dados.whatsapp || '')}`;
-                    } else if (tipo === 'salvar_config') {
-                        params += `&config=${encodeURIComponent(JSON.stringify(dados.config || {}))}`;
-                    } else if (tipo === 'salvar_usuario') {
-                        params += `&usuario=${encodeURIComponent(JSON.stringify(dados.usuario || {}))}`;
-                    } else if (tipo === 'excluir_usuario') {
-                        params += `&index=${dados.index}`;
-                    } else if (tipo === 'salvar_estrutura') {
-                        params += `&estrutura=${encodeURIComponent(dados.estrutura || '[]')}`;
-                    } else if (tipo === 'repor_estoque') {
-                        params += `&id=${encodeURIComponent(dados.id || '')}`;
-                        params += `&qtd=${encodeURIComponent(dados.qtd || 0)}`;
-                    } else if (tipo === 'zerar_estoque') {
-                        params += `&id=${encodeURIComponent(dados.id || '')}`;
-                    } else if (tipo === 'toggle_disponivel') {
-                        params += `&id=${encodeURIComponent(dados.id || '')}`;
-                    } else if (tipo === 'toggle_destaque') {
-                        params += `&id=${encodeURIComponent(dados.id || '')}`;
-                    }
+            if (tipo === 'cadastrar' || tipo === 'atualizar') {
+                const p = dados.produto || {};
+                params += `&nome=${encodeURIComponent(p["Nome do Produto"] || p.nome || '')}`;
+                params += `&ref=${encodeURIComponent(p.referencia || '')}`;
+                params += `&preco=${p.Preço || p.preco || 0}`;
+                params += `&quantidade=${encodeURIComponent(p.Quantidade || p.quantidade || '')}`;
+                params += `&categoria=${encodeURIComponent(p.Categoria || p.categoria || '')}`;
+                params += `&subcategoria=${encodeURIComponent(p.Subcategoria || p.subcategoria || '')}`;
+                params += `&cores=${encodeURIComponent(p.Cores || p.cores || '')}`;
+                params += `&tamanho=${encodeURIComponent(p.Tamanho || p.tamanho || '')}`;
+                params += `&imagem=${encodeURIComponent(p.Imagem || p.imagem || '')}`;
+                params += `&disponivel=${p.Disponível || p.disponivel || 'sim'}`;
+                params += `&destaque=${p.Destaque || p.destaque || 'nao'}`;
+                params += `&estoque=${p.Estoque || p.estoque || 0}`;
+                params += `&vendidos=${p.Vendidos || p.vendidos || 0}`;
+                params += `&saldo_estoque=${p["Saldo Estoque"] || p.saldo_estoque || 0}`;
+                if (p.ID) params += `&id=${p.ID}`;
+            } else if (tipo === 'excluir') {
+                params += `&id=${dados.id || ''}`;
+            } else if (tipo === 'salvar_categoria') {
+                params += `&categoria=${encodeURIComponent(dados.categoria?.nome || '')}`;
+            } else if (tipo === 'salvar_banner') {
+                params += `&banner=${encodeURIComponent(JSON.stringify(dados.banner || {}))}`;
+            } else if (tipo === 'excluir_banner') {
+                params += `&index=${dados.index || ''}`;
+            } else if (tipo === 'salvar_marquee') {
+                params += `&marquee=${encodeURIComponent(JSON.stringify(dados.marquee || {}))}`;
+            } else if (tipo === 'excluir_marquee') {
+                params += `&index=${dados.index || ''}`;
+            } else if (tipo === 'editar_marquee') {
+                params += `&index=${dados.index}`;
+                params += `&marquee=${encodeURIComponent(JSON.stringify(dados.marquee || {}))}`;
+            } else if (tipo === 'ativar_manutencao') {
+                params += `&ativar=${dados.ativar || 'nao'}`;
+                params += `&mensagem=${encodeURIComponent(dados.mensagem || '')}`;
+                params += `&whatsapp=${encodeURIComponent(dados.whatsapp || '')}`;
+            } else if (tipo === 'salvar_config') {
+                params += `&config=${encodeURIComponent(JSON.stringify(dados.config || {}))}`;
+            } else if (tipo === 'salvar_usuario') {
+                params += `&usuario=${encodeURIComponent(JSON.stringify(dados.usuario || {}))}`;
+            } else if (tipo === 'excluir_usuario') {
+                params += `&index=${dados.index}`;
+            } else if (tipo === 'salvar_estrutura') {
+                params += `&estrutura=${encodeURIComponent(dados.estrutura || '[]')}`;
+            } else if (tipo === 'listar_tamanhos') {
+                // nenhum parâmetro extra — o token já vai em `params`
+            } else if (tipo === 'salvar_tamanhos') {
+                params += `&tamanhos=${encodeURIComponent(dados.tamanhos || '[]')}`;
+            } else if (tipo === 'repor_estoque') {
+                params += `&id=${encodeURIComponent(dados.id || '')}`;
+                params += `&qtd=${encodeURIComponent(dados.qtd || 0)}`;
+            } else if (tipo === 'zerar_estoque') {
+                params += `&id=${encodeURIComponent(dados.id || '')}`;
+            } else if (tipo === 'toggle_disponivel') {
+                params += `&id=${encodeURIComponent(dados.id || '')}`;
+            } else if (tipo === 'toggle_destaque') {
+                params += `&id=${encodeURIComponent(dados.id || '')}`;
+            }
 
-                    const script = document.createElement('script');
-                    script.src = `${ESTOQUE_API_URL}?${params}&callback=${callbackName}`;
+            const script = document.createElement('script');
+            script.src = `${ESTOQUE_API_URL}?${params}&callback=${callbackName}`;
 
-                    script.onerror = function () {
-                        delete window[callbackName];
-                        if (script.parentNode) script.parentNode.removeChild(script);
-                        reject(new Error('Erro na requisição JSONP'));
-                    };
+            script.onerror = function () {
+                delete window[callbackName];
+                if (script.parentNode) script.parentNode.removeChild(script);
+                reject(new Error('Erro na requisição JSONP'));
+            };
 
-                    const timeoutId = setTimeout(() => {
-                        if (window[callbackName]) {
-                            delete window[callbackName];
-                            if (script.parentNode) script.parentNode.removeChild(script);
-                            reject(new Error('Timeout na requisição'));
-                        }
-                    }, 15000);
+            const timeoutId = setTimeout(() => {
+                if (window[callbackName]) {
+                    delete window[callbackName];
+                    if (script.parentNode) script.parentNode.removeChild(script);
+                    reject(new Error('Timeout na requisição'));
+                }
+            }, 15000);
 
-                    const originalCallback = window[callbackName];
-                    window[callbackName] = function (data) {
-                        clearTimeout(timeoutId);
-                        originalCallback(data);
-                    };
+            const originalCallback = window[callbackName];
+            window[callbackName] = function (data) {
+                clearTimeout(timeoutId);
+                originalCallback(data);
+            };
 
-                    document.body.appendChild(script);
-                } catch (error) { reject(error); }
-            });
-        }
+            document.body.appendChild(script);
+        } catch (error) { reject(error); }
+    });
+}
 
         // ============================================
         // CATEGORIAS
@@ -3614,7 +3701,12 @@
                 document.getElementById('modalProduto').classList.add('active');
                 document.body.style.overflow = 'hidden';
                 setTimeout(atualizarPreviewImagem, 100);
-                
+
+            } else if (tipo === 'modalTamanhos') {
+                document.getElementById('modalTamanhos').classList.add('active');
+                document.body.style.overflow = 'hidden';
+                renderizarTamanhosAdmin();
+                       
             } else if (tipo === 'modalEstrutura') {
                 document.getElementById('modalEstrutura').classList.add('active');
                 document.body.style.overflow = 'hidden';
@@ -4871,6 +4963,168 @@
         window.editarEstrutura = editarEstrutura;
         window.excluirEstrutura = excluirEstrutura;
         window.cancelarEdicaoEstrutura = cancelarEdicaoEstrutura;
+
+
+        // ============================================
+// 🆕 TAMANHOS
+// ============================================
+let tamanhosCache = [];
+
+async function carregarTamanhosAdmin() {
+  try {
+    const result = await chamarAPI('listar_tamanhos');
+    if (result.success) {
+      tamanhosCache = result.tamanhos || [];
+      return tamanhosCache;
+    }
+    return [];
+  } catch (e) {
+    console.error('Erro ao listar tamanhos:', e);
+    return [];
+  }
+}
+
+function renderizarTamanhosAdmin() {
+  const container = document.getElementById('tamanhos-list');
+  if (!container) return;
+  container.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm"><i class="fas fa-spinner fa-spin"></i> Carregando...</p>';
+
+  carregarTamanhosAdmin().then(tamanhos => {
+    container.innerHTML = '';
+
+    if (!tamanhos || tamanhos.length === 0) {
+      container.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm">Nenhum tamanho cadastrado. Adicione o primeiro abaixo 👇</p>';
+      return;
+    }
+
+    // Agrupa por cor + chave
+    const agrupado = {};
+    tamanhos.forEach((t, idx) => {
+      const key = `${t.cor}|${t.chave}`;
+      if (!agrupado[key]) agrupado[key] = [];
+      agrupado[key].push({ ...t, index: idx });
+    });
+
+    Object.keys(agrupado).forEach(key => {
+      const [cor, chave] = key.split('|');
+      const corBg = cor === 'dourado' ? '#fef3c7' : '#f1f5f9';
+      const corTexto = cor === 'dourado' ? '#92400e' : '#475569';
+      const corLabel = cor === 'dourado' ? '🟡 Dourado' : '⚪ Prata';
+
+      const div = document.createElement('div');
+      div.className = "bg-gray-50 p-3 rounded-lg border";
+      div.innerHTML = `
+        <div class="flex items-center gap-2 mb-2 flex-wrap">
+          <span style="background: ${corBg}; color: ${corTexto}; padding: 2px 10px; border-radius: 8px; font-size: 11px; font-weight: 700;">
+            ${corLabel}
+          </span>
+          <span class="font-bold text-sm text-gray-700">${chave}</span>
+          <span class="text-[10px] text-gray-400">(${agrupado[key].length} tamanhos)</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5">
+          ${agrupado[key].map(t => `
+            <span class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-full px-2.5 py-1 text-xs">
+              <strong>${t.label}</strong>
+              <button onclick="editarTamanho(${t.index})" class="text-blue-600 hover:text-blue-800 p-0.5" title="Editar">
+                <i class="fas fa-pen text-[10px]"></i>
+              </button>
+              <button onclick="excluirTamanho(${t.index})" class="text-red-500 hover:text-red-700 p-0.5" title="Excluir">
+                <i class="fas fa-times text-[10px]"></i>
+              </button>
+            </span>
+          `).join('')}
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  });
+}
+
+function editarTamanho(index) {
+  const t = tamanhosCache[index];
+  if (!t) return;
+  document.getElementById('tamanhoEditIndex').value = index;
+  document.getElementById('tamanhoCor').value = t.cor;
+  document.getElementById('tamanhoChave').value = t.chave;
+  document.getElementById('tamanhoLabel').value = t.label;
+  document.getElementById('tamanhoValor').value = t.valor;
+  document.getElementById('tamanhoFormTitle').innerText = '✏️ Editando tamanho';
+  document.getElementById('btnSalvarTamanhoText').innerText = 'Salvar Edição';
+  document.getElementById('formTamanho').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function cancelarEdicaoTamanho() {
+  document.getElementById('tamanhoEditIndex').value = -1;
+  document.getElementById('formTamanho').reset();
+  document.getElementById('tamanhoFormTitle').innerText = '➕ Adicionar Tamanho';
+  document.getElementById('btnSalvarTamanhoText').innerText = 'Adicionar';
+}
+
+async function excluirTamanho(index) {
+  if (!confirm('Excluir este tamanho?')) return;
+  const nova = tamanhosCache.filter((_, i) => i !== index);
+  try {
+    const result = await chamarAPI('salvar_tamanhos', { tamanhos: JSON.stringify(nova) });
+    if (result.success) {
+      alert('✅ Tamanho excluído!');
+      renderizarTamanhosAdmin();
+    } else {
+      alert('❌ Erro: ' + (result.error || 'desconhecido'));
+    }
+  } catch (e) {
+    alert('❌ Erro: ' + e.message);
+  }
+}
+
+document.getElementById('formTamanho').onsubmit = async function (e) {
+  e.preventDefault();
+  const indexEdit = parseInt(document.getElementById('tamanhoEditIndex').value, 10);
+  const novo = {
+    cor: document.getElementById('tamanhoCor').value,
+    chave: document.getElementById('tamanhoChave').value.trim().toLowerCase(),
+    label: document.getElementById('tamanhoLabel').value.trim(),
+    valor: document.getElementById('tamanhoValor').value.trim()
+  };
+
+  if (!novo.chave || !novo.label || !novo.valor) {
+    alert('Preencha todos os campos');
+    return;
+  }
+
+  let novaLista;
+  if (indexEdit >= 0) {
+    novaLista = tamanhosCache.map((t, i) => i === indexEdit ? novo : t);
+  } else {
+    novaLista = tamanhosCache.concat([novo]);
+  }
+
+  const btn = document.getElementById('btnSalvarTamanho');
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Salvando...';
+
+  try {
+    const result = await chamarAPI('salvar_tamanhos', { tamanhos: JSON.stringify(novaLista) });
+    if (result.success) {
+      alert(indexEdit >= 0 ? '✅ Tamanho atualizado!' : '✅ Tamanho adicionado!');
+      cancelarEdicaoTamanho();
+      setTimeout(() => renderizarTamanhosAdmin(), 500);
+    } else {
+      alert('❌ Erro: ' + (result.error || 'desconhecido'));
+    }
+  } catch (err) {
+    alert('❌ Erro: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+};
+
+window.editarTamanho = editarTamanho;
+window.excluirTamanho = excluirTamanho;
+window.cancelarEdicaoTamanho = cancelarEdicaoTamanho;
+
+
     </script>
 </body>
 
