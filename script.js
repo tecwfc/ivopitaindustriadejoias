@@ -55,6 +55,7 @@ let coresDisponiveis = [];
 let estruturaCategorias = [];
 let sidebarDinamicaAtiva = false;
 let __dadosCarregados = null;
+let __sidebarJaRenderizada = false;
 
 const ESTOQUE_CACHE = new Map();
 const ESTOQUE_CACHE_TTL = 5 * 1000; // 5 segundos
@@ -217,10 +218,10 @@ async function atualizarEmBackground(mostrarLoading = false) {
 }
 
 function aplicarDados(dados) {
-  allProducts = (dados.produtos || []).filter(p => {
+  allProducts = (dados.produtos || []).filter(function (p) {
     const disp = String(p["Disponível"] || p.disponivel || '').toLowerCase().trim();
     return disp === 'sim';
-  }).map(p => {
+  }).map(function (p) {
     if (!p["Saldo Estoque"] && p["Saldo Estoque"] !== 0) {
       p["Saldo Estoque"] = (parseInt(p.Estoque) || 0) - (parseInt(p.Vendidos) || 0);
     }
@@ -231,9 +232,21 @@ function aplicarDados(dados) {
   aplicarConfig(dados.config || {});
   renderizarMarquee(dados.marquee || []);
 
+  // ✅ GUARDA os tamanhos do backend ANTES de renderizar a sidebar
+  if (dados.tamanhos && Array.isArray(dados.tamanhos) && dados.tamanhos.length > 0) {
+    window.__tamanhosBackend = dados.tamanhos;
+    console.log(`📐 ${dados.tamanhos.length} tamanhos carregados do backend`);
+  }
+
+  // ✅ Renderiza a sidebar (com lock para não duplicar)
   if (dados.estrutura && Array.isArray(dados.estrutura) && dados.estrutura.length > 0) {
     estruturaCategorias = dados.estrutura;
-    renderizarSidebarDinamica();
+    if (!window.__sidebarJaRenderizada) {
+      window.__sidebarJaRenderizada = true;
+      renderizarSidebarDinamica();
+    } else {
+      console.log('🔒 Sidebar já renderizada — pulando renderização duplicada');
+    }
   }
 
   if (allProducts.length === 0) {
@@ -253,13 +266,42 @@ function aplicarDados(dados) {
   setTimeout(atualizarContadorProdutos, 50);
 }
 
-// ============================================
-// SIDEBAR DINÂMICA
-// ============================================
 function renderizarSidebarDinamica() {
   const scroll = document.getElementById('sidebar-scroll');
   if (!scroll) return;
 
+  // ✅ 1. PRIORIZA os tamanhos do BACKEND (se existirem)
+  let tamanhos = [];
+  if (window.__tamanhosBackend && Array.isArray(window.__tamanhosBackend) && window.__tamanhosBackend.length > 0) {
+    tamanhos = window.__tamanhosBackend.map(function (t) {
+      return {
+        cor: String(t.cor || 'dourado').toLowerCase().trim(),
+        chave: normalizar(String(t.chave || '')),
+        label: String(t.label || '').trim(),
+        valor: String(t.valor || '').trim()
+      };
+    });
+    console.log(`📏 [DEBUG] ${tamanhos.length} tamanhos vindos do BACKEND`);
+  } else {
+    // Fallback: lê do HTML estático
+    const vistos = new Set();
+    scroll.querySelectorAll('.sidebar-item-tamanho').forEach(function (btn) {
+      const cat = (btn.getAttribute('data-categoria') || '').toLowerCase().trim();
+      if (!cat || vistos.has(cat)) return;
+      vistos.add(cat);
+      const catNorm = normalizar(cat);
+      const partes = cat.split(/\s+/);
+      tamanhos.push({
+        cor: catNorm.indexOf('prata') !== -1 ? 'prata' : 'dourado',
+        chave: normalizar(partes[0] || ''),
+        label: btn.textContent.trim(),
+        valor: partes[partes.length - 1] || ''
+      });
+    });
+    console.log(`📏 [DEBUG] ${tamanhos.length} tamanhos vindos do HTML (fallback)`);
+  }
+
+  // ✅ 2. Guarda "Todas" e limpa
   const btnTodas = scroll.querySelector('.sidebar-item[data-categoria="todos"]');
   scroll.innerHTML = '';
 
@@ -282,8 +324,9 @@ function renderizarSidebarDinamica() {
     return;
   }
 
+  // ✅ 3. Agrupa a estrutura
   const grupos = {};
-  estruturaCategorias.forEach(item => {
+  estruturaCategorias.forEach(function (item) {
     const g = item.grupo || 'Outros';
     if (!grupos[g]) grupos[g] = {};
     const c = item.categoria || 'Sem categoria';
@@ -306,7 +349,7 @@ function renderizarSidebarDinamica() {
     'Folheado Prata': '#475569'
   };
 
-  Object.keys(grupos).forEach(nomeGrupo => {
+  Object.keys(grupos).forEach(function (nomeGrupo) {
     const groupDiv = document.createElement('div');
     groupDiv.className = 'sidebar-group';
 
@@ -326,16 +369,28 @@ function renderizarSidebarDinamica() {
     const contentDiv = document.createElement('div');
     contentDiv.className = 'sidebar-group-content';
 
-    const categoriasOrdenadas = Object.keys(grupos[nomeGrupo]).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    const categoriasOrdenadas = Object.keys(grupos[nomeGrupo]).sort(function (a, b) {
+      return a.localeCompare(b, 'pt-BR');
+    });
 
-    categoriasOrdenadas.forEach(nomeCategoria => {
+    categoriasOrdenadas.forEach(function (nomeCategoria) {
       const subs = grupos[nomeGrupo][nomeCategoria];
+      const nomeCategoriaLower = nomeCategoria.toLowerCase();
 
+      // ✅ Detecta a cor da categoria
+      let corAtual = 'dourado';
+      if (nomeCategoriaLower.indexOf('prata') !== -1 ||
+          nomeCategoriaLower.indexOf('prateado') !== -1 ||
+          nomeCategoriaLower.indexOf('prateada') !== -1) {
+        corAtual = 'prata';
+      }
+
+      // Se a categoria não tem subs, vira botão único
       if (subs.length === 0) {
         const btn = document.createElement('button');
         btn.className = 'sidebar-item-sub';
         btn.setAttribute('type', 'button');
-        btn.setAttribute('data-categoria', nomeCategoria.toLowerCase());
+        btn.setAttribute('data-categoria', nomeCategoriaLower);
         btn.innerHTML = `<span>${nomeCategoria}</span>`;
         contentDiv.appendChild(btn);
         return;
@@ -346,11 +401,12 @@ function renderizarSidebarDinamica() {
         .replace(/\s+(prata|prateado|prateada|prateados|prateadas)\s*$/i, '')
         .trim();
 
+      // Se só tem 1 sub e é igual ao nomeCurto, vira botão único
       if (subs.length === 1 && subs[0].toLowerCase() === nomeCurto.toLowerCase()) {
         const btn = document.createElement('button');
         btn.className = 'sidebar-item-sub';
         btn.setAttribute('type', 'button');
-        btn.setAttribute('data-categoria', nomeCategoria.toLowerCase());
+        btn.setAttribute('data-categoria', nomeCategoriaLower);
         btn.innerHTML = `<span>${nomeCategoria}</span>`;
         contentDiv.appendChild(btn);
         return;
@@ -369,13 +425,39 @@ function renderizarSidebarDinamica() {
       const subContent = document.createElement('div');
       subContent.className = 'sidebar-subgroup-content';
 
-      subs.forEach(sub => {
+      const catNorm = normalizar(nomeCategoriaLower);
+
+      subs.forEach(function (sub) {
         const btn = document.createElement('button');
         btn.className = 'sidebar-item-sub';
         btn.setAttribute('type', 'button');
         btn.setAttribute('data-categoria', (nomeCategoria + ' ' + sub).toLowerCase());
         btn.innerHTML = `<span>${sub}</span>`;
         subContent.appendChild(btn);
+
+        const subNorm = normalizar(sub);
+
+        // ✅ FILTRA os tamanhos do backend por cor + chave
+        const tamanhosAqui = tamanhos.filter(function (t) {
+          if (!t.chave) return false;
+          if (t.cor !== corAtual) return false;
+          const chaveNorm = normalizar(t.chave);
+          return catNorm.indexOf(chaveNorm) !== -1 || subNorm.indexOf(chaveNorm) !== -1;
+        });
+
+        if (tamanhosAqui.length > 0) {
+          console.log(`📏 [DEBUG] "${nomeCategoria} > ${sub}": ${tamanhosAqui.length} tamanhos (${corAtual})`);
+        }
+
+        // ✅ Cria os botões DINAMICAMENTE a partir dos dados do backend
+        tamanhosAqui.forEach(function (t) {
+          const btnT = document.createElement('button');
+          btnT.className = 'sidebar-item-tamanho';
+          btnT.setAttribute('type', 'button');
+          btnT.setAttribute('data-categoria', `${t.chave} ${t.cor} ${t.valor}`);
+          btnT.innerHTML = `<span>${t.label}</span>`;
+          subContent.appendChild(btnT);
+        });
       });
 
       subDiv.appendChild(subContent);
@@ -389,11 +471,16 @@ function renderizarSidebarDinamica() {
   sidebarDinamicaAtiva = true;
   rebindSidebarEvents();
 
+  const totalFinal = scroll.querySelectorAll('.sidebar-item-tamanho').length;
+  console.log(`🎉 [DEBUG] FIM: ${totalFinal} botões de tamanho renderizados na sidebar`);
+
   const searchInput = document.getElementById('sidebar-search');
   if (searchInput && searchInput.value.trim()) {
     aplicarBuscaSidebar(searchInput.value);
   }
 }
+
+
 
 function rebindSidebarEvents() {
   document.querySelectorAll('.sidebar-item').forEach(btn => {
@@ -408,6 +495,18 @@ function rebindSidebarEvents() {
   });
 
   document.querySelectorAll('.sidebar-item-sub').forEach(btn => {
+    btn.onclick = function (e) {
+      e.preventDefault();
+      const categoria = this.getAttribute('data-categoria');
+      if (!categoria) return;
+      marcarItemSidebarAtivo(categoria);
+      filtrarPorCategoria(categoria);
+      if (window.innerWidth <= 900) fecharSidebarMobile();
+    };
+  });
+
+    // ✅ Botões de tamanho (sub-subcategoria)
+  document.querySelectorAll('.sidebar-item-tamanho').forEach(btn => {
     btn.onclick = function (e) {
       e.preventDefault();
       const categoria = this.getAttribute('data-categoria');
@@ -487,7 +586,8 @@ window.fecharSidebarMobile = fecharSidebarMobile;
 // SIDEBAR - MARCAR ITEM ATIVO
 // ============================================
 function marcarItemSidebarAtivo(categoria) {
-  document.querySelectorAll('.sidebar-item, .sidebar-item-sub').forEach(el => {
+  // Limpa todos os ativos (incluindo os de tamanho)
+  document.querySelectorAll('.sidebar-item, .sidebar-item-sub, .sidebar-item-tamanho').forEach(el => {
     el.classList.remove('sidebar-item-active', 'active');
   });
 
@@ -497,10 +597,17 @@ function marcarItemSidebarAtivo(categoria) {
     return;
   }
 
-  const el = document.querySelector(`.sidebar-item-sub[data-categoria="${categoria}"]`);
-  if (el) el.classList.add('active');
-}
+  // Verifica se é um item de tamanho
+  const elTamanho = document.querySelector(`.sidebar-item-tamanho[data-categoria="${categoria}"]`);
+  if (elTamanho) {
+    elTamanho.classList.add('active');
+    return;
+  }
 
+  // Senão, é subcategoria normal
+  const elSub = document.querySelector(`.sidebar-item-sub[data-categoria="${categoria}"]`);
+  if (elSub) elSub.classList.add('active');
+}
 // ============================================
 // CONTADOR DE PRODUTOS (HEADER)
 // ============================================
@@ -567,6 +674,23 @@ function atualizarContadoresSidebar() {
       total += contarProdutosPorCategoria(categoria);
     });
 
+    // Contadores dos tamanhos (sub-subcategorias)
+document.querySelectorAll('.sidebar-item-tamanho[data-categoria]').forEach(btn => {
+  const categoria = btn.getAttribute('data-categoria');
+  if (!categoria) return;
+
+  const quantidade = contarProdutosPorCategoria(categoria);
+
+  let countSpan = btn.querySelector('.sidebar-count');
+  if (!countSpan) {
+    countSpan = document.createElement('span');
+    countSpan.className = 'sidebar-count';
+    btn.appendChild(countSpan);
+  }
+  countSpan.textContent = quantidade;
+  btn.style.opacity = quantidade === 0 ? '0.5' : '1';
+});
+
     let countSpan = subgroupTitle.querySelector('.sidebar-count');
     if (!countSpan) {
       countSpan = document.createElement('span');
@@ -587,11 +711,12 @@ function contarProdutosPorCategoria(categoria) {
   const palavrasFiltroNorm = palavrasFiltro.map(normalizarPalavraBusca);
 
   return allProducts.filter((p) => {
-    const catProduto = normalizar(p["Categoria"] || "");
+   const catProduto = normalizar(p["Categoria"] || "");
     const subcatProduto = normalizar(p["Subcategoria"] || "");
+    const tamanhoProduto = normalizar(p["Tamanho"] || "");  // 👈 NOVO
     const nomeProduto = normalizar(p["Nome do Produto"] || "");
     const refProduto = normalizar(p["referencia"] || "");
-    const combinado = catProduto + " " + subcatProduto + " " + nomeProduto + " " + refProduto;
+    const combinado = catProduto + " " + subcatProduto + " " + tamanhoProduto + " " + nomeProduto + " " + refProduto;
     const combinadoNorm = combinado.split(/\s+/).map(normalizarPalavraBusca).join(" ");
     return palavrasFiltroNorm.every((palavra) => combinadoNorm.includes(palavra));
   }).length;
@@ -2871,11 +2996,12 @@ function filtrarPorCategoria(categoria) {
     categoria === "todos"
       ? allProducts
       : allProducts.filter((p) => {
-        const catProduto = normalizar(p["Categoria"] || "");
-        const subcatProduto = normalizar(p["Subcategoria"] || "");
-        const nomeProduto = normalizar(p["Nome do Produto"] || "");
-        const refProduto = normalizar(p["referencia"] || "");
-        const combinado = catProduto + " " + subcatProduto + " " + nomeProduto + " " + refProduto;
+       const catProduto = normalizar(p["Categoria"] || "");
+      const subcatProduto = normalizar(p["Subcategoria"] || "");
+      const tamanhoProduto = normalizar(p["Tamanho"] || "");  // 👈 NOVO
+      const nomeProduto = normalizar(p["Nome do Produto"] || "");
+      const refProduto = normalizar(p["referencia"] || "");
+      const combinado = catProduto + " " + subcatProduto + " " + tamanhoProduto + " " + nomeProduto + " " + refProduto;
         const combinadoNorm = combinado.split(/\s+/).map(normalizarPalavraBusca).join(" ");
         return palavrasFiltroNorm.every((palavra) => combinadoNorm.includes(palavra));
       });
@@ -3070,6 +3196,19 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.key === "ArrowLeft") zoomAnterior();
     if (e.key === "ArrowRight") zoomProximo();
   });
+
+  // Sidebar - botões de tamanho (sub-subcategoria)
+document.querySelectorAll('.sidebar-item-tamanho').forEach(btn => {
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    const categoria = this.getAttribute('data-categoria');
+    if (!categoria) return;
+    marcarItemSidebarAtivo(categoria);
+    filtrarPorCategoria(categoria);
+    if (window.innerWidth <= 900) fecharSidebarMobile();
+  });
+});
+
 
   const produtosContainer = document.getElementById('produtos-container');
   if (produtosContainer) {
