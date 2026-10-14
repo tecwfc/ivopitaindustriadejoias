@@ -117,19 +117,23 @@ function normalizarPalavraBusca(palavra) {
 function driveImg(url, size = IMG_SIZE_CARD) {
   if (!url || url === 'placeholder.png') return PLACEHOLDER_SVG;
 
-  if (url.includes("googleusercontent.com")) {
-    return url.replace(/=s\d+.*$/, `=s${size}`).replace(/=w\d+.*$/, `=s${size}`);
+  // ✅ Já é lh3: apenas força o tamanho com =w (largura, mantém proporção)
+  if (url.includes("lh3.googleusercontent.com")) {
+    // Remove qualquer parâmetro de tamanho anterior e aplica o novo
+    return url.replace(/=w\d+.*$/, '').replace(/=s\d+.*$/, '') + `=w${size}`;
   }
 
+  // ✅ URL antiga do drive.google.com → converte para lh3
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (match) {
-    return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=s${size}`;
+    return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=w${size}`;
   }
 
+  // ✅ URL normal (http) → retorna como está
   if (url.startsWith("http")) return url;
+
   return PLACEHOLDER_SVG;
 }
-
 // ============================================
 // CARREGAMENTO DE DADOS
 // ============================================
@@ -241,6 +245,20 @@ function aplicarDados(dados) {
  log(`📦 ${allProducts.length} produtos disponíveis`);
   aplicarConfig(dados.config || {});
   renderizarMarquee(dados.marquee || []);
+  
+  // ✅ Preload das 4 primeiras imagens (acelera LCP)
+(function preloadPrimeirasImagens() {
+  const primeiras = allProducts.slice(0, 4);
+  primeiras.forEach(p => {
+    if (!p.Imagem) return;
+    const url = driveImg(p.Imagem, 400);
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = url;
+    document.head.appendChild(link);
+  });
+})();
 
   // ✅ GUARDA os tamanhos do backend
   if (dados.tamanhos && Array.isArray(dados.tamanhos) && dados.tamanhos.length > 0) {
