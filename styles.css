@@ -625,11 +625,14 @@ header.glass #search-input-desktop::placeholder {
 /* ========================================== */
 /* 7. TÍTULOS CATÁLOGO (HEADER)                */
 /* ========================================== */
+
+/* ✅ DESKTOP: título em cima, subtítulo embaixo */
 .catalogo-inline {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  white-space: nowrap;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3px;
   flex-shrink: 0;
 }
 
@@ -645,31 +648,30 @@ header.glass #search-input-desktop::placeholder {
   line-height: 1;
 }
 
-.catalogo-heading i { color: #c9a86a; font-size: 1.4rem; }
-
-.catalogo-separator {
+.catalogo-heading i {
   color: #c9a86a;
   font-size: 1.4rem;
-  font-weight: 300;
-  opacity: 0.7;
 }
 
 .catalogo-subheading {
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #5c6b63;
-  letter-spacing: 0.06em;
-  text-transform: lowercase;
-  font-style: italic;
-  white-space: nowrap;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #c9a86a;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-style: normal;
+  padding-left: 4px;
+  line-height: 1;
 }
 
+/* ✅ MOBILE: título em cima, subtítulo embaixo */
 .catalogo-mobile {
   display: none;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 2px;
   white-space: nowrap;
   overflow: hidden;
   padding: 0 4px;
@@ -691,25 +693,18 @@ header.glass #search-input-desktop::placeholder {
 
 .catalogo-heading-mobile i { color: #c9a86a; font-size: 0.9rem; }
 
-.catalogo-separator-mobile {
-  color: #c9a86a;
-  font-size: 1rem;
-  font-weight: 700;
-  opacity: 0.6;
-  line-height: 1;
-}
-
 .catalogo-subheading-mobile {
   font-family: 'Montserrat', sans-serif;
   font-size: 0.6rem;
   font-weight: 600;
-  color: #5c6b63;
-  letter-spacing: 0.05em;
-  text-transform: lowercase;
-  font-style: italic;
+  color: #c9a86a;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-style: normal;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1;
 }
 
 .catalogo-desktop-group { display: flex; }
@@ -2068,8 +2063,7 @@ header.glass #search-input-desktop::placeholder {
   .main-content { margin-left: 250px; }
   .catalogo-heading { font-size: 1.35rem; }
   .catalogo-heading i { font-size: 1.1rem; }
-  .catalogo-separator { font-size: 1.1rem; }
-  .catalogo-subheading { font-size: 0.7rem; }
+  .catalogo-subheading { font-size: 0.62rem; letter-spacing: 0.14em; }
   .search-compact { width: 160px !important; max-width: 160px !important; }
   .search-compact:focus-within { width: 200px !important; max-width: 200px !important; }
 }
@@ -2283,14 +2277,14 @@ header.glass #search-input-desktop::placeholder {
   .marquee-item { font-size: 9px; gap: 6px; }
   .marquee-track { gap: 40px; }
   .catalogo-heading-mobile { font-size: 1.1rem; }
-  .catalogo-subheading-mobile { font-size: 0.6rem; }
+  .catalogo-subheading-mobile { font-size: 0.55rem; letter-spacing: 0.1em; }
 }
 
 /* MOBILE MUITO PEQUENO (<400px) */
 @media (max-width: 400px) {
   .catalogo-heading-mobile { font-size: 1rem; }
   .catalogo-heading-mobile i { font-size: 0.8rem; }
-  .catalogo-subheading-mobile { font-size: 0.55rem; }
+  .catalogo-subheading-mobile { font-size: 0.5rem; }
   .catalogo-mobile { gap: 4px; }
 }
 
@@ -2299,8 +2293,7 @@ header.glass #search-input-desktop::placeholder {
   .produtos-grid-5 .product-card-title { font-size: 0.8rem; }
   .produtos-grid-5 .product-card-price { font-size: 13px; }
   .produtos-grid-5 .product-card-btn { font-size: 9.5px; padding: 7px; }
-  .catalogo-subheading-mobile,
-  .catalogo-separator-mobile { display: none; }
+  .catalogo-subheading-mobile { display: none; }
   .catalogo-heading-mobile { font-size: 1.05rem; }
 }
 
@@ -2339,16 +2332,13 @@ a[href*="wa.me"].animate-breathe i { color: #ffffff !important; }
 /* 23. FIX CARRINHO — ALTURA AUTOMÁTICA        */
 /* ========================================== */
 
-/* Container do modal do carrinho: flex column, cresce só o necessário */
 #cart-modal > div {
   display: flex !important;
   flex-direction: column !important;
   max-height: 92vh !important;
-  /* SEM height fixo — cresce apenas o necessário */
   overflow: hidden !important;
 }
 
-/* Lista de itens: cresce até 40vh, depois scroll interno */
 #cart-items {
   flex: 0 1 auto !important;
   min-height: 0 !important;
@@ -2369,14 +2359,12 @@ a[href*="wa.me"].animate-breathe i { color: #ffffff !important; }
   background: rgba(47, 107, 79, 0.5);
 }
 
-/* Header, barra e footer do carrinho: nunca encolhem */
 #cart-modal > div > div:first-child,
 #cart-modal > div > div:nth-child(2),
 #cart-modal > div > div:last-child {
   flex-shrink: 0 !important;
 }
 
-/* Carrinho — Bottom Sheet em mobile */
 @media (max-width: 600px) {
   #cart-modal {
     align-items: flex-end !important;
@@ -2404,7 +2392,6 @@ a[href*="wa.me"].animate-breathe i { color: #ffffff !important; }
   overflow: hidden !important;
 }
 
-/* Body do modal cliente: única área com scroll */
 #cliente-modal > div > div:nth-child(2) {
   flex: 1 1 0 !important;
   min-height: 0 !important;
@@ -2429,7 +2416,6 @@ a[href*="wa.me"].animate-breathe i { color: #ffffff !important; }
   flex-shrink: 0 !important;
 }
 
-/* Bottom sheet em mobile */
 @media (max-width: 600px) {
   #cliente-modal {
     align-items: flex-end !important;
@@ -2605,7 +2591,6 @@ a[href*="wa.me"].animate-breathe i { color: #ffffff !important; }
 
 #cliente-modal > div > div:nth-child(2) { padding: 14px 16px !important; }
 
-/* MOBILE — AINDA MAIS COMPACTO */
 @media (max-width: 640px) {
   #cart-modal > div > div:last-child { padding: 10px 12px !important; }
   #cart-total { font-size: 14px !important; }
@@ -2635,6 +2620,7 @@ a[href*="wa.me"].animate-breathe i { color: #ffffff !important; }
     padding: 9px 10px !important;
   }
 }
+
 /* ========================================== */
 /* 27. SUB-SUBCATEGORIA (TAMANHOS)             */
 /* ========================================== */
@@ -2644,12 +2630,12 @@ a[href*="wa.me"].animate-breathe i { color: #ffffff !important; }
   justify-content: space-between;
   gap: 6px;
   width: 100%;
-  padding: 5px 10px 5px 28px; /* Mais indentado que a subcategoria */
+  padding: 5px 10px 5px 28px;
   margin-bottom: 1px;
   border: none;
   background: transparent;
   border-radius: 6px;
-  font-size: 10.5px; /* Menor que a subcategoria */
+  font-size: 10.5px;
   font-weight: 500;
   color: #8c9a92;
   cursor: pointer;
@@ -2695,7 +2681,6 @@ a[href*="wa.me"].animate-breathe i { color: #ffffff !important; }
   color: #78350f;
 }
 
-/* No mobile, deixa maior para toque */
 @media (max-width: 900px) {
   .sidebar-item-tamanho {
     padding: 10px 16px 10px 40px;
@@ -2712,17 +2697,4 @@ a[href*="wa.me"].animate-breathe i { color: #ffffff !important; }
   .sidebar-item-tamanho.active {
     padding-left: 37px;
   }
-}
-.sidebar-item-tamanho:hover {
-  background: rgba(47, 107, 79, 0.05);
-  color: #2f6b4f;
-  padding-left: 32px;
-}
-
-.sidebar-item-tamanho.active {
-  background: rgba(201, 168, 106, 0.12);
-  color: #92400e;
-  font-weight: 700;
-  border-left: 2px solid #c9a86a;
-  padding-left: 25px;
 }
