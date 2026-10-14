@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ivo-pita-v11';
+const CACHE_NAME = 'ivo-pita-v12';        // ⬆️ suba a versão
 const CACHE_IMAGENS = 'ivo-imagens-v1';
 
 const urlsToCache = [
@@ -25,7 +25,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// ACTIVATE — Limpa caches antigos (exceto o de imagens)
+// ACTIVATE — Limpa caches antigos
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -59,8 +59,16 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // ✅ NOVO: Cache-First para imagens do Google Drive (resolve 403 e lentidão)
-  if (url.includes('googleusercontent.com') || url.includes('lh3.google.com')) {
+  // ✅ Cache-First para imagens do Google Drive (lh3 a lh6) + CDNs futuros
+  if (
+    url.includes('googleusercontent.com') ||
+    url.includes('lh3.google.com') ||
+    url.includes('lh4.google.com') ||
+    url.includes('lh5.google.com') ||
+    url.includes('lh6.google.com') ||
+    url.includes('res.cloudinary.com') ||   // ← Cloudinary (futuro)
+    url.includes('b-cdn.net')                // ← Bunny CDN (futuro)
+  ) {
     event.respondWith(
       caches.open(CACHE_IMAGENS).then(cache => {
         return cache.match(event.request).then(cached => {
