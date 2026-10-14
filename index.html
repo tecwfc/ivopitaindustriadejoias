@@ -32,62 +32,59 @@
 
 <body class="bg-bgSoft text-textDark">
 
-  <!-- HEADER -->
-  <header
-
-    class="glass fixed top-0 w-full z-[100] px-4 md:px-6 border-b border-primary/10 flex items-center justify-between gap-4 md:gap-6">
-    <div class="flex items-center gap-3 group cursor-pointer shrink-0"
-      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
-      <div class="relative">
-        <div
-          class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-20 group-hover:opacity-60 transition duration-1000">
-        </div>
-        <div
-          class="relative h-12 w-12 md:h-14 lg:h-16 md:w-14 lg:w-16 rounded-full border-2 border-white shadow-soft bg-white flex items-center justify-center overflow-hidden">
-          <img src="assets/papel_ivo_preto.png" alt="Ivo Pita Joias" class="w-full h-full object-cover rounded-full" />
-        </div>
+  <header class="glass fixed top-0 w-full z-[100] px-4 md:px-6 border-b border-primary/10 flex items-center justify-between gap-4 md:gap-6">
+  <div class="flex items-center gap-3 group cursor-pointer shrink-0"
+    onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+    <div class="relative">
+      <div
+        class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-20 group-hover:opacity-60 transition duration-1000">
       </div>
-      <div class="flex flex-col leading-tight hidden sm:flex">
-        <h1 class="font-black text-2xl md:text-3xl lg:text-4xl text-primary tracking-tighter font-serif">IVO PITA</h1>
-        <span class="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-gold opacity-90">Indústria de
-          Joias</span>
+      <div
+        class="relative h-12 w-12 md:h-14 lg:h-16 md:w-14 lg:w-16 rounded-full border-2 border-white shadow-soft bg-white flex items-center justify-center overflow-hidden">
+        <img src="assets/papel_ivo_preto.png" alt="Ivo Pita Joias" class="w-full h-full object-cover rounded-full" />
       </div>
     </div>
-
-    <div class="flex-1 items-center justify-center gap-6 lg:gap-8 catalogo-desktop-group">
-      <div class="catalogo-inline">
-        <span class="catalogo-heading"><i class="fas fa-book-open"></i> Catálogo</span>
-        <span class="catalogo-subheading">faça seu pedido online</span>
-      </div>
-      <div class="relative shrink-0 search-compact">
-        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-textMuted text-xs"></i>
-        <input type="text" id="search-input-desktop" placeholder="Buscar..."
-          class="w-full pl-8 pr-3 py-2 rounded-full border border-primary/20 bg-bgSoft text-xs outline-none transition-all focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/15" />
-      </div>
+    <div class="flex flex-col leading-tight hidden sm:flex">
+      <h1 class="font-black text-2xl md:text-3xl lg:text-4xl text-primary tracking-tighter font-serif">IVO PITA</h1>
+      <span class="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-gold opacity-90">Indústria de
+        Joias</span>
     </div>
+  </div>
 
-    <div class="catalogo-mobile">
-  <span class="catalogo-heading-mobile"><i class="fas fa-book-open"></i> Catálogo</span>
-  <span class="catalogo-subheading-mobile">faça seu pedido</span>
-</div>
-
-    <div class="flex items-center gap-1 md:gap-3 shrink-0">
-      <button id="mobile-search-btn"
-        class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
-        <i class="fas fa-search text-xl"></i>
-      </button>
-      <button id="cart-btn"
-        class="relative bg-primary text-white p-3 md:p-2.5 rounded-xl md:rounded-full hover:bg-primaryDark transition shadow-card active:scale-95">
-        <i class="fas fa-shopping-bag text-lg md:text-base"></i>
-        <span id="cart-count"
-          class="absolute -top-1 -right-1 bg-white text-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">0</span>
-      </button>
-      <button id="mobile-menu-btn"
-        class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
-        <i class="fa-solid fa-bars-staggered text-xl"></i>
-      </button>
+  <div class="flex-1 items-center justify-center gap-6 lg:gap-8 catalogo-desktop-group">
+    <div class="catalogo-inline">
+      <span class="catalogo-heading"><i class="fas fa-book-open"></i> Catálogo</span>
+      <span class="catalogo-subheading">faça seu pedido online</span>
     </div>
-  </header>
+    <div class="relative shrink-0 search-compact">
+      <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-textMuted text-xs"></i>
+      <input type="text" id="search-input-desktop" placeholder="Buscar..."
+        class="w-full pl-8 pr-3 py-2 rounded-full border border-primary/20 bg-bgSoft text-xs outline-none transition-all focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/15" />
+    </div>
+  </div>
+
+  <div class="catalogo-mobile">
+    <span class="catalogo-heading-mobile"><i class="fas fa-book-open"></i> Catálogo</span>
+    <span class="catalogo-subheading-mobile">faça seu pedido</span>
+  </div>
+
+  <div class="flex items-center gap-1 md:gap-3 shrink-0">
+    <button id="mobile-search-btn"
+      class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
+      <i class="fas fa-search text-xl"></i>
+    </button>
+    <button id="cart-btn"
+      class="relative bg-primary text-white p-3 md:p-2.5 rounded-xl md:rounded-full hover:bg-primaryDark transition shadow-card active:scale-95">
+      <i class="fas fa-shopping-bag text-lg md:text-base"></i>
+      <span id="cart-count"
+        class="absolute -top-1 -right-1 bg-white text-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">0</span>
+    </button>
+    <button id="mobile-menu-btn"
+      class="md:hidden text-primary bg-primary/5 p-3 rounded-xl active:scale-95 transition-all">
+      <i class="fa-solid fa-bars-staggered text-xl"></i>
+    </button>
+  </div>
+</header>
 
   <!-- MARQUEE -->
   <div class="marquee-bar">
