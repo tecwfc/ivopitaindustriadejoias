@@ -6,34 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
   <title>Ivo Pita | Indústria de Joias</title>
 
-  <!-- 🚧 VERIFICAÇÃO DE MANUTENÇÃO -->
-  <script>
-    (function () {
-      var params = new URLSearchParams(window.location.search);
-      if (params.get("admin") === "ivopita2026") {
-        sessionStorage.setItem("admin_bypass", "true");
-        return;
-      }
-      if (sessionStorage.getItem("admin_bypass") === "true") return;
-
-      var callback = "manut_check_" + Date.now();
-      window[callback] = function (data) {
-        delete window[callback];
-        if (data && data.success && data.data?.emManutencao) {
-          window.location.replace("manutencao.html");
-        } else if (data && data.success && data.emManutencao) {
-          window.location.replace("manutencao.html");
-        }
-      };
-      var s = document.createElement("script");
-      s.src =
-        "https://script.google.com/macros/s/AKfycbwRaA3rQLawY32JJssrGfCDx08iSnapR6f_K3LgK9T3TwNcXX56Rvmy4DBO1chfkT-M/exec?modo=publico&tipo=verificar_manutencao&callback=" +
-        callback;
-      document.head.appendChild(s);
-    })();
-  </script>
-
-  <!-- ⚡ PRECONNECT -->
+  <link rel="preconnect" href="https://script.google.com">
+  <link rel="dns-prefetch" href="https://script.googleusercontent.com">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
@@ -45,9 +19,7 @@
   <!-- CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;600;800&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
 
@@ -62,6 +34,7 @@
 
   <!-- HEADER -->
   <header
+  
     class="glass fixed top-0 w-full z-[100] px-4 md:px-6 border-b border-primary/10 flex items-center justify-between gap-4 md:gap-6">
     <div class="flex items-center gap-3 group cursor-pointer shrink-0"
       onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
