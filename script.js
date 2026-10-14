@@ -217,7 +217,17 @@ async function atualizarEmBackground(mostrarLoading = false) {
   }
 }
 
+
 function aplicarDados(dados) {
+  // ✅ VERIFICA MANUTENÇÃO (antes de tudo)
+  if (dados.manutencao && dados.manutencao.emManutencao) {
+    if (sessionStorage.getItem("admin_bypass") !== "true") {
+      window.location.replace("manutencao.html");
+      return;
+    }
+  }
+
+  // ✅ FILTRA PRODUTOS DISPONÍVEIS
   allProducts = (dados.produtos || []).filter(function (p) {
     const disp = String(p["Disponível"] || p.disponivel || '').toLowerCase().trim();
     return disp === 'sim';
@@ -228,27 +238,28 @@ function aplicarDados(dados) {
     return p;
   });
 
-  console.log(`📦 ${allProducts.length} produtos disponíveis`);
+ log(`📦 ${allProducts.length} produtos disponíveis`);
   aplicarConfig(dados.config || {});
   renderizarMarquee(dados.marquee || []);
 
-  // ✅ GUARDA os tamanhos do backend ANTES de renderizar a sidebar
+  // ✅ GUARDA os tamanhos do backend
   if (dados.tamanhos && Array.isArray(dados.tamanhos) && dados.tamanhos.length > 0) {
     window.__tamanhosBackend = dados.tamanhos;
-    console.log(`📐 ${dados.tamanhos.length} tamanhos carregados do backend`);
+    log(`📐 ${dados.tamanhos.length} tamanhos carregados do backend`);
   }
 
-  // ✅ Renderiza a sidebar (com lock para não duplicar)
+  // ✅ Renderiza a sidebar (com lock)
   if (dados.estrutura && Array.isArray(dados.estrutura) && dados.estrutura.length > 0) {
     estruturaCategorias = dados.estrutura;
     if (!window.__sidebarJaRenderizada) {
       window.__sidebarJaRenderizada = true;
       renderizarSidebarDinamica();
     } else {
-      console.log('🔒 Sidebar já renderizada — pulando renderização duplicada');
+      log('🔒 Sidebar já renderizada — pulando renderização duplicada');
     }
   }
 
+  // ✅ Renderiza produtos
   if (allProducts.length === 0) {
     const container = document.getElementById("produtos-container");
     if (container) {
@@ -266,6 +277,7 @@ function aplicarDados(dados) {
   setTimeout(atualizarContadorProdutos, 50);
 }
 
+
 function renderizarSidebarDinamica() {
   const scroll = document.getElementById('sidebar-scroll');
   if (!scroll) return;
@@ -281,7 +293,7 @@ function renderizarSidebarDinamica() {
         valor: String(t.valor || '').trim()
       };
     });
-    console.log(`📏 [DEBUG] ${tamanhos.length} tamanhos vindos do BACKEND`);
+   log(`📏 [DEBUG] ${tamanhos.length} tamanhos vindos do BACKEND`);
   } else {
     // Fallback: lê do HTML estático
     const vistos = new Set();
@@ -298,7 +310,7 @@ function renderizarSidebarDinamica() {
         valor: partes[partes.length - 1] || ''
       });
     });
-    console.log(`📏 [DEBUG] ${tamanhos.length} tamanhos vindos do HTML (fallback)`);
+    log(`📏 [DEBUG] ${tamanhos.length} tamanhos vindos do HTML (fallback)`);
   }
 
   // ✅ 2. Guarda "Todas" e limpa
@@ -320,7 +332,7 @@ function renderizarSidebarDinamica() {
   }
 
   if (!estruturaCategorias || estruturaCategorias.length === 0) {
-    console.log('ℹ️ Sem estrutura dinâmica — mantendo HTML estático');
+    log('ℹ️ Sem estrutura dinâmica — mantendo HTML estático');
     return;
   }
 
@@ -446,7 +458,7 @@ function renderizarSidebarDinamica() {
         });
 
         if (tamanhosAqui.length > 0) {
-          console.log(`📏 [DEBUG] "${nomeCategoria} > ${sub}": ${tamanhosAqui.length} tamanhos (${corAtual})`);
+         log(`📏 [DEBUG] "${nomeCategoria} > ${sub}": ${tamanhosAqui.length} tamanhos (${corAtual})`);
         }
 
         // ✅ Cria os botões DINAMICAMENTE a partir dos dados do backend
@@ -472,7 +484,7 @@ function renderizarSidebarDinamica() {
   rebindSidebarEvents();
 
   const totalFinal = scroll.querySelectorAll('.sidebar-item-tamanho').length;
-  console.log(`🎉 [DEBUG] FIM: ${totalFinal} botões de tamanho renderizados na sidebar`);
+ log(`🎉 [DEBUG] FIM: ${totalFinal} botões de tamanho renderizados na sidebar`);
 
   const searchInput = document.getElementById('sidebar-search');
   if (searchInput && searchInput.value.trim()) {
@@ -2031,6 +2043,14 @@ let isDragging = false;
 let dragStartX = 0;
 let dragStartY = 0;
 
+// ============================================
+// LOG CONDICIONAL (só aparece com ?debug=1 na URL)
+// ============================================
+const DEBUG = new URLSearchParams(location.search).has('debug');
+const log = DEBUG ? console.log.bind(console) : () => {};
+const warn = DEBUG ? console.warn.bind(console) : () => {};
+
+
 const ZOOM_MIN = 1;
 const ZOOM_MAX = 5;
 
@@ -2040,7 +2060,7 @@ function abrirZoomDireto(imagem) {
   const thumbnails = document.getElementById("zoom-thumbnails");
   if (!modal || !img || !thumbnails) return;
 
-  const imagemExibir = driveImg(imagem, IMG_SIZE_ZOOM);
+    const imagemExibir = driveImg(imagem, IMG_SIZE_ZOOM);
   imagensZoom = [imagemExibir];
   zoomIndex = 0;
   zoomScale = 1;
