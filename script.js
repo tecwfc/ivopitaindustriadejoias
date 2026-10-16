@@ -114,19 +114,25 @@ function normalizarPalavraBusca(palavra) {
   return palavra.replace(/s$/, "").replace(/a$/, "").replace(/o$/, "").replace(/es$/, "").replace(/ns$/, "m");
 }
 
+// ============================================
+// DRIVE IMG — OTIMIZADA v2
+// ============================================
 function driveImg(url, size = IMG_SIZE_CARD) {
   if (!url || url === 'placeholder.png') return PLACEHOLDER_SVG;
 
-  // ✅ Já é lh3: apenas força o tamanho com =w (largura, mantém proporção)
-  if (url.includes("lh3.googleusercontent.com")) {
-    // Remove qualquer parâmetro de tamanho anterior e aplica o novo
-    return url.replace(/=w\d+.*$/, '').replace(/=s\d+.*$/, '') + `=w${size}`;
+  // ✅ Já é googleusercontent: força tamanho + crop + qualidade
+  if (url.includes("googleusercontent.com")) {
+    const baseUrl = url
+      .replace(/=w\d+.*$/, '')
+      .replace(/=s\d+.*$/, '')
+      .split('?')[0];
+    return `${baseUrl}=w${size}-h${size}-c-rw-v1`;
   }
 
   // ✅ URL antiga do drive.google.com → converte para lh3
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (match) {
-    return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=w${size}`;
+    return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=w${size}-h${size}-c-rw-v1`;
   }
 
   // ✅ URL normal (http) → retorna como está
@@ -246,16 +252,18 @@ function aplicarDados(dados) {
   aplicarConfig(dados.config || {});
   renderizarMarquee(dados.marquee || []);
   
-  // ✅ Preload das 4 primeiras imagens (acelera LCP)
+
+// ✅ Preload APENAS das 2 primeiras (não 4) e em tamanho médio
 (function preloadPrimeirasImagens() {
-  const primeiras = allProducts.slice(0, 4);
+  const primeiras = allProducts.slice(0, 2);
   primeiras.forEach(p => {
     if (!p.Imagem) return;
-    const url = driveImg(p.Imagem, 400);
+    const url = driveImg(p.Imagem, 400); // ✅ 400px é o suficiente para o card
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
     link.href = url;
+    link.setAttribute('fetchpriority', 'high');
     document.head.appendChild(link);
   });
 })();
@@ -1825,6 +1833,9 @@ function addToCart(id, name, price, img, baseId, ref, quantity, buttonElement) {
 // ============================================
 // RENDERIZAR PRODUTOS
 // ============================================
+// ============================================
+// RENDERIZAR PRODUTOS — OTIMIZADO v2
+// ============================================
 function renderProducts(products) {
   const container = document.getElementById("produtos-container");
   if (!container) return;
@@ -1854,6 +1865,19 @@ function renderProducts(products) {
     const subcategoria = p["Subcategoria"] || "";
     const imagem = p["Imagem"] || "";
 
+    // ============================================
+    // ✅ IMAGENS OTIMIZADAS (3 tamanhos + srcset)
+    // ============================================
+    const imgSrcSmall  = driveImg(imagem, 300);
+    const imgSrcMedium = driveImg(imagem, 400);
+    const imgSrcLarge  = driveImg(imagem, 600);
+
+    const srcsetAttr = `${imgSrcSmall} 300w, ${imgSrcMedium} 400w, ${imgSrcLarge} 600w`;
+    const sizesAttr  = "(max-width: 600px) 45vw, (max-width: 1100px) 30vw, 20vw";
+
+    // ============================================
+    // ✅ BADGE DE ESTOQUE
+    // ============================================
     let stockBadge = "";
     if (estoque <= 0) {
       stockBadge = `<span class="stock-out"><i class="fas fa-times-circle"></i> Indisponível</span>`;
@@ -1863,10 +1887,16 @@ function renderProducts(products) {
       stockBadge = `<span class="stock-available"><i class="fas fa-check-circle"></i> ${estoque} disponíveis</span>`;
     }
 
+    // ============================================
+    // ✅ ESCAPE DE STRINGS (segurança em onclick)
+    // ============================================
     const nomeEscapado = nome.replace(/'/g, "\\'").replace(/"/g, "&quot;");
     const refEscapada = referencia.replace(/'/g, "\\'").replace(/"/g, "&quot;");
     const imgEscapada = imagem.replace(/"/g, "&quot;");
 
+    // ============================================
+    // ✅ BOTÃO DINÂMICO (com/sem cores)
+    // ============================================
     let botaoHTML = "";
     if (estoque <= 0) {
       botaoHTML = `<button disabled class="product-card-btn-disabled">Indisponível</button>`;
@@ -1880,39 +1910,59 @@ function renderProducts(products) {
       </button>`;
     }
 
-    let categoriaHTML = "";
-    if (categoria) {
-      categoriaHTML = `<p class="product-card-category">${categoria}</p>`;
-    }
+    // ============================================
+    // ✅ METADADOS (categoria/subcategoria/ref)
+    // ============================================
+    let categoriaHTML = categoria ? `<p class="product-card-category">${categoria}</p>` : "";
+    let subcategoriaHTML = subcategoria ? `<p class="product-card-subcategory">${subcategoria}</p>` : "";
+    const refHTML = referencia ? `<p class="product-card-ref">REF: ${referencia}</p>` : "";
 
-    let subcategoriaHTML = "";
-    if (subcategoria) {
-      subcategoriaHTML = `<p class="product-card-subcategory">${subcategoria}</p>`;
-    }
-
-    const refHTML = referencia
-      ? `<p class="product-card-ref">REF: ${referencia}</p>`
-      : "";
-
+    // ============================================
+    // ✅ PRIORIDADE (primeiros 5 = eager + high)
+    // ============================================
     const isPriority = index < 5;
-    const imgSrc = driveImg(imagem, IMG_SIZE_CARD);
 
+    // ============================================
+    // ✅ MONTAGEM FINAL DO CARD
+    // ============================================
     const card = document.createElement("div");
     card.className = "product-card";
-    card.innerHTML = `
-      <div class="product-card-image">
-        <img
-          ${isPriority ? `src="${imgSrc}"` : `data-src="${imgSrc}" src="${PLACEHOLDER_SVG}"`}
+
+    // Imagem: prioridade alta para os 5 primeiros, lazy para o resto
+    const imgTag = isPriority
+      ? `<img
+          src="${imgSrcMedium}"
+          srcset="${srcsetAttr}"
+          sizes="${sizesAttr}"
           alt="${nome}"
-          loading="${isPriority ? 'eager' : 'lazy'}"
+          loading="eager"
           decoding="async"
-          fetchpriority="${isPriority ? 'high' : 'low'}"
+          fetchpriority="high"
           width="400"
           height="400"
           class="product-card-img"
           onerror="this.onerror=null; this.src='${PLACEHOLDER_SVG}'"
           onclick="abrirZoomDireto('${imgEscapada}')"
-        >
+        >`
+      : `<img
+          data-src="${imgSrcMedium}"
+          data-srcset="${srcsetAttr}"
+          src="${PLACEHOLDER_SVG}"
+          sizes="${sizesAttr}"
+          alt="${nome}"
+          loading="lazy"
+          decoding="async"
+          fetchpriority="low"
+          width="400"
+          height="400"
+          class="product-card-img"
+          onerror="this.onerror=null; this.src='${PLACEHOLDER_SVG}'"
+          onclick="abrirZoomDireto('${imgEscapada}')"
+        >`;
+
+    card.innerHTML = `
+      <div class="product-card-image">
+        ${imgTag}
         ${estoque <= 0 ? '<div class="product-card-sold-out"><span>ESGOTADO</span></div>' : ""}
       </div>
       <div class="product-card-content">
@@ -1931,6 +1981,7 @@ function renderProducts(products) {
 
   container.appendChild(fragment);
 
+  // ✅ Ativa lazy loading nos cards restantes
   ativarLazyLoading();
 
   setTimeout(atualizarContadorProdutos, 100);
@@ -1939,32 +1990,40 @@ function renderProducts(products) {
 // ============================================
 // LAZY LOADING
 // ============================================
+// ============================================
+// LAZY LOADING v2 (com srcset + srcset)
+// ============================================
 let lazyObserver = null;
 
 function ativarLazyLoading() {
+  // Fallback para navegadores antigos
   if (!('IntersectionObserver' in window)) {
     document.querySelectorAll('img[data-src]').forEach(img => {
       img.src = img.dataset.src;
+      if (img.dataset.srcset) img.srcset = img.dataset.srcset;
       img.removeAttribute('data-src');
+      img.removeAttribute('data-srcset');
     });
     return;
   }
 
+  // Cria observer uma única vez (reutiliza)
   if (!lazyObserver) {
     lazyObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const img = entry.target;
-          const src = img.dataset.src;
-          if (src) {
-            img.src = src;
+          if (img.dataset.src) {
+            img.src = img.dataset.src;
+            if (img.dataset.srcset) img.srcset = img.dataset.srcset;
             img.removeAttribute('data-src');
+            img.removeAttribute('data-srcset');
           }
           lazyObserver.unobserve(img);
         }
       });
     }, {
-      rootMargin: '300px 0px',
+      rootMargin: '200px 0px', // ✅ 200px = carrega pouco antes de aparecer
       threshold: 0.01
     });
   }
@@ -2078,17 +2137,29 @@ function abrirZoomDireto(imagem) {
   const thumbnails = document.getElementById("zoom-thumbnails");
   if (!modal || !img || !thumbnails) return;
 
-    const imagemExibir = driveImg(imagem, IMG_SIZE_ZOOM);
-  imagensZoom = [imagemExibir];
+  // ✅ 1. Mostra preview rápido em 400px
+  const previewUrl = driveImg(imagem, 400);
+  const fullUrl = driveImg(imagem, IMG_SIZE_ZOOM);
+
+  imagensZoom = [fullUrl];
   zoomIndex = 0;
   zoomScale = 1;
   zoomPositionX = 0;
   zoomPositionY = 0;
 
-  img.src = imagensZoom[zoomIndex];
+  img.src = previewUrl;
   img.style.transform = 'scale(1) translate(0, 0)';
   img.classList.remove('zoomed');
   modal.classList.remove('zoomed-active');
+
+  // ✅ 2. Em background, carrega a versão grande
+  const highRes = new Image();
+  highRes.src = fullUrl;
+  highRes.onload = () => {
+    if (img.src === previewUrl) {
+      img.src = fullUrl; // troca quando carregar
+    }
+  };
 
   img.onerror = function () {
     this.onerror = null;
