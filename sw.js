@@ -1,5 +1,5 @@
-const CACHE_NAME = 'ivo-pita-v12';        // ⬆️ suba a versão
-const CACHE_IMAGENS = 'ivo-imagens-v1';
+const CACHE_NAME = 'ivo-pita-v13';  // ← suba aqui
+const CACHE_IMAGENS = 'ivo-imagens-v2'; // ← e aqui
 
 const urlsToCache = [
   './styles.css',
@@ -59,47 +59,47 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // ✅ Cache-First para imagens do Google Drive (lh3 a lh6) + CDNs futuros
-  if (
-    url.includes('googleusercontent.com') ||
-    url.includes('lh3.google.com') ||
-    url.includes('lh4.google.com') ||
-    url.includes('lh5.google.com') ||
-    url.includes('lh6.google.com') ||
-    url.includes('res.cloudinary.com') ||   // ← Cloudinary (futuro)
-    url.includes('b-cdn.net')                // ← Bunny CDN (futuro)
-  ) {
-    event.respondWith(
-      caches.open(CACHE_IMAGENS).then(cache => {
-        return cache.match(event.request).then(cached => {
-          if (cached) {
-            // Atualiza em background (stale-while-revalidate)
-            fetch(event.request).then(response => {
-              if (response && response.status === 200) {
-                cache.put(event.request, response);
-              }
-            }).catch(() => { /* ignora erro de rede */ });
-            return cached;
-          }
-
-          // Não está em cache: baixa e guarda
-          return fetch(event.request).then(response => {
-            if (response && response.status === 200) {
-              cache.put(event.request, response.clone());
+  // ✅ Cache-First para imagens do Google Drive
+if (
+  url.includes('googleusercontent.com') ||  // ← CAPTURA TODOS OS LH*
+  url.includes('lh3.google.com') ||
+  url.includes('lh4.google.com') ||
+  url.includes('lh5.google.com') ||
+  url.includes('lh6.google.com') ||
+  url.includes('res.cloudinary.com') ||
+  url.includes('b-cdn.net')
+) {
+  event.respondWith(
+    caches.open(CACHE_IMAGENS).then(cache => {
+      return cache.match(event.request).then(cached => {
+        if (cached) {
+          // ✅ Stale-while-revalidate (não bloqueia)
+          fetch(event.request).then(response => {
+            if (response && response.status === 200 && response.type === 'basic') {
+              cache.put(event.request, response);
             }
-            return response;
-          }).catch(() => {
-            // Fallback: placeholder SVG inline
-            return new Response(
-              '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="#f0f7f2"/><text x="200" y="210" font-family="Arial" font-size="14" fill="#2f6b4f" text-anchor="middle">Imagem indisponível</text></svg>',
-              { headers: { 'Content-Type': 'image/svg+xml' } }
-            );
-          });
+          }).catch(() => {});
+          return cached;
+        }
+
+        return fetch(event.request).then(response => {
+          // ✅ Só cacheia se for uma resposta válida
+          if (response && response.status === 200 && response.type === 'basic') {
+            const responseClone = response.clone();
+            cache.put(event.request, responseClone);
+          }
+          return response;
+        }).catch(() => {
+          return new Response(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="#f0f7f2"/><text x="200" y="210" font-family="Arial" font-size="14" fill="#2f6b4f" text-anchor="middle">Imagem indisponível</text></svg>',
+            { headers: { 'Content-Type': 'image/svg+xml' } }
+          );
         });
-      })
-    );
-    return;
-  }
+      });
+    })
+  );
+  return;
+}
 
   // 🚫 NUNCA cacheia outros serviços externos
   if (
