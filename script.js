@@ -11,9 +11,9 @@ const CACHE_KEY_DADOS = 'ivo_dados_v3';
 const CACHE_KEY_TIME = 'ivo_dados_time_v3';
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutos
 
-const IMG_SIZE_CARD = 400;
-const IMG_SIZE_MODAL = 600;
-const IMG_SIZE_ZOOM = 1200;
+const IMG_SIZE_CARD = 300;   
+const IMG_SIZE_MODAL = 500;  
+const IMG_SIZE_ZOOM = 1000;  
 
 let siteConfig = {
   whatsapp: "5588999049636",
@@ -115,31 +115,32 @@ function normalizarPalavraBusca(palavra) {
 }
 
 // ============================================
-// DRIVE IMG — OTIMIZADA v2
+// DRIVE IMG — VERSÃO SIMPLIFICADA (funciona!)
 // ============================================
 function driveImg(url, size = IMG_SIZE_CARD) {
   if (!url || url === 'placeholder.png') return PLACEHOLDER_SVG;
 
-  // ✅ Já é googleusercontent: força tamanho + crop + qualidade
+  // ✅ Já é googleusercontent: aplica SOMENTE =w (largura)
+  // O Drive mantém a proporção automaticamente
   if (url.includes("googleusercontent.com")) {
     const baseUrl = url
       .replace(/=w\d+.*$/, '')
       .replace(/=s\d+.*$/, '')
+      .replace(/=h\d+.*$/, '')
       .split('?')[0];
-    return `${baseUrl}=w${size}-h${size}-c-rw-v1`;
+    return `${baseUrl}=w${size}`;
   }
 
   // ✅ URL antiga do drive.google.com → converte para lh3
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (match) {
-    return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=w${size}-h${size}-c-rw-v1`;
+    return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=w${size}`;
   }
 
-  // ✅ URL normal (http) → retorna como está
   if (url.startsWith("http")) return url;
-
   return PLACEHOLDER_SVG;
 }
+
 // ============================================
 // CARREGAMENTO DE DADOS
 // ============================================
@@ -1868,11 +1869,11 @@ function renderProducts(products) {
     // ============================================
     // ✅ IMAGENS OTIMIZADAS (3 tamanhos + srcset)
     // ============================================
+    // ✅ 2 tamanhos são suficientes (300 e 500)
     const imgSrcSmall  = driveImg(imagem, 300);
-    const imgSrcMedium = driveImg(imagem, 400);
-    const imgSrcLarge  = driveImg(imagem, 600);
+    const imgSrcMedium = driveImg(imagem, 500);
 
-    const srcsetAttr = `${imgSrcSmall} 300w, ${imgSrcMedium} 400w, ${imgSrcLarge} 600w`;
+    const srcsetAttr = `${imgSrcSmall} 300w, ${imgSrcMedium} 500w`;
     const sizesAttr  = "(max-width: 600px) 45vw, (max-width: 1100px) 30vw, 20vw";
 
     // ============================================
@@ -1931,7 +1932,7 @@ function renderProducts(products) {
     // Imagem: prioridade alta para os 5 primeiros, lazy para o resto
     const imgTag = isPriority
       ? `<img
-          src="${imgSrcMedium}"
+          src="${imgSrcSmall}"
           srcset="${srcsetAttr}"
           sizes="${sizesAttr}"
           alt="${nome}"
