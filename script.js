@@ -3001,14 +3001,37 @@ async function downloadPDF() {
 // ============================================
 // FINALIZAR PEDIDO VIA WHATSAPP
 // ============================================
+// ============================================
+// FINALIZAR PEDIDO VIA WHATSAPP (CORRIGIDO)
+// ============================================
 async function finalizarPedidoDireto() {
-  if (cart.length === 0) { showToast("Sacola vazia!", "error", 2000); return; }
+  if (cart.length === 0) {
+    showToast("Sacola vazia!", "error", 2000);
+    return;
+  }
 
   const cliente = carregarDadosCliente();
+
   if (!clienteEstaCadastrado() || !cliente) {
     showToast("Por favor, cadastre seus dados antes de finalizar", "warning", 3000);
     setTimeout(() => abrirModalCliente(), 500);
     return;
+  }
+
+  // ✅ ABRE A ABA IMEDIATAMENTE (dentro do clique do usuário)
+  // Isso evita o popup blocker do navegador, que bloqueia window.open()
+  // quando chamado depois de um await.
+  const janelaWhats = window.open('', '_blank');
+
+  // ✅ Se a aba foi bloqueada mesmo assim, avisa o usuário
+  if (!janelaWhats || janelaWhats.closed) {
+    const continuar = confirm(
+      "⚠️ Seu navegador bloqueou a abertura do WhatsApp.\n\n" +
+      "Clique em OK para tentar novamente e permitir popups para este site."
+    );
+    if (!continuar) return;
+    // Tenta abrir novamente de forma síncrona (agora o usuário "autorizou")
+    return finalizarPedidoDiretoFallback();
   }
 
   const nomeCliente = cliente.nome;
@@ -3018,6 +3041,7 @@ async function finalizarPedidoDireto() {
   await validarCarrinho();
 
   if (cart.length === 0) {
+    if (janelaWhats && !janelaWhats.closed) janelaWhats.close();
     showToast("Seu carrinho ficou vazio (itens esgotaram).", "error", 3000);
     return;
   }
@@ -3030,15 +3054,20 @@ async function finalizarPedidoDireto() {
 
   try {
     const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
-    const freteExibicao = subtotal >= FRETE_GRATIS_VALOR ? "GRÁTIS" : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
+    const freteExibicao = subtotal >= FRETE_GRATIS_VALOR
+      ? "GRÁTIS"
+      : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
 
     const resultado = await processarPedidoPublico(nomeCliente, enderecoCompleto, cliente);
 
     if (!resultado || !resultado.success) {
       const erro = (resultado && resultado.error) || "Erro ao salvar pedido";
 
-      if (erro.toLowerCase().includes("estoque insuficiente") ||
-        erro.toLowerCase().includes("não encontrado")) {
+      // Erros de estoque → atualiza carrinho
+      if (
+        erro.toLowerCase().includes("estoque insuficiente") ||
+        erro.toLowerCase().includes("não encontrado")
+      ) {
         showToast("⚠️ Um item esgotou enquanto você finalizava. Atualizando...", "warning", 5000);
         invalidarEstoqueCache();
         localStorage.removeItem(CACHE_KEY_DADOS);
@@ -3050,9 +3079,16 @@ async function finalizarPedidoDireto() {
         }, 1500);
         throw new Error("Estoque desatualizado — revise seu carrinho");
       }
+
+      // Rate limit do Apps Script
+      if (erro.toLowerCase().includes("muitos pedidos")) {
+        throw new Error("Aguarde cerca de 1 minuto antes de tentar novamente.");
+      }
+
       throw new Error(erro);
     }
 
+    // ✅ Monta a mensagem do WhatsApp
     const dadosCliente = [
       `👤 *CLIENTE:* ${cliente.nome.toUpperCase()}`,
       `📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}`,
@@ -3071,33 +3107,140 @@ async function finalizarPedidoDireto() {
       cliente.email ? `E-mail: ${cliente.email}` : ''
     ].filter(Boolean).join('\n');
 
-    const mensagemWhats = `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n${dadosCliente}\n\n*📦 ITENS DO PEDIDO:*\n${cart.map((i) => `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`).join("\n")}\n\n*💰 RESUMO DO PEDIDO:*\n─────────────────\nSubtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\nFrete: ${freteExibicao}\n─────────────────\n*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n─────────────────\n\n✨ *Obrigado pela preferência!*`;
+    const mensagemWhats =
+      `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n` +
+      `${dadosCliente}\n\n` +
+      `*📦 ITENS DO PEDIDO:*\n` +
+      cart.map((i) =>
+        `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`
+      ).join("\n") +
+      `\n\n*💰 RESUMO DO PEDIDO:*\n` +
+      `─────────────────\n` +
+      `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\n` +
+      `Frete: ${freteExibicao}\n` +
+      `─────────────────\n` +
+      `*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n` +
+      `─────────────────\n\n` +
+      `✨ *Obrigado pela preferência!*`;
 
-    const numeroWhats = window.__whatsappNumero || String(siteConfig.whatsapp).replace(/\D/g, "") || "5588981762208";
+    const numeroWhats =
+      window.__whatsappNumero ||
+      String(siteConfig.whatsapp).replace(/\D/g, "") ||
+      "5588981762208";
+
+    const urlWhats = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`;
 
     localStorage.setItem("ultimo_pedido_ts", Date.now().toString());
+
+    // ✅ Usa a aba que já abrimos no início (não bloqueia)
+    if (janelaWhats && !janelaWhats.closed) {
+      janelaWhats.location.href = urlWhats;
+    } else {
+      // Fallback: tenta via location (caso a aba tenha sido fechada)
+      window.location.href = urlWhats;
+    }
+
+    // Limpa carrinho e fecha modal
+    cart = [];
+    updateCart();
+    document.getElementById("cart-modal")?.classList.add("hidden");
+    document.getElementById("cart-modal")?.classList.remove("flex");
+
+    showToast("✅ Pedido enviado e estoque atualizado!", "success", 4000);
+
+    // Recarrega dados do servidor (estoque atualizado)
+    invalidarEstoqueCache();
+    localStorage.removeItem(CACHE_KEY_DADOS);
+    carregarTudo();
+
+  } catch (error) {
+    console.error("❌ Erro ao finalizar pedido:", error);
+
+    // Fecha a aba em branco se houver erro
+    if (janelaWhats && !janelaWhats.closed) {
+      janelaWhats.close();
+    }
+
+    showToast("❌ " + error.message, "error", 5000);
+
+  } finally {
+    if (checkoutBtn) {
+      checkoutBtn.disabled = false;
+      checkoutBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Finalizar';
+    }
+  }
+}
+
+// ============================================
+// FALLBACK (caso a aba tenha sido bloqueada)
+// ============================================
+async function finalizarPedidoDiretoFallback() {
+  if (cart.length === 0) return;
+
+  const cliente = carregarDadosCliente();
+  if (!clienteEstaCadastrado() || !cliente) return;
+
+  try {
+    const resultado = await processarPedidoPublico(
+      cliente.nome,
+      formatarEnderecoCompleto(),
+      cliente
+    );
+
+    if (!resultado || !resultado.success) {
+      throw new Error((resultado && resultado.error) || "Erro ao salvar pedido");
+    }
+
+    const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
+    const freteExibicao = subtotal >= FRETE_GRATIS_VALOR
+      ? "GRÁTIS"
+      : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
+
+    const mensagemWhats =
+      `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n` +
+      `👤 *CLIENTE:* ${cliente.nome.toUpperCase()}\n` +
+      `📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}\n` +
+      (cliente.cpf ? `🆔 *${cliente.tipo === 'J' ? 'CNPJ' : 'CPF'}:* ${cliente.cpf}\n` : '') +
+      (cliente.ie ? `📋 *${cliente.tipo === 'J' ? 'I.E.' : 'RG'}:* ${cliente.ie}\n` : '') +
+      (cliente.nascimento ? `🎂 *Nascimento:* ${formatarDataBR(cliente.nascimento)}\n` : '') +
+      `\n📍 *ENDEREÇO DE ENTREGA:*\n` +
+      `${cliente.endereco}, ${cliente.numero}${cliente.complemento ? ' - ' + cliente.complemento : ''}\n` +
+      `Bairro: ${cliente.bairro}\n` +
+      `${cliente.cidade} - ${cliente.estado}\n` +
+      `CEP: ${cliente.cep}\n\n` +
+      `📞 *CONTATO:*\n` +
+      `Celular: ${cliente.celular}\n` +
+      (cliente.email ? `E-mail: ${cliente.email}\n` : '') +
+      `\n*📦 ITENS DO PEDIDO:*\n` +
+      cart.map((i) =>
+        `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`
+      ).join("\n") +
+      `\n\n*💰 RESUMO DO PEDIDO:*\n` +
+      `─────────────────\n` +
+      `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\n` +
+      `Frete: ${freteExibicao}\n` +
+      `─────────────────\n` +
+      `*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n` +
+      `─────────────────\n\n` +
+      `✨ *Obrigado pela preferência!*`;
+
+    const numeroWhats =
+      window.__whatsappNumero ||
+      String(siteConfig.whatsapp).replace(/\D/g, "") ||
+      "5588981762208";
+
+    const urlWhats = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`;
 
     cart = [];
     updateCart();
     document.getElementById("cart-modal")?.classList.add("hidden");
     document.getElementById("cart-modal")?.classList.remove("flex");
 
-    window.open(`https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`, "_blank");
-
-    showToast("✅ Pedido enviado e estoque atualizado!", "success", 4000);
-
-    invalidarEstoqueCache();
-    localStorage.removeItem(CACHE_KEY_DADOS);
-    carregarTudo();
+    window.location.href = urlWhats;
 
   } catch (error) {
-    console.error("❌ Erro:", error);
+    console.error("❌ Erro no fallback:", error);
     showToast("❌ " + error.message, "error", 5000);
-  } finally {
-    if (checkoutBtn) {
-      checkoutBtn.disabled = false;
-      checkoutBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Finalizar';
-    }
   }
 }
 
