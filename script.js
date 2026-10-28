@@ -58,7 +58,7 @@ let __dadosCarregados = null;
 let __sidebarJaRenderizada = false;
 
 const ESTOQUE_CACHE = new Map();
-const ESTOQUE_CACHE_TTL = 5 * 1000; // 5 segundos
+const ESTOQUE_CACHE_TTL = 2 * 60 * 1000; // 2 minutos
 
 // ============================================
 // CACHE DE ESTOQUE
@@ -2772,11 +2772,11 @@ async function visualizarPDF() {
     return;
   }
 
-  if (!clienteEstaCadastrado()) {
-    showToast("Cadastre seus dados antes de visualizar o PDF", "warning", 3000);
-    setTimeout(() => abrirModalCliente(), 500);
-    return;
-  }
+  // if (!clienteEstaCadastrado()) {
+  //   showToast("Cadastre seus dados antes de visualizar o PDF", "warning", 3000);
+  //   setTimeout(() => abrirModalCliente(), 500);
+  //   return;
+  // }
 
   const ok = await carregarLibsPDF();
   if (!ok) {
@@ -2905,6 +2905,9 @@ async function carregarLibsPDF() {
 // ============================================
 // DOWNLOAD PDF
 // ============================================
+// ============================================
+// DOWNLOAD PDF
+// ============================================
 async function downloadPDF() {
   let element = document.getElementById("pdf-content-to-print");
   if (!element) {
@@ -2913,15 +2916,15 @@ async function downloadPDF() {
     return;
   }
 
-  if (cart.length === 0) { showToast("Sacola vazia!", "error", 2000); return; }
-  if (!clienteEstaCadastrado()) {
-    showToast("Cadastre seus dados antes de gerar o PDF", "warning", 3000);
-    return;
+  if (cart.length === 0) { 
+    showToast("Sacola vazia!", "error", 2000); 
+    return; 
   }
 
-  const cliente = carregarDadosCliente();
-  const nomeCliente = cliente.nome;
-  const enderecoCompleto = formatarEnderecoCompleto();
+  // ✅ REMOVIDA A TRAVA DE CADASTRO AQUI
+  const cliente = carregarDadosCliente() || {};
+  const nomeCliente = cliente.nome || 'Cliente (a confirmar)';
+  const enderecoCompleto = clienteEstaCadastrado() ? formatarEnderecoCompleto() : 'A confirmar via WhatsApp';
 
   const btn = document.getElementById("download-pdf-btn");
   const original = btn ? btn.innerHTML : "";
@@ -2981,6 +2984,7 @@ async function downloadPDF() {
     const dataArquivo = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
     pdf.save(`Pedido_IvoPita_${dataArquivo}.pdf`);
 
+    // ✅ Salva o pedido no servidor (em background)
     const resultado = await processarPedidoPublico(nomeCliente, enderecoCompleto, cliente);
 
     if (!resultado || !resultado.success) {
@@ -3013,10 +3017,7 @@ async function downloadPDF() {
 }
 
 // ============================================
-// FINALIZAR PEDIDO VIA WHATSAPP
-// ============================================
-// ============================================
-// FINALIZAR PEDIDO VIA WHATSAPP
+// FINALIZAR PEDIDO VIA WHATSAPP (RÁPIDO - abre em <1s)
 // ============================================
 async function finalizarPedidoDireto() {
   if (cart.length === 0) {
@@ -3024,13 +3025,8 @@ async function finalizarPedidoDireto() {
     return;
   }
 
-  const cliente = carregarDadosCliente();
-
-  if (!clienteEstaCadastrado() || !cliente) {
-    showToast("Por favor, cadastre seus dados antes de finalizar", "warning", 3000);
-    setTimeout(() => abrirModalCliente(), 500);
-    return;
-  }
+  const cliente = carregarDadosCliente() || {};
+  const temDadosCompletos = clienteEstaCadastrado();
 
   // ✅ Abre a aba JÁ no clique do usuário (evita popup blocker)
   const janelaWhats = window.open('', '_blank');
@@ -3044,56 +3040,18 @@ async function finalizarPedidoDireto() {
     return finalizarPedidoDiretoFallback();
   }
 
-  const nomeCliente = cliente.nome;
-  const enderecoCompleto = formatarEnderecoCompleto();
+  const nomeCliente = cliente.nome || 'Cliente (a confirmar)';
+  const enderecoCompleto = temDadosCompletos ? formatarEnderecoCompleto() : 'A confirmar via WhatsApp';
 
-  showToast("Validando estoque...", "info", 1500);
-  await validarCarrinho();
+  // ✅ Monta a mensagem AGORA (sem esperar nada do servidor)
+  const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
+  const freteExibicao = subtotal >= FRETE_GRATIS_VALOR
+    ? "GRÁTIS"
+    : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
 
-  if (cart.length === 0) {
-    if (janelaWhats && !janelaWhats.closed) janelaWhats.close();
-    showToast("Seu carrinho ficou vazio (itens esgotaram).", "error", 3000);
-    return;
-  }
-
-  const checkoutBtn = document.getElementById("checkout-btn");
-  if (checkoutBtn) {
-    checkoutBtn.disabled = true;
-    checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
-  }
-
-  try {
-    const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
-    const freteExibicao = subtotal >= FRETE_GRATIS_VALOR
-      ? "GRÁTIS"
-      : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
-
-    const resultado = await processarPedidoPublico(nomeCliente, enderecoCompleto, cliente);
-
-    if (!resultado || !resultado.success) {
-      const erro = (resultado && resultado.error) || "Erro ao salvar pedido";
-
-      if (erro.toLowerCase().includes("estoque insuficiente") || erro.toLowerCase().includes("não encontrado")) {
-        showToast("⚠️ Um item esgotou enquanto você finalizava. Atualizando...", "warning", 5000);
-        invalidarEstoqueCache();
-        localStorage.removeItem(CACHE_KEY_DADOS);
-        setTimeout(async () => {
-          await carregarTudo();
-          await validarCarrinho();
-          document.getElementById("cart-modal")?.classList.remove("hidden");
-          document.getElementById("cart-modal")?.classList.add("flex");
-        }, 1500);
-        throw new Error("Estoque desatualizado — revise seu carrinho");
-      }
-
-      if (erro.toLowerCase().includes("muitos pedidos")) {
-        throw new Error("Aguarde cerca de 1 minuto antes de tentar novamente.");
-      }
-
-      throw new Error(erro);
-    }
-
-    const dadosCliente = [
+  let dadosClienteTexto = '';
+  if (temDadosCompletos && cliente.nome) {
+    dadosClienteTexto = [
       `👤 *CLIENTE:* ${cliente.nome.toUpperCase()}`,
       `📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}`,
       cliente.cpf ? `🆔 *${cliente.tipo === 'J' ? 'CNPJ' : 'CPF'}:* ${cliente.cpf}` : '',
@@ -3110,84 +3068,278 @@ async function finalizarPedidoDireto() {
       `Celular: ${cliente.celular}`,
       cliente.email ? `E-mail: ${cliente.email}` : ''
     ].filter(Boolean).join('\n');
-
-    const mensagemWhats =
-      `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n` +
-      `${dadosCliente}\n\n` +
-      `*📦 ITENS DO PEDIDO:*\n` +
-      cart.map((i) =>
-        `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`
-      ).join("\n") +
-      `\n\n*💰 RESUMO DO PEDIDO:*\n` +
-      `─────────────────\n` +
-      `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\n` +
-      `Frete: ${freteExibicao}\n` +
-      `─────────────────\n` +
-      `*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n` +
-      `─────────────────\n\n` +
-      `✨ *Obrigado pela preferência!*`;
-
-    // ✅ CORREÇÃO DO NÚMERO DO WHATSAPP AQUI
-    let numeroWhats = String(
-      window.__whatsappNumero ||
-      siteConfig.whatsapp ||
-      "5588981762208"
-    ).replace(/\D/g, "").replace(/^0+/, "");
-
-    if (!numeroWhats.startsWith("55")) {
-      numeroWhats = "55" + numeroWhats;
-    }
-
-    const urlWhats = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`;
-
-    localStorage.setItem("ultimo_pedido_ts", Date.now().toString());
-
-    if (janelaWhats && !janelaWhats.closed) {
-      janelaWhats.location.href = urlWhats;
-    } else {
-      window.location.href = urlWhats;
-    }
-
-    cart = [];
-    updateCart();
-    document.getElementById("cart-modal")?.classList.add("hidden");
-    document.getElementById("cart-modal")?.classList.remove("flex");
-
-    showToast("✅ Pedido enviado e estoque atualizado!", "success", 4000);
-
-    invalidarEstoqueCache();
-    localStorage.removeItem(CACHE_KEY_DADOS);
-    carregarTudo();
-
-  } catch (error) {
-    console.error("❌ Erro ao finalizar pedido:", error);
-
-    if (janelaWhats && !janelaWhats.closed) {
-      janelaWhats.close();
-    }
-
-    showToast("❌ " + error.message, "error", 5000);
-
-  } finally {
-    if (checkoutBtn) {
-      checkoutBtn.disabled = false;
-      checkoutBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Finalizar';
-    }
+  } else {
+    dadosClienteTexto = `👤 *CLIENTE:* (não cadastrado — favor preencher os dados no WhatsApp)`;
   }
+
+  const mensagemWhats =
+    `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n` +
+    `${dadosClienteTexto}\n\n` +
+    `*📦 ITENS DO PEDIDO:*\n` +
+    cart.map((i) =>
+      `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`
+    ).join("\n") +
+    `\n\n*💰 RESUMO DO PEDIDO:*\n` +
+    `─────────────────\n` +
+    `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\n` +
+    `Frete: ${freteExibicao}\n` +
+    `─────────────────\n` +
+    `*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n` +
+    `─────────────────\n\n` +
+    `✨ *Obrigado pela preferência!*`;
+
+  // ✅ Garante o 55 na frente do número
+  let numeroWhats = String(
+    window.__whatsappNumero ||
+    siteConfig.whatsapp ||
+    "5588981762208"
+  ).replace(/\D/g, "").replace(/^0+/, "");
+
+  if (!numeroWhats.startsWith("55")) {
+    numeroWhats = "55" + numeroWhats;
+  }
+
+  const urlWhats = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`;
+
+  // ✅ ABRE O WHATSAPP IMEDIATAMENTE (antes de qualquer await)
+  if (janelaWhats && !janelaWhats.closed) {
+    janelaWhats.location.href = urlWhats;
+  } else {
+    window.location.href = urlWhats;
+  }
+
+  // ✅ Salva a "foto" do pedido antes de limpar o carrinho
+  const clienteSnapshot = { ...cliente };
+  const nomeClienteSnapshot = nomeCliente;
+  const enderecoSnapshot = enderecoCompleto;
+  const cartSnapshot = cart.slice();
+  const subtotalSnapshot = subtotal;
+  const freteSnapshot = subtotal >= FRETE_GRATIS_VALOR ? 0 : TAXA_FRETE;
+  const totalSnapshot = totalFinal;
+
+  // ✅ Limpa carrinho e fecha modal imediatamente
+  localStorage.setItem("ultimo_pedido_ts", Date.now().toString());
+  cart = [];
+  updateCart();
+  document.getElementById("cart-modal")?.classList.add("hidden");
+  document.getElementById("cart-modal")?.classList.remove("flex");
+
+  showToast("✅ Pedido enviado! WhatsApp abrindo...", "success", 3000);
+
+  // ✅ Em BACKGROUND: salva o pedido no servidor (não bloqueia o WhatsApp)
+  (async function salvarPedidoEmBackground() {
+    try {
+      // Restaura o carrinho temporariamente para o processarPedidoPublico ler
+      const cartOriginal = cart;
+      cart = cartSnapshot;
+      subtotal = subtotalSnapshot;
+      
+      // Chama o processamento do pedido
+      const resultado = await processarPedidoPublico(
+        nomeClienteSnapshot,
+        enderecoSnapshot,
+        clienteSnapshot
+      );
+
+      // Restaura o carrinho vazio
+      cart = cartOriginal;
+      subtotal = 0;
+
+      if (!resultado || !resultado.success) {
+        console.warn("⚠️ Erro ao salvar pedido em background:", resultado?.error || "desconhecido");
+      } else {
+        console.log("✅ Pedido salvo no servidor com sucesso");
+      }
+
+      invalidarEstoqueCache();
+      localStorage.removeItem(CACHE_KEY_DADOS);
+      carregarTudo();
+    } catch (err) {
+      console.warn("⚠️ Erro ao salvar pedido em background:", err);
+      invalidarEstoqueCache();
+      localStorage.removeItem(CACHE_KEY_DADOS);
+      carregarTudo();
+    }
+  })();
 }
 
 
+
+
+
 // ============================================
-// FALLBACK (caso a aba tenha sido bloqueada)
+// FINALIZAR PEDIDO VIA WHATSAPP
 // ============================================
+// async function finalizarPedidoDireto() {
+//   if (cart.length === 0) {
+//     showToast("Sacola vazia!", "error", 2000);
+//     return;
+//   }
+
+//   // ✅ NÃO exige mais cadastro. Se não tiver dados, segue mesmo assim.
+//   const cliente = carregarDadosCliente() || {};
+//   const temDadosCompletos = clienteEstaCadastrado();
+
+//   // ✅ Abre a aba JÁ no clique do usuário (evita popup blocker)
+//   const janelaWhats = window.open('', '_blank');
+
+//   if (!janelaWhats || janelaWhats.closed) {
+//     const continuar = confirm(
+//       "⚠️ Seu navegador bloqueou a abertura do WhatsApp.\n\n" +
+//       "Clique em OK para tentar novamente e permitir popups para este site."
+//     );
+//     if (!continuar) return;
+//     return finalizarPedidoDiretoFallback();
+//   }
+
+//   const nomeCliente = cliente.nome || 'Cliente (a confirmar)';
+//   const enderecoCompleto = temDadosCompletos ? formatarEnderecoCompleto() : 'A confirmar via WhatsApp';
+
+//   showToast("Validando estoque...", "info", 1500);
+//   await validarCarrinho();
+
+//   if (cart.length === 0) {
+//     if (janelaWhats && !janelaWhats.closed) janelaWhats.close();
+//     showToast("Seu carrinho ficou vazio (itens esgotaram).", "error", 3000);
+//     return;
+//   }
+
+//   const checkoutBtn = document.getElementById("checkout-btn");
+//   if (checkoutBtn) {
+//     checkoutBtn.disabled = true;
+//     checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+//   }
+
+//   try {
+//     const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
+//     const freteExibicao = subtotal >= FRETE_GRATIS_VALOR
+//       ? "GRÁTIS"
+//       : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
+
+//     const resultado = await processarPedidoPublico(nomeCliente, enderecoCompleto, cliente);
+
+//     if (!resultado || !resultado.success) {
+//       const erro = (resultado && resultado.error) || "Erro ao salvar pedido";
+
+//       if (erro.toLowerCase().includes("estoque insuficiente") || erro.toLowerCase().includes("não encontrado")) {
+//         showToast("⚠️ Um item esgotou enquanto você finalizava. Atualizando...", "warning", 5000);
+//         invalidarEstoqueCache();
+//         localStorage.removeItem(CACHE_KEY_DADOS);
+//         setTimeout(async () => {
+//           await carregarTudo();
+//           await validarCarrinho();
+//           document.getElementById("cart-modal")?.classList.remove("hidden");
+//           document.getElementById("cart-modal")?.classList.add("flex");
+//         }, 1500);
+//         throw new Error("Estoque desatualizado — revise seu carrinho");
+//       }
+
+//       if (erro.toLowerCase().includes("muitos pedidos")) {
+//         throw new Error("Aguarde cerca de 1 minuto antes de tentar novamente.");
+//       }
+
+//       throw new Error(erro);
+//     }
+
+//     // ✅ Monta os dados do cliente APENAS se estiverem cadastrados
+//     let dadosClienteTexto = '';
+//     if (temDadosCompletos && cliente.nome) {
+//       dadosClienteTexto = [
+//         `👤 *CLIENTE:* ${cliente.nome.toUpperCase()}`,
+//         `📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}`,
+//         cliente.cpf ? `🆔 *${cliente.tipo === 'J' ? 'CNPJ' : 'CPF'}:* ${cliente.cpf}` : '',
+//         cliente.ie ? `📋 *${cliente.tipo === 'J' ? 'I.E.' : 'RG'}:* ${cliente.ie}` : '',
+//         cliente.nascimento ? `🎂 *Nascimento:* ${formatarDataBR(cliente.nascimento)}` : '',
+//         '',
+//         `📍 *ENDEREÇO DE ENTREGA:*`,
+//         `${cliente.endereco}, ${cliente.numero}${cliente.complemento ? ' - ' + cliente.complemento : ''}`,
+//         `Bairro: ${cliente.bairro}`,
+//         `${cliente.cidade} - ${cliente.estado}`,
+//         `CEP: ${cliente.cep}`,
+//         '',
+//         `📞 *CONTATO:*`,
+//         `Celular: ${cliente.celular}`,
+//         cliente.email ? `E-mail: ${cliente.email}` : ''
+//       ].filter(Boolean).join('\n');
+//     } else {
+//       dadosClienteTexto = `👤 *CLIENTE:* (não cadastrado — favor preencher os dados no WhatsApp)`;
+//     }
+
+//     const mensagemWhats =
+//       `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n` +
+//       `${dadosClienteTexto}\n\n` +
+//       `*📦 ITENS DO PEDIDO:*\n` +
+//       cart.map((i) =>
+//         `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`
+//       ).join("\n") +
+//       `\n\n*💰 RESUMO DO PEDIDO:*\n` +
+//       `─────────────────\n` +
+//       `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\n` +
+//       `Frete: ${freteExibicao}\n` +
+//       `─────────────────\n` +
+//       `*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n` +
+//       `─────────────────\n\n` +
+//       `✨ *Obrigado pela preferência!*`;
+
+//     // ✅ Garante o 55 na frente do número
+//     let numeroWhats = String(
+//       window.__whatsappNumero ||
+//       siteConfig.whatsapp ||
+//       "5588981762208"
+//     ).replace(/\D/g, "").replace(/^0+/, "");
+
+//     if (!numeroWhats.startsWith("55")) {
+//       numeroWhats = "55" + numeroWhats;
+//     }
+
+//     const urlWhats = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`;
+
+//     localStorage.setItem("ultimo_pedido_ts", Date.now().toString());
+
+//     if (janelaWhats && !janelaWhats.closed) {
+//       janelaWhats.location.href = urlWhats;
+//     } else {
+//       window.location.href = urlWhats;
+//     }
+
+//     cart = [];
+//     updateCart();
+//     document.getElementById("cart-modal")?.classList.add("hidden");
+//     document.getElementById("cart-modal")?.classList.remove("flex");
+
+//     showToast("✅ Pedido enviado e estoque atualizado!", "success", 4000);
+
+//     invalidarEstoqueCache();
+//     localStorage.removeItem(CACHE_KEY_DADOS);
+//     carregarTudo();
+
+//   } catch (error) {
+//     console.error("❌ Erro ao finalizar pedido:", error);
+
+//     if (janelaWhats && !janelaWhats.closed) {
+//       janelaWhats.close();
+//     }
+
+//     showToast("❌ " + error.message, "error", 5000);
+
+//   } finally {
+//     if (checkoutBtn) {
+//       checkoutBtn.disabled = false;
+//       checkoutBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Finalizar';
+//     }
+//   }
+// }
+
+
 // ============================================
 // FALLBACK (caso a aba tenha sido bloqueada)
 // ============================================
 async function finalizarPedidoDiretoFallback() {
   if (cart.length === 0) return;
 
-  const cliente = carregarDadosCliente();
-  if (!clienteEstaCadastrado() || !cliente) return;
+  // ✅ NÃO exige mais cadastro
+  const cliente = carregarDadosCliente() || {};
+  const temDadosCompletos = clienteEstaCadastrado();
 
   const checkoutBtn = document.getElementById("checkout-btn");
   if (checkoutBtn) {
@@ -3195,12 +3347,11 @@ async function finalizarPedidoDiretoFallback() {
     checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
   }
 
+  const nomeCliente = cliente.nome || 'Cliente (a confirmar)';
+  const enderecoCompleto = temDadosCompletos ? formatarEnderecoCompleto() : 'A confirmar via WhatsApp';
+
   try {
-    const resultado = await processarPedidoPublico(
-      cliente.nome,
-      formatarEnderecoCompleto(),
-      cliente
-    );
+    const resultado = await processarPedidoPublico(nomeCliente, enderecoCompleto, cliente);
 
     if (!resultado || !resultado.success) {
       throw new Error((resultado && resultado.error) || "Erro ao salvar pedido");
@@ -3211,27 +3362,32 @@ async function finalizarPedidoDiretoFallback() {
       ? "GRÁTIS"
       : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
 
-    const dadosCliente = [
-      `👤 *CLIENTE:* ${cliente.nome.toUpperCase()}`,
-      `📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}`,
-      cliente.cpf ? `🆔 *${cliente.tipo === 'J' ? 'CNPJ' : 'CPF'}:* ${cliente.cpf}` : '',
-      cliente.ie ? `📋 *${cliente.tipo === 'J' ? 'I.E.' : 'RG'}:* ${cliente.ie}` : '',
-      cliente.nascimento ? `🎂 *Nascimento:* ${formatarDataBR(cliente.nascimento)}` : '',
-      '',
-      `📍 *ENDEREÇO DE ENTREGA:*`,
-      `${cliente.endereco}, ${cliente.numero}${cliente.complemento ? ' - ' + cliente.complemento : ''}`,
-      `Bairro: ${cliente.bairro}`,
-      `${cliente.cidade} - ${cliente.estado}`,
-      `CEP: ${cliente.cep}`,
-      '',
-      `📞 *CONTATO:*`,
-      `Celular: ${cliente.celular}`,
-      cliente.email ? `E-mail: ${cliente.email}` : ''
-    ].filter(Boolean).join('\n');
+    let dadosClienteTexto = '';
+    if (temDadosCompletos && cliente.nome) {
+      dadosClienteTexto = [
+        `👤 *CLIENTE:* ${cliente.nome.toUpperCase()}`,
+        `📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}`,
+        cliente.cpf ? `🆔 *${cliente.tipo === 'J' ? 'CNPJ' : 'CPF'}:* ${cliente.cpf}` : '',
+        cliente.ie ? `📋 *${cliente.tipo === 'J' ? 'I.E.' : 'RG'}:* ${cliente.ie}` : '',
+        cliente.nascimento ? `🎂 *Nascimento:* ${formatarDataBR(cliente.nascimento)}` : '',
+        '',
+        `📍 *ENDEREÇO DE ENTREGA:*`,
+        `${cliente.endereco}, ${cliente.numero}${cliente.complemento ? ' - ' + cliente.complemento : ''}`,
+        `Bairro: ${cliente.bairro}`,
+        `${cliente.cidade} - ${cliente.estado}`,
+        `CEP: ${cliente.cep}`,
+        '',
+        `📞 *CONTATO:*`,
+        `Celular: ${cliente.celular}`,
+        cliente.email ? `E-mail: ${cliente.email}` : ''
+      ].filter(Boolean).join('\n');
+    } else {
+      dadosClienteTexto = `👤 *CLIENTE:* (não cadastrado — favor preencher os dados no WhatsApp)`;
+    }
 
     const mensagemWhats =
       `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n` +
-      `${dadosCliente}\n\n` +
+      `${dadosClienteTexto}\n\n` +
       `*📦 ITENS DO PEDIDO:*\n` +
       cart.map((i) =>
         `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`
@@ -3245,7 +3401,7 @@ async function finalizarPedidoDiretoFallback() {
       `─────────────────\n\n` +
       `✨ *Obrigado pela preferência!*`;
 
-    // ✅ CORREÇÃO DO NÚMERO DO WHATSAPP AQUI
+    // ✅ Garante o 55 na frente do número
     let numeroWhats = String(
       window.__whatsappNumero ||
       siteConfig.whatsapp ||
@@ -3277,6 +3433,8 @@ async function finalizarPedidoDiretoFallback() {
     }
   }
 }
+
+
 
 function formatarDataBR(dataISO) {
   if (!dataISO) return '';
