@@ -177,20 +177,32 @@ async function atualizarEmBackground(mostrarLoading = false) {
     const dados = await new Promise((resolve, reject) => {
       const cb = 'ivo_load_' + Date.now();
       let script = null;
+      let resolvido = false;
+
+      // ✅ Timeout de 25s (Apps Script frio pode demorar)
       const timeout = setTimeout(() => {
-        delete window[cb];
-        if (script && script.parentNode) script.parentNode.removeChild(script);
-        reject(new Error('Timeout'));
-      }, 12000);
+        if (resolvido) return;
+        resolvido = true;
+        console.warn('⏱️ Timeout do carregamento (25s)');
+        reject(new Error('Timeout ao carregar dados'));
+        // ⚠️ NÃO deletar o callback imediatamente — deixa o script terminar
+        // para evitar o erro "callback is not defined"
+      }, 25000);
+
       window[cb] = function (response) {
+        if (resolvido) return;
+        resolvido = true;
         clearTimeout(timeout);
         delete window[cb];
         if (script && script.parentNode) script.parentNode.removeChild(script);
         resolve(response);
       };
+
       script = document.createElement('script');
       script.src = `${ESTOQUE_API_URL}?callback=${cb}&_t=${Date.now()}`;
       script.onerror = () => {
+        if (resolvido) return;
+        resolvido = true;
         clearTimeout(timeout);
         delete window[cb];
         if (script && script.parentNode) script.parentNode.removeChild(script);
@@ -254,17 +266,21 @@ function aplicarDados(dados) {
   renderizarMarquee(dados.marquee || []);
   
 
-// ✅ Preload APENAS das 2 primeiras (não 4) e em tamanho médio
+
+// script.js — trocar 400 por 300
 (function preloadPrimeirasImagens() {
   const primeiras = allProducts.slice(0, 2);
   primeiras.forEach(p => {
     if (!p.Imagem) return;
-    const url = driveImg(p.Imagem, 400); // ✅ 400px é o suficiente para o card
+    const url = driveImg(p.Imagem, 300); // ✅ mesmo tamanho do src
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
     link.href = url;
     link.setAttribute('fetchpriority', 'high');
+    // ✅ Evita aviso de "não usado" caso o navegador escolha o 500w
+    link.setAttribute('imagesrcset', `${driveImg(p.Imagem, 300)} 300w, ${driveImg(p.Imagem, 500)} 500w`);
+    link.setAttribute('imagesizes', "(max-width: 600px) 45vw, (max-width: 1100px) 30vw, 20vw");
     document.head.appendChild(link);
   });
 })();
