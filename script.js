@@ -16,8 +16,8 @@ const IMG_SIZE_MODAL = 500;
 const IMG_SIZE_ZOOM = 1000;  
 
 let siteConfig = {
-  whatsapp: "5588999049636",
-  whatsappDisplay: "(88) 99904-9636",
+  whatsapp: "5588981762208",
+  whatsappDisplay: "(88) 98176-2208",
   email: "contato@ivopita.com.br",
   endereco: "Juazeiro do Norte, CE",
   telefone: "(88) 99909-9999",
@@ -3073,7 +3073,7 @@ async function finalizarPedidoDireto() {
 
     const mensagemWhats = `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n${dadosCliente}\n\n*📦 ITENS DO PEDIDO:*\n${cart.map((i) => `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`).join("\n")}\n\n*💰 RESUMO DO PEDIDO:*\n─────────────────\nSubtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\nFrete: ${freteExibicao}\n─────────────────\n*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n─────────────────\n\n✨ *Obrigado pela preferência!*`;
 
-    const numeroWhats = window.__whatsappNumero || String(siteConfig.whatsapp).replace(/\D/g, "") || "5588999049636";
+    const numeroWhats = window.__whatsappNumero || String(siteConfig.whatsapp).replace(/\D/g, "") || "5588981762208";
 
     localStorage.setItem("ultimo_pedido_ts", Date.now().toString());
 
