@@ -1,5 +1,5 @@
-const CACHE_NAME = 'ivo-pita-v13';  // ← suba aqui
-const CACHE_IMAGENS = 'ivo-imagens-v2'; // ← e aqui
+const CACHE_NAME = 'ivo-pita-v16';  // ← suba aqui
+const CACHE_IMAGENS = 'ivo-imagens-v5'; // ← e aqui
 
 const urlsToCache = [
   './styles.css',
