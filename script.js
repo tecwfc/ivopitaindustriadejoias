@@ -2084,6 +2084,9 @@ function renderizarMarquee(items) {
 // ============================================
 // APLICAR CONFIGURAÇÕES
 // ============================================
+// ============================================
+// APLICAR CONFIGURAÇÕES
+// ============================================
 function aplicarConfig(cfg) {
   if (!cfg || typeof cfg !== "object") return;
 
@@ -2092,7 +2095,16 @@ function aplicarConfig(cfg) {
   if (cfg.freteGratisValor) FRETE_GRATIS_VALOR = parseFloat(cfg.freteGratisValor) || 3500;
   if (cfg.taxaFrete) TAXA_FRETE = parseFloat(cfg.taxaFrete) || 15;
 
-  const whatsNumero = String(cfg.whatsapp || siteConfig.whatsapp).replace(/\D/g, "");
+  // ✅ CORREÇÃO DO NÚMERO DO WHATSAPP AQUI
+  let whatsNumero = String(cfg.whatsapp || siteConfig.whatsapp || "5588981762208").replace(/\D/g, "");
+  whatsNumero = whatsNumero.replace(/^0+/, ""); // remove zeros à esquerda
+  if (!whatsNumero.startsWith("55")) {
+    whatsNumero = "55" + whatsNumero; // adiciona o código do Brasil
+  }
+  if (whatsNumero.length < 12 || whatsNumero.length > 13) {
+    whatsNumero = "5588981762208"; // fallback de segurança
+  }
+
   const whatsLink = `https://wa.me/${whatsNumero}`;
 
   document.querySelectorAll('a[href*="wa.me"]').forEach((a) => {
@@ -2126,6 +2138,8 @@ function aplicarConfig(cfg) {
   window.__whatsappNumero = whatsNumero;
 }
 window.aplicarConfig = aplicarConfig;
+
+
 
 // ============================================
 // ZOOM COM LUPA
@@ -3002,7 +3016,7 @@ async function downloadPDF() {
 // FINALIZAR PEDIDO VIA WHATSAPP
 // ============================================
 // ============================================
-// FINALIZAR PEDIDO VIA WHATSAPP (CORRIGIDO)
+// FINALIZAR PEDIDO VIA WHATSAPP
 // ============================================
 async function finalizarPedidoDireto() {
   if (cart.length === 0) {
@@ -3018,19 +3032,15 @@ async function finalizarPedidoDireto() {
     return;
   }
 
-  // ✅ ABRE A ABA IMEDIATAMENTE (dentro do clique do usuário)
-  // Isso evita o popup blocker do navegador, que bloqueia window.open()
-  // quando chamado depois de um await.
+  // ✅ Abre a aba JÁ no clique do usuário (evita popup blocker)
   const janelaWhats = window.open('', '_blank');
 
-  // ✅ Se a aba foi bloqueada mesmo assim, avisa o usuário
   if (!janelaWhats || janelaWhats.closed) {
     const continuar = confirm(
       "⚠️ Seu navegador bloqueou a abertura do WhatsApp.\n\n" +
       "Clique em OK para tentar novamente e permitir popups para este site."
     );
     if (!continuar) return;
-    // Tenta abrir novamente de forma síncrona (agora o usuário "autorizou")
     return finalizarPedidoDiretoFallback();
   }
 
@@ -3063,11 +3073,7 @@ async function finalizarPedidoDireto() {
     if (!resultado || !resultado.success) {
       const erro = (resultado && resultado.error) || "Erro ao salvar pedido";
 
-      // Erros de estoque → atualiza carrinho
-      if (
-        erro.toLowerCase().includes("estoque insuficiente") ||
-        erro.toLowerCase().includes("não encontrado")
-      ) {
+      if (erro.toLowerCase().includes("estoque insuficiente") || erro.toLowerCase().includes("não encontrado")) {
         showToast("⚠️ Um item esgotou enquanto você finalizava. Atualizando...", "warning", 5000);
         invalidarEstoqueCache();
         localStorage.removeItem(CACHE_KEY_DADOS);
@@ -3080,7 +3086,6 @@ async function finalizarPedidoDireto() {
         throw new Error("Estoque desatualizado — revise seu carrinho");
       }
 
-      // Rate limit do Apps Script
       if (erro.toLowerCase().includes("muitos pedidos")) {
         throw new Error("Aguarde cerca de 1 minuto antes de tentar novamente.");
       }
@@ -3088,7 +3093,6 @@ async function finalizarPedidoDireto() {
       throw new Error(erro);
     }
 
-    // ✅ Monta a mensagem do WhatsApp
     const dadosCliente = [
       `👤 *CLIENTE:* ${cliente.nome.toUpperCase()}`,
       `📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}`,
@@ -3123,24 +3127,27 @@ async function finalizarPedidoDireto() {
       `─────────────────\n\n` +
       `✨ *Obrigado pela preferência!*`;
 
-    const numeroWhats =
+    // ✅ CORREÇÃO DO NÚMERO DO WHATSAPP AQUI
+    let numeroWhats = String(
       window.__whatsappNumero ||
-      String(siteConfig.whatsapp).replace(/\D/g, "") ||
-      "5588981762208";
+      siteConfig.whatsapp ||
+      "5588981762208"
+    ).replace(/\D/g, "").replace(/^0+/, "");
+
+    if (!numeroWhats.startsWith("55")) {
+      numeroWhats = "55" + numeroWhats;
+    }
 
     const urlWhats = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`;
 
     localStorage.setItem("ultimo_pedido_ts", Date.now().toString());
 
-    // ✅ Usa a aba que já abrimos no início (não bloqueia)
     if (janelaWhats && !janelaWhats.closed) {
       janelaWhats.location.href = urlWhats;
     } else {
-      // Fallback: tenta via location (caso a aba tenha sido fechada)
       window.location.href = urlWhats;
     }
 
-    // Limpa carrinho e fecha modal
     cart = [];
     updateCart();
     document.getElementById("cart-modal")?.classList.add("hidden");
@@ -3148,7 +3155,6 @@ async function finalizarPedidoDireto() {
 
     showToast("✅ Pedido enviado e estoque atualizado!", "success", 4000);
 
-    // Recarrega dados do servidor (estoque atualizado)
     invalidarEstoqueCache();
     localStorage.removeItem(CACHE_KEY_DADOS);
     carregarTudo();
@@ -3156,7 +3162,6 @@ async function finalizarPedidoDireto() {
   } catch (error) {
     console.error("❌ Erro ao finalizar pedido:", error);
 
-    // Fecha a aba em branco se houver erro
     if (janelaWhats && !janelaWhats.closed) {
       janelaWhats.close();
     }
@@ -3171,6 +3176,10 @@ async function finalizarPedidoDireto() {
   }
 }
 
+
+// ============================================
+// FALLBACK (caso a aba tenha sido bloqueada)
+// ============================================
 // ============================================
 // FALLBACK (caso a aba tenha sido bloqueada)
 // ============================================
@@ -3179,6 +3188,12 @@ async function finalizarPedidoDiretoFallback() {
 
   const cliente = carregarDadosCliente();
   if (!clienteEstaCadastrado() || !cliente) return;
+
+  const checkoutBtn = document.getElementById("checkout-btn");
+  if (checkoutBtn) {
+    checkoutBtn.disabled = true;
+    checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+  }
 
   try {
     const resultado = await processarPedidoPublico(
@@ -3196,22 +3211,28 @@ async function finalizarPedidoDiretoFallback() {
       ? "GRÁTIS"
       : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
 
+    const dadosCliente = [
+      `👤 *CLIENTE:* ${cliente.nome.toUpperCase()}`,
+      `📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}`,
+      cliente.cpf ? `🆔 *${cliente.tipo === 'J' ? 'CNPJ' : 'CPF'}:* ${cliente.cpf}` : '',
+      cliente.ie ? `📋 *${cliente.tipo === 'J' ? 'I.E.' : 'RG'}:* ${cliente.ie}` : '',
+      cliente.nascimento ? `🎂 *Nascimento:* ${formatarDataBR(cliente.nascimento)}` : '',
+      '',
+      `📍 *ENDEREÇO DE ENTREGA:*`,
+      `${cliente.endereco}, ${cliente.numero}${cliente.complemento ? ' - ' + cliente.complemento : ''}`,
+      `Bairro: ${cliente.bairro}`,
+      `${cliente.cidade} - ${cliente.estado}`,
+      `CEP: ${cliente.cep}`,
+      '',
+      `📞 *CONTATO:*`,
+      `Celular: ${cliente.celular}`,
+      cliente.email ? `E-mail: ${cliente.email}` : ''
+    ].filter(Boolean).join('\n');
+
     const mensagemWhats =
       `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n` +
-      `👤 *CLIENTE:* ${cliente.nome.toUpperCase()}\n` +
-      `📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}\n` +
-      (cliente.cpf ? `🆔 *${cliente.tipo === 'J' ? 'CNPJ' : 'CPF'}:* ${cliente.cpf}\n` : '') +
-      (cliente.ie ? `📋 *${cliente.tipo === 'J' ? 'I.E.' : 'RG'}:* ${cliente.ie}\n` : '') +
-      (cliente.nascimento ? `🎂 *Nascimento:* ${formatarDataBR(cliente.nascimento)}\n` : '') +
-      `\n📍 *ENDEREÇO DE ENTREGA:*\n` +
-      `${cliente.endereco}, ${cliente.numero}${cliente.complemento ? ' - ' + cliente.complemento : ''}\n` +
-      `Bairro: ${cliente.bairro}\n` +
-      `${cliente.cidade} - ${cliente.estado}\n` +
-      `CEP: ${cliente.cep}\n\n` +
-      `📞 *CONTATO:*\n` +
-      `Celular: ${cliente.celular}\n` +
-      (cliente.email ? `E-mail: ${cliente.email}\n` : '') +
-      `\n*📦 ITENS DO PEDIDO:*\n` +
+      `${dadosCliente}\n\n` +
+      `*📦 ITENS DO PEDIDO:*\n` +
       cart.map((i) =>
         `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`
       ).join("\n") +
@@ -3224,12 +3245,20 @@ async function finalizarPedidoDiretoFallback() {
       `─────────────────\n\n` +
       `✨ *Obrigado pela preferência!*`;
 
-    const numeroWhats =
+    // ✅ CORREÇÃO DO NÚMERO DO WHATSAPP AQUI
+    let numeroWhats = String(
       window.__whatsappNumero ||
-      String(siteConfig.whatsapp).replace(/\D/g, "") ||
-      "5588981762208";
+      siteConfig.whatsapp ||
+      "5588981762208"
+    ).replace(/\D/g, "").replace(/^0+/, "");
+
+    if (!numeroWhats.startsWith("55")) {
+      numeroWhats = "55" + numeroWhats;
+    }
 
     const urlWhats = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`;
+
+    localStorage.setItem("ultimo_pedido_ts", Date.now().toString());
 
     cart = [];
     updateCart();
@@ -3241,6 +3270,11 @@ async function finalizarPedidoDiretoFallback() {
   } catch (error) {
     console.error("❌ Erro no fallback:", error);
     showToast("❌ " + error.message, "error", 5000);
+  } finally {
+    if (checkoutBtn) {
+      checkoutBtn.disabled = false;
+      checkoutBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Finalizar';
+    }
   }
 }
 
