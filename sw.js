@@ -1,5 +1,5 @@
-const CACHE_NAME = 'ivo-pita-v17';        // ← era v16, agora v17
-const CACHE_IMAGENS = 'ivo-imagens-v6';   // ← era v5, agora v6
+const CACHE_NAME = 'ivo-pita-v19';        // era v18
+const CACHE_IMAGENS = 'ivo-imagens-v8';   // era v7
 
 const urlsToCache = [
   './styles.css',
