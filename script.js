@@ -3072,21 +3072,36 @@ async function finalizarPedidoDireto() {
     dadosClienteTexto = `👤 *CLIENTE:* (não cadastrado — favor preencher os dados no WhatsApp)`;
   }
 
+      // ✅ Usa variáveis seguras para os textos
+  const clienteNome = dadosClienteTexto.includes("não cadastrado") 
+    ? "CLIENTE: (não cadastrado — favor preencher os dados no WhatsApp)" 
+    : dadosClienteTexto;
+
   const mensagemWhats =
-    `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n` +
-    `${dadosClienteTexto}\n\n` +
-    `*📦 ITENS DO PEDIDO:*\n` +
+    `*IVO PITA - INDÚSTRIA DE JOIAS*\n` +
+    `_Novo Pedido Recebido_\n\n` +
+    
+    `${clienteNome}\n\n` +
+    
+    `*--------------------------------------------------*\n` +
+    `*ITENS DO PEDIDO*\n` +
+    `*--------------------------------------------------*\n` +
     cart.map((i) =>
-      `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`
-    ).join("\n") +
-    `\n\n*💰 RESUMO DO PEDIDO:*\n` +
-    `─────────────────\n` +
+      `- *${i.quantity}x* ${i.name}${i.ref ? ` _(Ref: ${i.ref})_` : ""}\n` +
+      `     Valor un: R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")}\n` +
+      `     Subtotal: R$ ${i.price.toFixed(2).replace(".", ",")}`
+    ).join("\n\n") +
+    `\n\n*--------------------------------------------------*\n` +
+    `*RESUMO FINANCEIRO*\n` +
+    `*--------------------------------------------------*\n` +
     `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\n` +
     `Frete: ${freteExibicao}\n` +
-    `─────────────────\n` +
     `*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n` +
-    `─────────────────\n\n` +
-    `✨ *Obrigado pela preferência!*`;
+    `*--------------------------------------------------*\n\n` +
+    
+    `_Agradecemos a sua preferência!_\n` +
+    `_Equipe Ivo Pita_`;
+    
 
   // ✅ Garante o 55 na frente do número
   let numeroWhats = String(
@@ -3163,174 +3178,6 @@ async function finalizarPedidoDireto() {
   })();
 }
 
-
-
-
-
-// ============================================
-// FINALIZAR PEDIDO VIA WHATSAPP
-// ============================================
-// async function finalizarPedidoDireto() {
-//   if (cart.length === 0) {
-//     showToast("Sacola vazia!", "error", 2000);
-//     return;
-//   }
-
-//   // ✅ NÃO exige mais cadastro. Se não tiver dados, segue mesmo assim.
-//   const cliente = carregarDadosCliente() || {};
-//   const temDadosCompletos = clienteEstaCadastrado();
-
-//   // ✅ Abre a aba JÁ no clique do usuário (evita popup blocker)
-//   const janelaWhats = window.open('', '_blank');
-
-//   if (!janelaWhats || janelaWhats.closed) {
-//     const continuar = confirm(
-//       "⚠️ Seu navegador bloqueou a abertura do WhatsApp.\n\n" +
-//       "Clique em OK para tentar novamente e permitir popups para este site."
-//     );
-//     if (!continuar) return;
-//     return finalizarPedidoDiretoFallback();
-//   }
-
-//   const nomeCliente = cliente.nome || 'Cliente (a confirmar)';
-//   const enderecoCompleto = temDadosCompletos ? formatarEnderecoCompleto() : 'A confirmar via WhatsApp';
-
-//   showToast("Validando estoque...", "info", 1500);
-//   await validarCarrinho();
-
-//   if (cart.length === 0) {
-//     if (janelaWhats && !janelaWhats.closed) janelaWhats.close();
-//     showToast("Seu carrinho ficou vazio (itens esgotaram).", "error", 3000);
-//     return;
-//   }
-
-//   const checkoutBtn = document.getElementById("checkout-btn");
-//   if (checkoutBtn) {
-//     checkoutBtn.disabled = true;
-//     checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
-//   }
-
-//   try {
-//     const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
-//     const freteExibicao = subtotal >= FRETE_GRATIS_VALOR
-//       ? "GRÁTIS"
-//       : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
-
-//     const resultado = await processarPedidoPublico(nomeCliente, enderecoCompleto, cliente);
-
-//     if (!resultado || !resultado.success) {
-//       const erro = (resultado && resultado.error) || "Erro ao salvar pedido";
-
-//       if (erro.toLowerCase().includes("estoque insuficiente") || erro.toLowerCase().includes("não encontrado")) {
-//         showToast("⚠️ Um item esgotou enquanto você finalizava. Atualizando...", "warning", 5000);
-//         invalidarEstoqueCache();
-//         localStorage.removeItem(CACHE_KEY_DADOS);
-//         setTimeout(async () => {
-//           await carregarTudo();
-//           await validarCarrinho();
-//           document.getElementById("cart-modal")?.classList.remove("hidden");
-//           document.getElementById("cart-modal")?.classList.add("flex");
-//         }, 1500);
-//         throw new Error("Estoque desatualizado — revise seu carrinho");
-//       }
-
-//       if (erro.toLowerCase().includes("muitos pedidos")) {
-//         throw new Error("Aguarde cerca de 1 minuto antes de tentar novamente.");
-//       }
-
-//       throw new Error(erro);
-//     }
-
-//     // ✅ Monta os dados do cliente APENAS se estiverem cadastrados
-//     let dadosClienteTexto = '';
-//     if (temDadosCompletos && cliente.nome) {
-//       dadosClienteTexto = [
-//         `👤 *CLIENTE:* ${cliente.nome.toUpperCase()}`,
-//         `📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}`,
-//         cliente.cpf ? `🆔 *${cliente.tipo === 'J' ? 'CNPJ' : 'CPF'}:* ${cliente.cpf}` : '',
-//         cliente.ie ? `📋 *${cliente.tipo === 'J' ? 'I.E.' : 'RG'}:* ${cliente.ie}` : '',
-//         cliente.nascimento ? `🎂 *Nascimento:* ${formatarDataBR(cliente.nascimento)}` : '',
-//         '',
-//         `📍 *ENDEREÇO DE ENTREGA:*`,
-//         `${cliente.endereco}, ${cliente.numero}${cliente.complemento ? ' - ' + cliente.complemento : ''}`,
-//         `Bairro: ${cliente.bairro}`,
-//         `${cliente.cidade} - ${cliente.estado}`,
-//         `CEP: ${cliente.cep}`,
-//         '',
-//         `📞 *CONTATO:*`,
-//         `Celular: ${cliente.celular}`,
-//         cliente.email ? `E-mail: ${cliente.email}` : ''
-//       ].filter(Boolean).join('\n');
-//     } else {
-//       dadosClienteTexto = `👤 *CLIENTE:* (não cadastrado — favor preencher os dados no WhatsApp)`;
-//     }
-
-//     const mensagemWhats =
-//       `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n` +
-//       `${dadosClienteTexto}\n\n` +
-//       `*📦 ITENS DO PEDIDO:*\n` +
-//       cart.map((i) =>
-//         `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`
-//       ).join("\n") +
-//       `\n\n*💰 RESUMO DO PEDIDO:*\n` +
-//       `─────────────────\n` +
-//       `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\n` +
-//       `Frete: ${freteExibicao}\n` +
-//       `─────────────────\n` +
-//       `*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n` +
-//       `─────────────────\n\n` +
-//       `✨ *Obrigado pela preferência!*`;
-
-//     // ✅ Garante o 55 na frente do número
-//     let numeroWhats = String(
-//       window.__whatsappNumero ||
-//       siteConfig.whatsapp ||
-//       "5588981762208"
-//     ).replace(/\D/g, "").replace(/^0+/, "");
-
-//     if (!numeroWhats.startsWith("55")) {
-//       numeroWhats = "55" + numeroWhats;
-//     }
-
-//     const urlWhats = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemWhats)}`;
-
-//     localStorage.setItem("ultimo_pedido_ts", Date.now().toString());
-
-//     if (janelaWhats && !janelaWhats.closed) {
-//       janelaWhats.location.href = urlWhats;
-//     } else {
-//       window.location.href = urlWhats;
-//     }
-
-//     cart = [];
-//     updateCart();
-//     document.getElementById("cart-modal")?.classList.add("hidden");
-//     document.getElementById("cart-modal")?.classList.remove("flex");
-
-//     showToast("✅ Pedido enviado e estoque atualizado!", "success", 4000);
-
-//     invalidarEstoqueCache();
-//     localStorage.removeItem(CACHE_KEY_DADOS);
-//     carregarTudo();
-
-//   } catch (error) {
-//     console.error("❌ Erro ao finalizar pedido:", error);
-
-//     if (janelaWhats && !janelaWhats.closed) {
-//       janelaWhats.close();
-//     }
-
-//     showToast("❌ " + error.message, "error", 5000);
-
-//   } finally {
-//     if (checkoutBtn) {
-//       checkoutBtn.disabled = false;
-//       checkoutBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Finalizar';
-//     }
-//   }
-// }
-
-
 // ============================================
 // FALLBACK (caso a aba tenha sido bloqueada)
 // ============================================
@@ -3385,21 +3232,36 @@ async function finalizarPedidoDiretoFallback() {
       dadosClienteTexto = `👤 *CLIENTE:* (não cadastrado — favor preencher os dados no WhatsApp)`;
     }
 
-    const mensagemWhats =
-      `🛍️ *NOVO PEDIDO - IVO PITA* 🛍️\n\n` +
-      `${dadosClienteTexto}\n\n` +
-      `*📦 ITENS DO PEDIDO:*\n` +
-      cart.map((i) =>
-        `✅ ${i.quantity}x ${i.name}${i.ref ? ` (Ref: ${i.ref})` : ""} - R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")} cada`
-      ).join("\n") +
-      `\n\n*💰 RESUMO DO PEDIDO:*\n` +
-      `─────────────────\n` +
-      `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\n` +
-      `Frete: ${freteExibicao}\n` +
-      `─────────────────\n` +
-      `*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n` +
-      `─────────────────\n\n` +
-      `✨ *Obrigado pela preferência!*`;
+     // ✅ Usa variáveis seguras para os textos
+  const clienteNome = dadosClienteTexto.includes("não cadastrado") 
+    ? "CLIENTE: (não cadastrado — favor preencher os dados no WhatsApp)" 
+    : dadosClienteTexto;
+
+  const mensagemWhats =
+    `*IVO PITA - INDÚSTRIA DE JOIAS*\n` +
+    `_Novo Pedido Recebido_\n\n` +
+    
+    `${clienteNome}\n\n` +
+    
+    `*--------------------------------------------------*\n` +
+    `*ITENS DO PEDIDO*\n` +
+    `*--------------------------------------------------*\n` +
+    cart.map((i) =>
+      `- *${i.quantity}x* ${i.name}${i.ref ? ` _(Ref: ${i.ref})_` : ""}\n` +
+      `     Valor un: R$ ${(i.price / i.quantity).toFixed(2).replace(".", ",")}\n` +
+      `     Subtotal: R$ ${i.price.toFixed(2).replace(".", ",")}`
+    ).join("\n\n") +
+    `\n\n*--------------------------------------------------*\n` +
+    `*RESUMO FINANCEIRO*\n` +
+    `*--------------------------------------------------*\n` +
+    `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}\n` +
+    `Frete: ${freteExibicao}\n` +
+    `*TOTAL: R$ ${totalFinal.toFixed(2).replace(".", ",")}*\n` +
+    `*--------------------------------------------------*\n\n` +
+    
+    `_Agradecemos a sua preferência!_\n` +
+    `_Equipe Ivo Pita_`;
+
 
     // ✅ Garante o 55 na frente do número
     let numeroWhats = String(
