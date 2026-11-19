@@ -10,6 +10,7 @@ const ESTOQUE_API_URL =
 const CACHE_KEY_DADOS = 'ivo_dados_v3';
 const CACHE_KEY_TIME = 'ivo_dados_time_v3';
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutos
+const CART_NOME_KEY = 'ivo_cart_nome_cliente';
 
 const IMG_SIZE_CARD = 300;   
 const IMG_SIZE_MODAL = 500;  
@@ -586,6 +587,85 @@ function aplicarBuscaSidebar(termo) {
     el.style.display = match ? '' : 'none';
   });
 }
+
+// Retorna o total de unidades (não linhas) no carrinho
+function totalItensCarrinho() {
+  return cart.reduce((s, i) => s + (i.quantity || 0), 0);
+}
+
+// Verifica se passou do limite
+function carrinhoPassouLimite() {
+  return totalItensCarrinho() > 100;
+}
+
+// Sincroniza o input do nome com o storage
+function sincronizarNomeCarrinho() {
+  const input = document.getElementById('cart-nome-cliente');
+  if (input && !input.value) {
+    input.value = obterNomeClienteCarrinho();
+  }
+}
+
+// Valida nome e retorna string (ou '' se inválido)
+function validarNomeClienteCarrinho() {
+  const input = document.getElementById('cart-nome-cliente');
+  const erro = document.getElementById('cart-nome-erro');
+
+  const nome = (input ? input.value.trim() : '') || obterNomeClienteCarrinho();
+
+  if (!nome) {
+    if (erro) erro.classList.remove('hidden');
+    if (input) {
+      input.classList.add('border-red-500');
+      input.focus();
+    }
+    showToast("⚠️ Informe o nome do cliente antes de continuar", "error", 3000);
+    return '';
+  }
+
+  if (erro) erro.classList.add('hidden');
+  if (input) input.classList.remove('border-red-500');
+  salvarNomeCarrinho(nome);
+  return nome;
+}
+
+window.totalItensCarrinho = totalItensCarrinho;
+window.validarNomeClienteCarrinho = validarNomeClienteCarrinho;
+
+
+// ============================================
+// NOME DO CLIENTE NO CARRINHO
+// ============================================
+function carregarNomeCarrinho() {
+  try {
+    return localStorage.getItem(CART_NOME_KEY) || '';
+  } catch (e) {
+    return '';
+  }
+}
+
+function salvarNomeCarrinho(nome) {
+  try {
+    if (nome && nome.trim()) {
+      localStorage.setItem(CART_NOME_KEY, nome.trim());
+    } else {
+      localStorage.removeItem(CART_NOME_KEY);
+    }
+  } catch (e) {}
+}
+
+function obterNomeClienteCarrinho() {
+  const input = document.getElementById('cart-nome-cliente');
+  const nomeInput = input ? input.value.trim() : '';
+  if (nomeInput) return nomeInput;
+
+  const dados = carregarDadosCliente();
+  if (dados && dados.nome) return dados.nome;
+
+  return carregarNomeCarrinho();
+}
+window.obterNomeClienteCarrinho = obterNomeClienteCarrinho;
+
 
 // ============================================
 // SIDEBAR - TOGGLE
@@ -1686,6 +1766,34 @@ function updateCart() {
         </div>`;
       container.appendChild(div);
     });
+
+      // ===== LIMITE DE 100 ITENS + NOME =====
+  const totalItens = totalItensCarrinho();
+  const checkoutBtn = document.getElementById("checkout-btn");
+  const aviso = document.getElementById("cart-limite-aviso");
+  const avisoQtd = document.getElementById("cart-limite-qtd");
+  const pdfBtn = document.getElementById("pdf-preview-btn");
+
+  if (totalItens > 100) {
+    if (checkoutBtn) checkoutBtn.style.display = "none";
+    if (aviso) aviso.classList.remove("hidden");
+    if (avisoQtd) avisoQtd.textContent = totalItens;
+    if (pdfBtn) {
+      pdfBtn.classList.remove("flex-1");
+      pdfBtn.classList.add("w-full");
+    }
+  } else {
+    if (checkoutBtn) checkoutBtn.style.display = "";
+    if (aviso) aviso.classList.add("hidden");
+    if (pdfBtn) {
+      pdfBtn.classList.add("flex-1");
+      pdfBtn.classList.remove("w-full");
+    }
+  }
+
+  // Restaura nome do cliente no input
+  sincronizarNomeCarrinho();
+
   }
 
   const bar = document.getElementById("free-shipping-bar");
@@ -2619,6 +2727,10 @@ function performSearch(termo) {
 // ============================================
 function gerarConteudoPDF() {
   const cliente = carregarDadosCliente() || {};
+
+  // ✅ Sobrescreve o nome com o que está no carrinho (se houver)
+  const nomeCarrinho = obterNomeClienteCarrinho();
+  if (nomeCarrinho) cliente.nome = nomeCarrinho;
   const dataAtual = new Date().toLocaleDateString("pt-BR");
   const horaAtual = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
   const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
@@ -2629,23 +2741,36 @@ function gerarConteudoPDF() {
 
   let itensHTML = "";
   let totalItens = 0;
-  cart.forEach((item, index) => {
-    const precoUnitario = item.precoUnitario || (item.price / item.quantity);
-    totalItens += item.quantity;
-    itensHTML += `
-      <tr>
-        <td style="padding: 8px 6px; text-align: center; font-size: 10px; color: #6b7280; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">${index + 1}</td>
-        <td style="padding: 8px 6px; text-align: center; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
-          <div style="font-size: 9px; color: #182420; font-weight: 600; letter-spacing: 0.02em;">${item.ref || '—'}</div>
-        </td>
-        <td style="padding: 8px 6px; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
-          <div style="font-size: 10px; font-weight: 600; color: #182420; line-height: 1.35;">${item.name}</div>
-        </td>
-        <td style="padding: 8px 6px; text-align: center; font-size: 10px; color: #182420; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">${item.quantity}</td>
-        <td style="padding: 8px 6px; text-align: right; font-size: 10px; color: #6b7280; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">R$ ${precoUnitario.toFixed(2).replace(".", ",")}</td>
-        <td style="padding: 8px 6px; text-align: right; font-size: 10px; font-weight: 700; color: #1f4d38; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">R$ ${item.price.toFixed(2).replace(".", ",")}</td>
-      </tr>`;
-  });
+cart.forEach((item, index) => {
+  const precoUnitario = item.precoUnitario || (item.price / item.quantity);
+  totalItens += item.quantity;
+
+  // 🎨 Extrai a cor do nome ("Produto - Azul") se existir
+  let corItem = '—';
+  let nomeItem = item.name || '';
+  if (item.name && item.name.includes(' - ')) {
+    const partes = item.name.split(' - ');
+    corItem = partes[partes.length - 1].trim();
+    nomeItem = partes.slice(0, -1).join(' - ').trim();
+  }
+
+  itensHTML += `
+    <tr>
+      <td style="padding: 8px 6px; text-align: center; font-size: 10px; color: #6b7280; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">${index + 1}</td>
+      <td style="padding: 8px 6px; text-align: center; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
+        <div style="font-size: 9px; color: #182420; font-weight: 600; letter-spacing: 0.02em;">${item.ref || '—'}</div>
+      </td>
+      <td style="padding: 8px 6px; text-align: center; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
+        <div style="font-size: 9px; color: #182420; font-weight: 600;">${corItem}</div>
+      </td>
+      <td style="padding: 8px 6px; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
+        <div style="font-size: 10px; font-weight: 600; color: #182420; line-height: 1.35;">${nomeItem}</div>
+      </td>
+      <td style="padding: 8px 6px; text-align: center; font-size: 10px; color: #182420; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">${item.quantity}</td>
+      <td style="padding: 8px 6px; text-align: right; font-size: 10px; color: #6b7280; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">R$ ${precoUnitario.toFixed(2).replace(".", ",")}</td>
+      <td style="padding: 8px 6px; text-align: right; font-size: 10px; font-weight: 700; color: #1f4d38; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">R$ ${item.price.toFixed(2).replace(".", ",")}</td>
+    </tr>`;
+});
 
   const docLabel = cliente.tipo === 'J' ? 'CNPJ' : 'CPF';
   const ieLabel = cliente.tipo === 'J' ? 'I.E.' : 'RG';
@@ -2718,16 +2843,17 @@ function gerarConteudoPDF() {
 
         <div style="margin-bottom: 16px;">
           <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-              <tr style="border-bottom: 1.5px solid #1f4d38;">
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 45px;">Itens</th>
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 90px;">Referência</th>
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: left;">Descrição</th>
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 50px;">Qtde</th>
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 85px;">Valor Uni.</th>
-                <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 95px;">Total</th>
-              </tr>
-            </thead>
+           <thead>
+  <tr style="border-bottom: 1.5px solid #1f4d38;">
+    <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 40px;">Itens</th>
+    <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 80px;">Referência</th>
+    <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 70px;">Cor</th>
+    <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: left;">Descrição</th>
+    <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 45px;">Qtde</th>
+    <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 80px;">Valor Uni.</th>
+    <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 90px;">Total</th>
+  </tr>
+</thead>
             <tbody>${itensHTML}</tbody>
           </table>
         </div>
@@ -2772,11 +2898,8 @@ async function visualizarPDF() {
     return;
   }
 
-  // if (!clienteEstaCadastrado()) {
-  //   showToast("Cadastre seus dados antes de visualizar o PDF", "warning", 3000);
-  //   setTimeout(() => abrirModalCliente(), 500);
-  //   return;
-  // }
+  // ✅ Nome obrigatório
+  if (!validarNomeClienteCarrinho()) return;
 
   const ok = await carregarLibsPDF();
   if (!ok) {
@@ -2905,11 +3028,11 @@ async function carregarLibsPDF() {
 // ============================================
 // DOWNLOAD PDF
 // ============================================
-// ============================================
-// DOWNLOAD PDF
-// ============================================
 async function downloadPDF() {
+   if (!validarNomeClienteCarrinho()) return;
+
   let element = document.getElementById("pdf-content-to-print");
+ 
   if (!element) {
     await visualizarPDF();
     setTimeout(() => downloadPDF(), 500);
@@ -2923,7 +3046,10 @@ async function downloadPDF() {
 
   // ✅ REMOVIDA A TRAVA DE CADASTRO AQUI
   const cliente = carregarDadosCliente() || {};
-  const nomeCliente = cliente.nome || 'Cliente (a confirmar)';
+const nomeCarrinho = obterNomeClienteCarrinho();
+if (nomeCarrinho) cliente.nome = nomeCarrinho;
+const nomeCliente = cliente.nome || 'Cliente (a confirmar)';
+
   const enderecoCompleto = clienteEstaCadastrado() ? formatarEnderecoCompleto() : 'A confirmar via WhatsApp';
 
   const btn = document.getElementById("download-pdf-btn");
@@ -3026,7 +3152,11 @@ async function finalizarPedidoDireto() {
   }
 
   const cliente = carregarDadosCliente() || {};
-  const temDadosCompletos = clienteEstaCadastrado();
+// ✅ Sobrescreve o nome com o que está no carrinho (se houver)
+const nomeCarrinho = obterNomeClienteCarrinho();
+if (nomeCarrinho) cliente.nome = nomeCarrinho;
+
+const temDadosCompletos = clienteEstaCadastrado();
 
   // ✅ Abre a aba JÁ no clique do usuário (evita popup blocker)
   const janelaWhats = window.open('', '_blank');
@@ -3049,28 +3179,49 @@ async function finalizarPedidoDireto() {
     ? "GRÁTIS"
     : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
 
-  let dadosClienteTexto = '';
-  if (temDadosCompletos && cliente.nome) {
-    dadosClienteTexto = [
-      `👤 *CLIENTE:* ${cliente.nome.toUpperCase()}`,
-      `📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}`,
-      cliente.cpf ? `🆔 *${cliente.tipo === 'J' ? 'CNPJ' : 'CPF'}:* ${cliente.cpf}` : '',
-      cliente.ie ? `📋 *${cliente.tipo === 'J' ? 'I.E.' : 'RG'}:* ${cliente.ie}` : '',
-      cliente.nascimento ? `🎂 *Nascimento:* ${formatarDataBR(cliente.nascimento)}` : '',
-      '',
-      `📍 *ENDEREÇO DE ENTREGA:*`,
-      `${cliente.endereco}, ${cliente.numero}${cliente.complemento ? ' - ' + cliente.complemento : ''}`,
-      `Bairro: ${cliente.bairro}`,
-      `${cliente.cidade} - ${cliente.estado}`,
-      `CEP: ${cliente.cep}`,
-      '',
-      `📞 *CONTATO:*`,
-      `Celular: ${cliente.celular}`,
-      cliente.email ? `E-mail: ${cliente.email}` : ''
-    ].filter(Boolean).join('\n');
-  } else {
-    dadosClienteTexto = `👤 *CLIENTE:* (não cadastrado — favor preencher os dados no WhatsApp)`;
+let dadosClienteTexto = '';
+if (cliente.nome) {
+  // ✅ Se tem nome (mesmo sem cadastro completo), monta o bloco
+  const linhasCliente = [`👤 *CLIENTE:* ${cliente.nome.toUpperCase()}`];
+
+  if (cliente.tipo) {
+    linhasCliente.push(`📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}`);
   }
+  if (cliente.cpf) {
+    linhasCliente.push(`🆔 *${cliente.tipo === 'J' ? 'CNPJ' : 'CPF'}:* ${cliente.cpf}`);
+  }
+  if (cliente.ie) {
+    linhasCliente.push(`📋 *${cliente.tipo === 'J' ? 'I.E.' : 'RG'}:* ${cliente.ie}`);
+  }
+  if (cliente.nascimento) {
+    linhasCliente.push(`🎂 *Nascimento:* ${formatarDataBR(cliente.nascimento)}`);
+  }
+
+  // Só mostra endereço se tiver endereço preenchido
+  if (cliente.endereco && cliente.cidade) {
+    linhasCliente.push('');
+    linhasCliente.push(`📍 *ENDEREÇO DE ENTREGA:*`);
+    linhasCliente.push(`${cliente.endereco}, ${cliente.numero || ''}${cliente.complemento ? ' - ' + cliente.complemento : ''}`);
+    if (cliente.bairro) linhasCliente.push(`Bairro: ${cliente.bairro}`);
+    linhasCliente.push(`${cliente.cidade} - ${cliente.estado || ''}`);
+    if (cliente.cep) linhasCliente.push(`CEP: ${cliente.cep}`);
+  } else {
+    linhasCliente.push('');
+    linhasCliente.push(`📍 *ENDEREÇO:* A confirmar via WhatsApp`);
+  }
+
+  // Só mostra contato se tiver
+  if (cliente.celular || cliente.email) {
+    linhasCliente.push('');
+    linhasCliente.push(`📞 *CONTATO:*`);
+    if (cliente.celular) linhasCliente.push(`Celular: ${cliente.celular}`);
+    if (cliente.email) linhasCliente.push(`E-mail: ${cliente.email}`);
+  }
+
+  dadosClienteTexto = linhasCliente.join('\n');
+} else {
+  dadosClienteTexto = `👤 *CLIENTE:* (não informado)`;
+}
 
       // ✅ Usa variáveis seguras para os textos
   const clienteNome = dadosClienteTexto.includes("não cadastrado") 
@@ -3209,28 +3360,49 @@ async function finalizarPedidoDiretoFallback() {
       ? "GRÁTIS"
       : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
 
-    let dadosClienteTexto = '';
-    if (temDadosCompletos && cliente.nome) {
-      dadosClienteTexto = [
-        `👤 *CLIENTE:* ${cliente.nome.toUpperCase()}`,
-        `📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}`,
-        cliente.cpf ? `🆔 *${cliente.tipo === 'J' ? 'CNPJ' : 'CPF'}:* ${cliente.cpf}` : '',
-        cliente.ie ? `📋 *${cliente.tipo === 'J' ? 'I.E.' : 'RG'}:* ${cliente.ie}` : '',
-        cliente.nascimento ? `🎂 *Nascimento:* ${formatarDataBR(cliente.nascimento)}` : '',
-        '',
-        `📍 *ENDEREÇO DE ENTREGA:*`,
-        `${cliente.endereco}, ${cliente.numero}${cliente.complemento ? ' - ' + cliente.complemento : ''}`,
-        `Bairro: ${cliente.bairro}`,
-        `${cliente.cidade} - ${cliente.estado}`,
-        `CEP: ${cliente.cep}`,
-        '',
-        `📞 *CONTATO:*`,
-        `Celular: ${cliente.celular}`,
-        cliente.email ? `E-mail: ${cliente.email}` : ''
-      ].filter(Boolean).join('\n');
-    } else {
-      dadosClienteTexto = `👤 *CLIENTE:* (não cadastrado — favor preencher os dados no WhatsApp)`;
-    }
+   let dadosClienteTexto = '';
+if (cliente.nome) {
+  // ✅ Se tem nome (mesmo sem cadastro completo), monta o bloco
+  const linhasCliente = [`👤 *CLIENTE:* ${cliente.nome.toUpperCase()}`];
+
+  if (cliente.tipo) {
+    linhasCliente.push(`📄 *Tipo:* ${cliente.tipo === 'J' ? 'Pessoa Jurídica' : 'Pessoa Física'}`);
+  }
+  if (cliente.cpf) {
+    linhasCliente.push(`🆔 *${cliente.tipo === 'J' ? 'CNPJ' : 'CPF'}:* ${cliente.cpf}`);
+  }
+  if (cliente.ie) {
+    linhasCliente.push(`📋 *${cliente.tipo === 'J' ? 'I.E.' : 'RG'}:* ${cliente.ie}`);
+  }
+  if (cliente.nascimento) {
+    linhasCliente.push(`🎂 *Nascimento:* ${formatarDataBR(cliente.nascimento)}`);
+  }
+
+  // Só mostra endereço se tiver endereço preenchido
+  if (cliente.endereco && cliente.cidade) {
+    linhasCliente.push('');
+    linhasCliente.push(`📍 *ENDEREÇO DE ENTREGA:*`);
+    linhasCliente.push(`${cliente.endereco}, ${cliente.numero || ''}${cliente.complemento ? ' - ' + cliente.complemento : ''}`);
+    if (cliente.bairro) linhasCliente.push(`Bairro: ${cliente.bairro}`);
+    linhasCliente.push(`${cliente.cidade} - ${cliente.estado || ''}`);
+    if (cliente.cep) linhasCliente.push(`CEP: ${cliente.cep}`);
+  } else {
+    linhasCliente.push('');
+    linhasCliente.push(`📍 *ENDEREÇO:* A confirmar via WhatsApp`);
+  }
+
+  // Só mostra contato se tiver
+  if (cliente.celular || cliente.email) {
+    linhasCliente.push('');
+    linhasCliente.push(`📞 *CONTATO:*`);
+    if (cliente.celular) linhasCliente.push(`Celular: ${cliente.celular}`);
+    if (cliente.email) linhasCliente.push(`E-mail: ${cliente.email}`);
+  }
+
+  dadosClienteTexto = linhasCliente.join('\n');
+} else {
+  dadosClienteTexto = `👤 *CLIENTE:* (não informado)`;
+}
 
      // ✅ Usa variáveis seguras para os textos
   const clienteNome = dadosClienteTexto.includes("não cadastrado") 
@@ -3441,8 +3613,32 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("cart-modal")?.classList.remove("flex");
   });
 
-  document.getElementById("checkout-btn")?.addEventListener("click", finalizarPedidoDireto);
-  document.getElementById("pdf-preview-btn")?.addEventListener("click", visualizarPDF);
+  // ============================================
+  // CHECKOUT — nome obrigatório + limite 100 itens
+  // ============================================
+  document.getElementById("checkout-btn")?.addEventListener("click", () => {
+    // 1) Nome obrigatório
+    if (!validarNomeClienteCarrinho()) return;
+
+    // 2) Limite de 100 → força PDF
+    if (carrinhoPassouLimite()) {
+      showToast(
+        `Pedidos com mais de 100 itens devem ser finalizados via PDF (WhatsApp quebraria a mensagem).`,
+        "warning",
+        4000
+      );
+      setTimeout(() => visualizarPDF(), 300);
+      return;
+    }
+
+    finalizarPedidoDireto();
+  });
+
+  // PDF preview — nome obrigatório
+  document.getElementById("pdf-preview-btn")?.addEventListener("click", () => {
+    if (!validarNomeClienteCarrinho()) return;
+    visualizarPDF();
+  });
 
   document.getElementById("close-pdf-modal")?.addEventListener("click", () => {
     document.getElementById("pdf-preview-modal")?.classList.add("hidden");
@@ -3451,17 +3647,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("download-pdf-btn")?.addEventListener("click", downloadPDF);
 
-  // Limpar carrinho
+  // ============================================
+  // LIMPAR CARRINHO (+ limpa nome do cliente)
+  // ============================================
   const clearBtn = document.getElementById("clear-cart-btn");
   const confirmModal = document.getElementById("confirm-clear-modal");
   if (clearBtn && confirmModal) {
     clearBtn.onclick = () => confirmModal.classList.remove("hidden");
     document.getElementById("cancel-clear-btn").onclick = () => confirmModal.classList.add("hidden");
+
     document.getElementById("confirm-clear-btn").onclick = () => {
       cart = [];
+
+      // 🧹 Limpa o nome do cliente também
+      salvarNomeCarrinho("");
+      const inputNome = document.getElementById("cart-nome-cliente");
+      if (inputNome) inputNome.value = "";
+      const erroNome = document.getElementById("cart-nome-erro");
+      if (erroNome) erroNome.classList.add("hidden");
+      if (inputNome) inputNome.classList.remove("border-red-500");
+
       updateCart();
       confirmModal.classList.add("hidden");
     };
+  }
+
+  // ============================================
+  // LISTENER DO INPUT DO NOME NO CARRINHO
+  // ============================================
+  const inputNomeCarrinho = document.getElementById("cart-nome-cliente");
+  if (inputNomeCarrinho) {
+    inputNomeCarrinho.addEventListener("input", function () {
+      const erro = document.getElementById("cart-nome-erro");
+      if (this.value.trim()) {
+        if (erro) erro.classList.add("hidden");
+        this.classList.remove("border-red-500");
+      }
+      salvarNomeCarrinho(this.value);
+    });
   }
 
   document.getElementById("mobile-menu-btn")?.addEventListener("click", abrirSidebarMobile);
@@ -3521,17 +3744,16 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Sidebar - botões de tamanho (sub-subcategoria)
-document.querySelectorAll('.sidebar-item-tamanho').forEach(btn => {
-  btn.addEventListener('click', function (e) {
-    e.preventDefault();
-    const categoria = this.getAttribute('data-categoria');
-    if (!categoria) return;
-    marcarItemSidebarAtivo(categoria);
-    filtrarPorCategoria(categoria);
-    if (window.innerWidth <= 900) fecharSidebarMobile();
+  document.querySelectorAll('.sidebar-item-tamanho').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      const categoria = this.getAttribute('data-categoria');
+      if (!categoria) return;
+      marcarItemSidebarAtivo(categoria);
+      filtrarPorCategoria(categoria);
+      if (window.innerWidth <= 900) fecharSidebarMobile();
+    });
   });
-});
-
 
   const produtosContainer = document.getElementById('produtos-container');
   if (produtosContainer) {
