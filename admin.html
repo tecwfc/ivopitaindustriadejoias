@@ -4298,6 +4298,9 @@
 // ============================================
 // PDF DE PEDIDOS — layout idêntico ao antigo
 // ============================================
+// ============================================
+// PDF DE PEDIDOS — layout PRETO e fonte maior (Opção B)
+// ============================================
 function gerarPDFComLista(dados) {
     if (!dados || dados.length === 0) {
         alert('⚠️ Não há dados para gerar o PDF!');
@@ -4310,7 +4313,7 @@ function gerarPDFComLista(dados) {
         return;
     }
 
-    // Totais gerais (usados no resumo no topo)
+    // Totais gerais
     const totalVendas = dados.reduce((s, v) => s + (parseFloat(v.total) || 0), 0);
     const totalPedidos = dados.length;
     const ticketMedio = totalPedidos > 0 ? totalVendas / totalPedidos : 0;
@@ -4319,7 +4322,7 @@ function gerarPDFComLista(dados) {
 
     const dataGeracao = new Date().toLocaleString('pt-BR');
 
-    // Blocos de pedido (um por vez, idêntico ao antigo)
+    // Blocos de pedido
     let blocosPedido = '';
 
     dados.forEach((v, idx) => {
@@ -4329,12 +4332,12 @@ function gerarPDFComLista(dados) {
         const totalPedido = parseFloat(v.total) || 0;
         const statusReal = v.status || 'Pago';
 
-        // Linhas de itens
+        // Linhas de itens — TUDO PRETO, FONTE MAIOR
         let linhasItens = '';
         if (itens.length === 0) {
             linhasItens = `
                 <tr>
-                    <td colspan="5" style="padding: 10px; text-align: center; color: #9ca3af; font-size: 11px;">
+                    <td colspan="5" style="padding: 12px; text-align: center; color: #000000; font-size: 13px; border-bottom: 1px solid #000000;">
                         Sem itens detalhados
                     </td>
                 </tr>`;
@@ -4346,69 +4349,68 @@ function gerarPDFComLista(dados) {
 
                 linhasItens += `
                     <tr>
-                        <td style="padding: 8px 6px; text-align: center; font-size: 10px; color: #6b7280; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
+                        <td style="padding: 10px 8px; text-align: center; font-size: 13px; color: #000000; border-bottom: 1px solid #000000; vertical-align: middle;">
                             ${String(i + 1).padStart(2, '0')}
                         </td>
-                        <td style="padding: 8px 6px; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
-                            <div style="font-size: 10px; font-weight: 600; color: #182420; line-height: 1.35;">
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #000000; vertical-align: middle;">
+                            <div style="font-size: 14px; font-weight: 700; color: #000000; line-height: 1.4;">
                                 ${item.nome || 'Produto'}
                             </div>
                             ${item.referencia
-                                ? `<div style="font-size: 8px; color: #9ca3af; font-weight: 700; margin-top: 2px;">REF. ${item.referencia}</div>`
-                                : ''}
+                            ? `<div style="font-size: 14px; color: #000000; font-weight: 800; margin-top: 4px; letter-spacing: 0.03em;">REF. ${item.referencia}</div>`
+                            : ''}
                         </td>
-                        <td style="padding: 8px 6px; text-align: center; font-size: 10px; color: #182420; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
+                        <td style="padding: 10px 8px; text-align: center; font-size: 13px; color: #000000; font-weight: 600; border-bottom: 1px solid #000000; vertical-align: middle;">
                             ${qtd}
                         </td>
-                        <td style="padding: 8px 6px; text-align: right; font-size: 10px; color: #6b7280; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
+                        <td style="padding: 10px 8px; text-align: right; font-size: 13px; color: #000000; border-bottom: 1px solid #000000; vertical-align: middle;">
                             R$ ${precoUnit.toFixed(2).replace('.', ',')}
                         </td>
-                        <td style="padding: 8px 6px; text-align: right; font-size: 10px; font-weight: 700; color: #1f4d38; border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
+                        <td style="padding: 10px 8px; text-align: right; font-size: 13px; font-weight: 700; color: #000000; border-bottom: 1px solid #000000; vertical-align: middle;">
                             R$ ${totalItem.toFixed(2).replace('.', ',')}
                         </td>
                     </tr>`;
             });
         }
 
-        // Total de itens do pedido
         const totalItensPedido = itens.reduce((s, it) => s + (parseInt(it.quantidade) || 1), 0);
 
         blocosPedido += `
         <div style="page-break-after: always; padding: 10mm 0;">
             <!-- Cabeçalho do pedido -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 10px; border-bottom: 1.5px solid #e5e7eb; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #000000; margin-bottom: 16px;">
                 <div>
-                    <div style="font-size: 22px; font-weight: 700; color: #1f4d38; letter-spacing: 0.02em; line-height: 1;">IVO PITA</div>
-                    <div style="font-size: 8px; font-weight: 600; color: #9ca3af; letter-spacing: 0.25em; text-transform: uppercase; margin-top: 3px;">Indústria de Joias</div>
+                    <div style="font-size: 26px; font-weight: 800; color: #000000; letter-spacing: 0.02em; line-height: 1;">IVO PITA</div>
+                    <div style="font-size: 10px; font-weight: 700; color: #000000; letter-spacing: 0.25em; text-transform: uppercase; margin-top: 4px;">Indústria de Joias</div>
                 </div>
                 <div style="text-align: right;">
-                    <div style="font-size: 12px; font-weight: 800; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.08em;">Pedido #${idx + 1}</div>
-                    <div style="font-size: 9px; color: #6b7280; margin-top: 3px;">${formatarData(v.data)}</div>
-                    <div style="font-size: 8px; color: #9ca3af; margin-top: 2px;">Status: ${statusReal}</div>
+                    <div style="font-size: 16px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.08em;">Pedido #${idx + 1}</div>
+                    <div style="font-size: 12px; color: #000000; margin-top: 4px;">${formatarData(v.data)}</div>
+                    <div style="font-size: 11px; color: #000000; margin-top: 3px; font-weight: 600;">Status: ${statusReal}</div>
                 </div>
             </div>
 
             <!-- Dados do cliente -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
                 <div>
-                    <div style="font-size: 8px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px;">Cliente</div>
-                    <div style="font-size: 11px; font-weight: 600; color: #182420; line-height: 1.35;">${v.cliente || 'Não informado'}</div>
+                    <div style="font-size: 10px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 5px;">Cliente</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #000000; line-height: 1.4;">${v.cliente || 'Não informado'}</div>
                 </div>
                 <div>
-                    <div style="font-size: 8px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px;">Endereço de Entrega</div>
-                    <div style="font-size: 10px; color: #4b5563; line-height: 1.45;">${v.endereco || 'Não informado'}</div>
+                    <div style="font-size: 10px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 5px;">Endereço de Entrega</div>
+                    <div style="font-size: 12px; color: #000000; line-height: 1.5;">${v.endereco || 'Não informado'}</div>
                 </div>
             </div>
 
             <!-- Tabela de itens -->
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px;">
                 <thead>
-                    <tr style="border-bottom: 1.5px solid #1f4d38;">
-                        <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 40px;">Item</th>
-                        <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: left;">Descrição</th>
-                        <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; width: 50px;">Qtd</th>
-                        <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 85px;">Valor Unit.</th>
-                        <th style="padding: 8px 6px; font-size: 8px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.12em; text-align: right; width: 95px;">Total</th>
+                    <tr style="border-bottom: 2px solid #000000; background: #f2f2f2;">
+                        <th style="padding: 10px 8px; font-size: 11px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.1em; text-align: center; width: 45px; border-bottom: 2px solid #000000;">Item</th>
+                        <th style="padding: 10px 8px; font-size: 11px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.1em; text-align: left; border-bottom: 2px solid #000000;">Descrição</th>
+                        <th style="padding: 10px 8px; font-size: 11px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.1em; text-align: center; width: 55px; border-bottom: 2px solid #000000;">Qtd</th>
+                        <th style="padding: 10px 8px; font-size: 11px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.1em; text-align: right; width: 95px; border-bottom: 2px solid #000000;">Valor Unit.</th>
+                        <th style="padding: 10px 8px; font-size: 11px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.1em; text-align: right; width: 105px; border-bottom: 2px solid #000000;">Total</th>
                     </tr>
                 </thead>
                 <tbody>${linhasItens}</tbody>
@@ -4416,20 +4418,20 @@ function gerarPDFComLista(dados) {
 
             <!-- Totais do pedido -->
             <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
-                <div style="width: 260px; border-top: 1px solid #e5e7eb; padding-top: 10px;">
-                    <div style="display: flex; justify-content: space-between; padding: 5px 0; font-size: 10px; color: #6b7280;">
+                <div style="width: 300px; border-top: 2px solid #000000; padding-top: 12px;">
+                    <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 12px; color: #000000;">
                         <span>Subtotal (${totalItensPedido} ${totalItensPedido === 1 ? 'item' : 'itens'})</span>
-                        <span style="color: #182420; font-weight: 600;">R$ ${subtotalPedido.toFixed(2).replace('.', ',')}</span>
+                        <span style="color: #000000; font-weight: 700;">R$ ${subtotalPedido.toFixed(2).replace('.', ',')}</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; padding: 5px 0; font-size: 10px; color: #6b7280;">
+                    <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 12px; color: #000000;">
                         <span>Frete</span>
-                        <span style="color: ${fretePedido === 0 ? '#16a34a' : '#182420'}; font-weight: 600;">
+                        <span style="color: #000000; font-weight: 700;">
                             ${fretePedido === 0 ? 'GRÁTIS' : 'R$ ' + fretePedido.toFixed(2).replace('.', ',')}
                         </span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0 6px; border-top: 1px solid #e5e7eb; margin-top: 6px;">
-                        <span style="font-size: 10px; font-weight: 700; color: #1f4d38; text-transform: uppercase; letter-spacing: 0.1em;">Total</span>
-                        <span style="font-size: 15px; font-weight: 800; color: #1f4d38; letter-spacing: -0.02em;">R$ ${totalPedido.toFixed(2).replace('.', ',')}</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0 6px; border-top: 2px solid #000000; margin-top: 8px;">
+                        <span style="font-size: 13px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.1em;">Total</span>
+                        <span style="font-size: 20px; font-weight: 800; color: #000000; letter-spacing: -0.02em;">R$ ${totalPedido.toFixed(2).replace('.', ',')}</span>
                     </div>
                 </div>
             </div>
@@ -4437,25 +4439,12 @@ function gerarPDFComLista(dados) {
         `;
     });
 
-    // Rodapé final (contato)
-    const rodape = `
-        <div style="page-break-before: always; padding-top: 20mm; text-align: center; font-size: 8px; color: #9ca3af;">
-            <div style="font-weight: 700; color: #1f4d38; font-size: 9px; margin-bottom: 4px;">IVO PITA — INDÚSTRIA DE JOIAS</div>
-            <div>(88) 99904-9636 · contato@ivopita.com.br</div>
-            <div>@ivopita</div>
-            <div>Juazeiro do Norte, CE</div>
-            <div style="margin-top: 8px; font-size: 7px; color: #cbd5e1;">
-                Relatório gerado em ${dataGeracao} · ${totalPedidos} pedido(s)
-            </div>
-        </div>
-    `;
-
-    // HTML final
+    // HTML final (rodapé de contato REMOVIDO)
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pedidos - Ivo Pita</title>
     <style>
       @page { size: A4; margin: 12mm; }
       * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      body { font-family: Arial, sans-serif; margin: 0; padding: 0; color: #182420; background: #ffffff; }
+      body { font-family: Arial, sans-serif; margin: 0; padding: 0; color: #000000; background: #ffffff; }
 
       @media print {
         body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -4471,7 +4460,6 @@ function gerarPDFComLista(dados) {
 
     <div class="pagina">
         ${blocosPedido}
-        ${rodape}
     </div>
 
     <div class="no-print" style="max-width: 210mm; margin: 0 auto; text-align: center; padding: 16px; background: #f0f7f2; border-radius: 12px;">
