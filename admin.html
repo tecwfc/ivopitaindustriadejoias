@@ -4335,42 +4335,56 @@ function gerarPDFComLista(dados) {
         // Linhas de itens — TUDO PRETO, FONTE MAIOR
         let linhasItens = '';
         if (itens.length === 0) {
-            linhasItens = `
-                <tr>
-                    <td colspan="5" style="padding: 12px; text-align: center; color: #000000; font-size: 13px; border-bottom: 1px solid #000000;">
-                        Sem itens detalhados
-                    </td>
-                </tr>`;
+           linhasItens = `
+    <tr>
+        <td colspan="6" style="padding: 12px; text-align: center; color: #000000; font-size: 13px; border-bottom: 1px solid #000000;">
+            Sem itens detalhados
+        </td>
+    </tr>`;
+    
         } else {
-            itens.forEach((item, i) => {
-                const precoUnit = parseFloat(item.preco) || 0;
-                const qtd = parseInt(item.quantidade) || 1;
-                const totalItem = precoUnit * qtd;
+          itens.forEach((item, i) => {
+    const precoUnit = parseFloat(item.preco) || 0;
+    const qtd = parseInt(item.quantidade) || 1;
+    const totalItem = precoUnit * qtd;
 
-                linhasItens += `
-                    <tr>
-                        <td style="padding: 10px 8px; text-align: center; font-size: 13px; color: #000000; border-bottom: 1px solid #000000; vertical-align: middle;">
-                            ${String(i + 1).padStart(2, '0')}
-                        </td>
-                        <td style="padding: 10px 8px; border-bottom: 1px solid #000000; vertical-align: middle;">
-                            <div style="font-size: 14px; font-weight: 700; color: #000000; line-height: 1.4;">
-                                ${item.nome || 'Produto'}
-                            </div>
-                            ${item.referencia
-                            ? `<div style="font-size: 14px; color: #000000; font-weight: 800; margin-top: 4px; letter-spacing: 0.03em;">REF. ${item.referencia}</div>`
-                            : ''}
-                        </td>
-                        <td style="padding: 10px 8px; text-align: center; font-size: 13px; color: #000000; font-weight: 600; border-bottom: 1px solid #000000; vertical-align: middle;">
-                            ${qtd}
-                        </td>
-                        <td style="padding: 10px 8px; text-align: right; font-size: 13px; color: #000000; border-bottom: 1px solid #000000; vertical-align: middle;">
-                            R$ ${precoUnit.toFixed(2).replace('.', ',')}
-                        </td>
-                        <td style="padding: 10px 8px; text-align: right; font-size: 13px; font-weight: 700; color: #000000; border-bottom: 1px solid #000000; vertical-align: middle;">
-                            R$ ${totalItem.toFixed(2).replace('.', ',')}
-                        </td>
-                    </tr>`;
-            });
+    // ✅ SEPARA A COR DO NOME
+    let nomeItem = item.nome || 'Produto';
+    let corItem = '—';
+    
+    if (nomeItem.includes(' - ')) {
+        const partes = nomeItem.split(' - ');
+        corItem = partes.pop().replace(/[\(\)]/g, '').replace(/cada/gi, '').replace(/R\$\s*[\d.,]+/gi, '').trim();
+        nomeItem = partes.join(' - ').trim(); // O resto é o nome
+    }
+
+    linhasItens += `
+        <tr>
+            <td style="padding: 10px 6px; text-align: center; font-size: 12px; color: #000000; border-bottom: 1px solid #000000; vertical-align: middle;">
+                ${String(i + 1).padStart(2, '0')}
+            </td>
+            <td style="padding: 10px 6px; border-bottom: 1px solid #000000; vertical-align: middle;">
+                <div style="font-size: 13px; font-weight: 700; color: #000000; line-height: 1.4;">
+                    ${nomeItem}
+                </div>
+                ${item.referencia
+                    ? `<div style="font-size: 14px; color: #000000; font-weight: 800; margin-top: 4px; letter-spacing: 0.03em;">REF. ${item.referencia}</div>`
+                    : ''}
+            </td>
+            <td style="padding: 10px 6px; text-align: center; font-size: 12px; color: #000000; font-weight: 600; border-bottom: 1px solid #000000; vertical-align: middle;">
+                ${corItem}
+            </td>
+            <td style="padding: 10px 6px; text-align: center; font-size: 12px; color: #000000; font-weight: 600; border-bottom: 1px solid #000000; vertical-align: middle;">
+                ${qtd}
+            </td>
+            <td style="padding: 10px 6px; text-align: right; font-size: 12px; color: #000000; border-bottom: 1px solid #000000; vertical-align: middle;">
+                R$ ${precoUnit.toFixed(2).replace('.', ',')}
+            </td>
+            <td style="padding: 10px 6px; text-align: right; font-size: 12px; font-weight: 700; color: #000000; border-bottom: 1px solid #000000; vertical-align: middle;">
+                R$ ${totalItem.toFixed(2).replace('.', ',')}
+            </td>
+        </tr>`;
+});
         }
 
         const totalItensPedido = itens.reduce((s, it) => s + (parseInt(it.quantidade) || 1), 0);
@@ -4407,14 +4421,15 @@ function gerarPDFComLista(dados) {
             <!-- Tabela de itens -->
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px;">
                 <thead>
-                    <tr style="border-bottom: 2px solid #000000; background: #f2f2f2;">
-                        <th style="padding: 10px 8px; font-size: 11px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.1em; text-align: center; width: 45px; border-bottom: 2px solid #000000;">Item</th>
-                        <th style="padding: 10px 8px; font-size: 11px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.1em; text-align: left; border-bottom: 2px solid #000000;">Descrição</th>
-                        <th style="padding: 10px 8px; font-size: 11px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.1em; text-align: center; width: 55px; border-bottom: 2px solid #000000;">Qtd</th>
-                        <th style="padding: 10px 8px; font-size: 11px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.1em; text-align: right; width: 95px; border-bottom: 2px solid #000000;">Valor Unit.</th>
-                        <th style="padding: 10px 8px; font-size: 11px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.1em; text-align: right; width: 105px; border-bottom: 2px solid #000000;">Total</th>
-                    </tr>
-                </thead>
+    <tr style="border-bottom: 2px solid #000000; background: #f2f2f2;">
+        <th style="padding: 10px 6px; font-size: 10px; font-weight: 800; color: #000000; text-transform: uppercase; text-align: center; width: 35px; border-bottom: 2px solid #000000;">Item</th>
+        <th style="padding: 10px 6px; font-size: 10px; font-weight: 800; color: #000000; text-transform: uppercase; text-align: left; border-bottom: 2px solid #000000;">Descrição</th>
+        <th style="padding: 10px 6px; font-size: 10px; font-weight: 800; color: #000000; text-transform: uppercase; text-align: center; width: 70px; border-bottom: 2px solid #000000;">Cor</th>
+        <th style="padding: 10px 6px; font-size: 10px; font-weight: 800; color: #000000; text-transform: uppercase; text-align: center; width: 45px; border-bottom: 2px solid #000000;">Qtd</th>
+        <th style="padding: 10px 6px; font-size: 10px; font-weight: 800; color: #000000; text-transform: uppercase; text-align: right; width: 85px; border-bottom: 2px solid #000000;">Valor Unit.</th>
+        <th style="padding: 10px 6px; font-size: 10px; font-weight: 800; color: #000000; text-transform: uppercase; text-align: right; width: 95px; border-bottom: 2px solid #000000;">Total</th>
+    </tr>
+</thead>
                 <tbody>${linhasItens}</tbody>
             </table>
 
