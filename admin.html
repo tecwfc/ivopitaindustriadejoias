@@ -4130,7 +4130,7 @@
                             data-index="${index}" onchange="toggleSelecionarVenda(${index})"
                             ${vendasSelecionadas.has(index) ? 'checked' : ''}>
                     </td>
-                    <td class="py-2 px-2 text-xs">${index + 1}</td>
+                    <td class="py-2 px-2 text-xs font-bold">${String(v.numeroPedido || 0).padStart(3, '0')}</td>
                     <td class="py-2 px-2 text-xs">${dataFormatada}</td>
     
                     <td class="py-2 px-2 text-xs font-medium">${v.cliente || 'Não informado'}</td>
@@ -4384,7 +4384,9 @@ function gerarPDFComLista(dados) {
                     <div style="font-size: 10px; font-weight: 700; color: #000000; letter-spacing: 0.25em; text-transform: uppercase; margin-top: 4px;">Indústria de Joias</div>
                 </div>
                 <div style="text-align: right;">
-                    <div style="font-size: 16px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.08em;">Pedido #${idx + 1}</div>
+                   <div style="font-size: 16px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.08em;">
+    Ped. ${String(v.numeroPedido || 0).padStart(3, '0')}
+</div>
                     <div style="font-size: 12px; color: #000000; margin-top: 4px;">${formatarData(v.data)}</div>
                     <div style="font-size: 11px; color: #000000; margin-top: 3px; font-weight: 600;">Status: ${statusReal}</div>
                 </div>
