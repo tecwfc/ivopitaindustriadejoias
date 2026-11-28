@@ -48,6 +48,7 @@ let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let selectedColor = "";
 let tempProduct = null;
 let subtotal = 0;
+let ultimoNumeroPedido = 0;  // 🆕 Guarda o número do pedido para o PDF
 let imagensZoom = [];
 let zoomIndex = 0;
 let quantidadeSelecionada = 0;
@@ -2736,8 +2737,11 @@ function gerarConteudoPDF() {
   const totalFinal = subtotal >= FRETE_GRATIS_VALOR ? subtotal : subtotal + TAXA_FRETE;
   const freteTexto = subtotal >= FRETE_GRATIS_VALOR ? "Grátis" : `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
 
-  const numeroPedido = String(Date.now()).slice(-6);
-  const anoAtual = new Date().getFullYear();
+  // ✅ Usa o número real retornado pelo servidor
+const numeroPedido = ultimoNumeroPedido > 0 
+  ? String(ultimoNumeroPedido).padStart(3, '0')
+  : String(Date.now()).slice(-6);  // fallback se ainda não salvou
+const anoAtual = new Date().getFullYear();
 
   let itensHTML = "";
   let totalItens = 0;
@@ -2827,7 +2831,7 @@ cart.forEach((item, index) => {
           </div>
           <div style="text-align: right;">
             <div style="font-size: 8px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 2px;">Pedido nº</div>
-            <div style="font-size: 12px; font-weight: 700; color: #1f4d38; letter-spacing: 0.03em;">#${anoAtual}-${numeroPedido}</div>
+            <div style="font-size: 14px; font-weight: 800; color: #1f4d38; letter-spacing: 0.03em;">Ped. ${numeroPedido}</div>
             <div style="font-size: 9px; color: #9ca3af; margin-top: 3px;">${dataAtual} · ${horaAtual}</div>
           </div>
         </div>
@@ -3029,28 +3033,12 @@ async function carregarLibsPDF() {
 // DOWNLOAD PDF
 // ============================================
 async function downloadPDF() {
-   if (!validarNomeClienteCarrinho()) return;
+  if (!validarNomeClienteCarrinho()) return;
 
-  let element = document.getElementById("pdf-content-to-print");
- 
-  if (!element) {
-    await visualizarPDF();
-    setTimeout(() => downloadPDF(), 500);
+  if (cart.length === 0) {
+    showToast("Sacola vazia!", "error", 2000);
     return;
   }
-
-  if (cart.length === 0) { 
-    showToast("Sacola vazia!", "error", 2000); 
-    return; 
-  }
-
-  // ✅ REMOVIDA A TRAVA DE CADASTRO AQUI
-  const cliente = carregarDadosCliente() || {};
-const nomeCarrinho = obterNomeClienteCarrinho();
-if (nomeCarrinho) cliente.nome = nomeCarrinho;
-const nomeCliente = cliente.nome || 'Cliente (a confirmar)';
-
-  const enderecoCompleto = clienteEstaCadastrado() ? formatarEnderecoCompleto() : 'A confirmar via WhatsApp';
 
   const btn = document.getElementById("download-pdf-btn");
   const original = btn ? btn.innerHTML : "";
@@ -3059,14 +3047,36 @@ const nomeCliente = cliente.nome || 'Cliente (a confirmar)';
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
   }
 
-  showToast("Gerando PDF...", "info", 2000);
+  showToast("Processando pedido...", "info", 2000);
 
   try {
     await carregarLibsPDF();
 
+    const cliente = carregarDadosCliente() || {};
+    const nomeCarrinho = obterNomeClienteCarrinho();
+    if (nomeCarrinho) cliente.nome = nomeCarrinho;
+    const nomeCliente = cliente.nome || 'Cliente (a confirmar)';
+    const enderecoCompleto = clienteEstaCadastrado() ? formatarEnderecoCompleto() : 'A confirmar via WhatsApp';
+
+    // ✅ 1. PRIMEIRO salva o pedido no servidor (para pegar o número real)
+    const resultado = await processarPedidoPublico(nomeCliente, enderecoCompleto, cliente);
+
+    if (!resultado || !resultado.success) {
+      throw new Error((resultado && resultado.error) || "Erro ao salvar pedido");
+    }
+
+    // ✅ 2. Guarda o número retornado
+    ultimoNumeroPedido = resultado.numeroPedido || 0;
+
+    // ✅ 3. Agora gera o PDF (vai usar o número real)
+    document.getElementById("pdf-preview-content").innerHTML = gerarConteudoPDF();
+
     if (document.fonts && document.fonts.ready) {
       await document.fonts.ready;
     }
+
+    const element = document.getElementById("pdf-content-to-print");
+    if (!element) throw new Error("Erro ao gerar preview do PDF");
 
     const canvas = await html2canvas(element, {
       scale: 2,
@@ -3108,24 +3118,22 @@ const nomeCliente = cliente.nome || 'Cliente (a confirmar)';
     }
 
     const dataArquivo = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-    pdf.save(`Pedido_IvoPita_${dataArquivo}.pdf`);
+    const nomeArquivo = ultimoNumeroPedido > 0
+      ? `Pedido_${String(ultimoNumeroPedido).padStart(3, '0')}_IvoPita.pdf`
+      : `Pedido_IvoPita_${dataArquivo}.pdf`;
+    pdf.save(nomeArquivo);
 
-    // ✅ Salva o pedido no servidor (em background)
-    const resultado = await processarPedidoPublico(nomeCliente, enderecoCompleto, cliente);
-
-    if (!resultado || !resultado.success) {
-      throw new Error((resultado && resultado.error) || "Erro ao salvar pedido");
-    }
-
+    // ✅ 4. Limpa carrinho
     cart = [];
     updateCart();
+    ultimoNumeroPedido = 0;
 
     document.getElementById("pdf-preview-modal")?.classList.add("hidden");
     document.getElementById("pdf-preview-modal")?.classList.remove("flex");
     document.getElementById("cart-modal")?.classList.add("hidden");
     document.getElementById("cart-modal")?.classList.remove("flex");
 
-    showToast("✅ Pedido finalizado! PDF baixado.", "success", 4000);
+    showToast(`✅ Pedido #${String(resultado.numeroPedido).padStart(3, '0')} finalizado! PDF baixado.`, "success", 4000);
 
     invalidarEstoqueCache();
     localStorage.removeItem(CACHE_KEY_DADOS);
@@ -3133,7 +3141,7 @@ const nomeCliente = cliente.nome || 'Cliente (a confirmar)';
 
   } catch (error) {
     console.error("❌ Erro:", error);
-    showToast("❌ Erro: " + error.message + " — O PDF foi baixado, mas o pedido NÃO foi salvo.", "error", 6000);
+    showToast("❌ Erro: " + error.message, "error", 6000);
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -3311,12 +3319,15 @@ if (cliente.nome) {
       cart = cartOriginal;
       subtotal = 0;
 
-      if (!resultado || !resultado.success) {
-        console.warn("⚠️ Erro ao salvar pedido em background:", resultado?.error || "desconhecido");
-      } else {
-        console.log("✅ Pedido salvo no servidor com sucesso");
-      }
-
+     if (!resultado || !resultado.success) {
+  console.warn("⚠️ Erro ao salvar pedido em background:", resultado?.error || "desconhecido");
+} else {
+  const numPedido = resultado.numeroPedido || 0;
+  console.log(`✅ Pedido #${String(numPedido).padStart(3, '0')} salvo no servidor`);
+  if (numPedido > 0) {
+    showToast(`✅ Pedido #${String(numPedido).padStart(3, '0')} registrado!`, "success", 4000);
+  }
+}
       invalidarEstoqueCache();
       localStorage.removeItem(CACHE_KEY_DADOS);
       carregarTudo();
